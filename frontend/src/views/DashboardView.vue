@@ -130,6 +130,11 @@ onMounted(async () => {
   window.addEventListener('online', () => isOnline.value = true)
   window.addEventListener('offline', () => isOnline.value = false)
 
+  // Ensure user data is loaded
+  if (!authStore.user) {
+    await authStore.fetchUser()
+  }
+
   await batchesStore.fetchBatches()
   loading.value = false
 })

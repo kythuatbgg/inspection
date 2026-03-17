@@ -4,10 +4,16 @@ import { db } from '../db'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
+// Set axios default header if token exists
+const storedToken = localStorage.getItem('token')
+if (storedToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: localStorage.getItem('token') || null,
+    token: storedToken,
     loading: false
   }),
 
