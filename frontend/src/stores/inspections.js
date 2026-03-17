@@ -32,6 +32,15 @@ export const useInspectionsStore = defineStore('inspections', {
       } finally {
         this.loading = false
       }
+    },
+
+    async fetchInspectionDetails(inspectionId) {
+      try {
+        const response = await axios.get(`${API_URL}/inspections/${inspectionId}/details`)
+        return response.data.data
+      } catch (e) {
+        return []
+      }
     }
   }
 })

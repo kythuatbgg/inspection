@@ -37,6 +37,7 @@ class BatchController extends Controller
             'user:id,name,username',
             'checklist:id,name,min_pass_score,max_critical_allowed',
             'planDetails.cabinet',
+            'planDetails.inspection',
         ])->findOrFail($batchId);
 
         // Check access for inspectors
@@ -54,6 +55,7 @@ class BatchController extends Controller
                 'id' => $batch->id,
                 'name' => $batch->name,
                 'user' => $batch->user,
+                'checklist_id' => $batch->checklist_id,
                 'checklist' => $batch->checklist,
                 'start_date' => $batch->start_date,
                 'end_date' => $batch->end_date,

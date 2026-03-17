@@ -189,6 +189,23 @@ onMounted(async () => {
       content: item[`content_${lang}`] || item.content_vn
     }))
 
+    // Check if inspection already exists (view mode)
+    if (plan.status === 'done') {
+      const existingInspection = await inspectionsStore.getInspectionForPlan(planId)
+      if (existingInspection) {
+        // Load existing answers
+        const details = await inspectionsStore.fetchInspectionDetails(existingInspection.id)
+        details.forEach(detail => {
+          answers.value[detail.item_id] = {
+            item_id: detail.item_id,
+            is_failed: detail.is_failed,
+            score_awarded: detail.score_awarded,
+            image: detail.image_url
+          }
+        })
+      }
+    }
+
   } catch (error) {
     console.error('Failed to load inspection:', error)
     alert('Không thể tải dữ liệu')

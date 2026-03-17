@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PlanDetail extends Model
 {
@@ -41,5 +42,13 @@ class PlanDetail extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class, 'plan_detail_id');
+    }
+
+    /**
+     * Get the latest inspection for this plan detail.
+     */
+    public function inspection(): HasOne
+    {
+        return $this->hasOne(Inspection::class, 'plan_detail_id')->latestOfMany();
     }
 }
