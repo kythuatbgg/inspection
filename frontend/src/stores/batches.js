@@ -47,6 +47,26 @@ export const useBatchesStore = defineStore('batches', {
       const index = this.batches.findIndex(b => b.id === id)
       if (index !== -1) this.batches[index] = response.data.data
       return response.data.data
+    },
+
+    async fetchPlan(planId) {
+      this.loading = true
+      try {
+        // Get batch that contains this plan
+        const batchesResponse = await axios.get(`${API_URL}/batches`)
+        for (const batch of batchesResponse.data.data) {
+          if (batch.plan_details) {
+            const plan = batch.plan_details.find(p => p.id === parseInt(planId))
+            if (plan) {
+              this.currentBatch = batch
+              return plan
+            }
+          }
+        }
+        return null
+      } finally {
+        this.loading = false
+      }
     }
   }
 })

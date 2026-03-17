@@ -14,6 +14,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/batch/:id',
+    name: 'BatchDetail',
+    component: () => import('../views/BatchDetailView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/inspection/:planId',
     name: 'Inspection',
     component: () => import('../views/InspectionView.vue'),

@@ -34,6 +34,16 @@ export const useChecklistsStore = defineStore('checklists', {
       } finally {
         this.loading = false
       }
+    },
+
+    async fetchChecklistItems(checklistId) {
+      try {
+        const response = await axios.get(`${API_URL}/checklists/${checklistId}/items`)
+        return response.data.data
+      } catch (error) {
+        console.error('Failed to fetch checklist items:', error)
+        return []
+      }
     }
   }
 })

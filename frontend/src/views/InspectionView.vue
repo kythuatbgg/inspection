@@ -127,6 +127,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useBatchesStore } from '../stores/batches'
 import { useChecklistsStore } from '../stores/checklists'
 import { useInspectionsStore } from '../stores/inspections'
 import { db } from '../db'
@@ -135,6 +136,7 @@ import { captureWatermark } from '../services/watermark'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const batchesStore = useBatchesStore()
 const checklistsStore = useChecklistsStore()
 const inspectionsStore = useInspectionsStore()
 
@@ -154,9 +156,46 @@ const canSubmit = computed(() => {
 
 onMounted(async () => {
   const planId = route.params.planId
-  // Fetch plan details and checklist
-  // For now, use mock data - will integrate with API
-  loading.value = false
+
+  try {
+    // Fetch plan details from batch
+    const plan = await batchesStore.fetchPlan(planId)
+    if (!plan) {
+      alert('Không tìm thấy kế hoạch')
+      router.push('/')
+      return
+    }
+
+    cabinetCode.value = plan.cabinet_code
+
+    // Get batch to find checklist_id
+    const batch = batchesStore.currentBatch
+    if (!batch || !batch.checklist_id) {
+      alert('Không tìm thấy checklist')
+      router.push('/')
+      return
+    }
+
+    checklistId.value = batch.checklist_id
+    checklistName.value = batch.checklist?.name || 'Checklist'
+
+    // Fetch checklist items
+    const itemsData = await checklistsStore.fetchChecklistItems(batch.checklist_id)
+
+    // Transform items to include language content
+    const lang = authStore.userLanguage
+    items.value = itemsData.map(item => ({
+      ...item,
+      content: item[`content_${lang}`] || item.content_vn
+    }))
+
+  } catch (error) {
+    console.error('Failed to load inspection:', error)
+    alert('Không thể tải dữ liệu')
+    router.push('/')
+  } finally {
+    loading.value = false
+  }
 })
 
 const getContent = (item) => {
