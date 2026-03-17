@@ -36,8 +36,7 @@ class BatchController extends Controller
         $batch = InspectionBatch::with([
             'user:id,name,username',
             'checklist:id,name,min_pass_score,max_critical_allowed',
-            'planDetails.cabinet',
-            'planDetails.inspection',
+            'planDetails',
         ])->findOrFail($batchId);
 
         // Check access for inspectors
@@ -49,6 +48,19 @@ class BatchController extends Controller
         $totalPlans = $batch->planDetails->count();
         $completedPlans = $batch->planDetails->where('status', 'done')->count();
         $progress = $totalPlans > 0 ? round(($completedPlans / $totalPlans) * 100) : 0;
+
+        // Get cabinet info for each plan
+        $planDetails = $batch->planDetails->map(function ($plan) {
+            return [
+                'id' => $plan->id,
+                'batch_id' => $plan->batch_id,
+                'cabinet_code' => $plan->cabinet_code,
+                'status' => $plan->status,
+                'cabinet' => \App\Models\Cabinet::find($plan->cabinet_code),
+                'created_at' => $plan->created_at,
+                'updated_at' => $plan->updated_at,
+            ];
+        });
 
         return response()->json([
             'data' => [
@@ -65,7 +77,7 @@ class BatchController extends Controller
                     'completed' => $completedPlans,
                     'percentage' => $progress,
                 ],
-                'plan_details' => $batch->planDetails,
+                'plan_details' => $planDetails,
                 'created_at' => $batch->created_at,
             ],
         ]);
