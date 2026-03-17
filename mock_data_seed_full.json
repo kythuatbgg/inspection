@@ -1,0 +1,176 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Hồng Quân",
+      "username": "admin_quan",
+      "password": "password123",
+      "role": "admin",
+      "lang_pref": "vn"
+    },
+    {
+      "id": 2,
+      "name": "Nhân viên Hiện trường 1",
+      "username": "inspector_01",
+      "password": "password123",
+      "role": "inspector",
+      "lang_pref": "vn"
+    },
+    {
+      "id": 3,
+      "name": "Nhân viên Hiện trường 2",
+      "username": "inspector_02",
+      "password": "password123",
+      "role": "inspector",
+      "lang_pref": "kh"
+    }
+  ],
+  "cabinets": [
+    {
+      "cabinet_code": "CAB-BTS-TAK-001",
+      "bts_site": "BTS-TAK-01",
+      "name": "Tủ hộp cáp ngã tư Takéo",
+      "type": "FBB Box 24FO",
+      "lat": 10.9908,
+      "lng": 104.7848
+    },
+    {
+      "cabinet_code": "CAB-BTS-TAK-002",
+      "bts_site": "BTS-TAK-01",
+      "name": "Tủ hộp cáp chợ Doun Kaev",
+      "type": "FBB Box 48FO",
+      "lat": 10.9950,
+      "lng": 104.7800
+    }
+  ],
+  "checklists": [
+    {
+      "id": 1,
+      "name": "Phụ lục 2.6: Bảo dưỡng Tủ hộp cáp",
+      "min_pass_score": 80,
+      "max_critical_allowed": 1
+    },
+    {
+      "id": 2,
+      "name": "Phụ lục 2.7: Triển khai Thuê bao mới",
+      "min_pass_score": 80,
+      "max_critical_allowed": 1
+    }
+  ],
+  "checklist_items": [
+    { "id": 1, "checklist_id": 1, "category": "CSDL", "content_vn": "Thực tế và NIMS: Có hạ tầng sẵn sàng cho kinh doanh", "content_en": "Actual and NIMS: Infrastructure readiness for business", "content_kh": "ជាក់ស្តែង និង NIMS: ការរៀបចំគ្រឹះស្ថានសម្រាប់អាជីវកម្ម", "max_score": 0, "is_critical": true },
+    { "id": 2, "checklist_id": 1, "category": "CSDL", "content_vn": "Thực tế/NIMS: Số lượng sợi sử dụng", "content_en": "Actual/NIMS: Number of fibers in use", "content_kh": "ជាក់ស្តែង/NIMS: ចំនួនសរសៃដែលកំពុងប្រើប្រាស់", "max_score": 0, "is_critical": true },
+    { "id": 3, "checklist_id": 1, "category": "CSDL", "content_vn": "Thực tế/NIMS: Tên tủ", "content_en": "Actual/NIMS: Cabinet name", "content_kh": "ជាក់ស្តែង/NIMS: ឈ្មោះប្រអប់", "max_score": 0, "is_critical": true },
+    { "id": 4, "checklist_id": 1, "category": "CSDL", "content_vn": "Thực tế/NIMS: Chủng loại tủ", "content_en": "Actual/NIMS: Cabinet type", "content_kh": "ជាក់ស្តែង/NIMS: ប្រភេទប្រអប់", "max_score": 0, "is_critical": true },
+    { "id": 5, "checklist_id": 1, "category": "CSDL", "content_vn": "Thực tế/NIMS: Vị trí tủ hộp cáp (cho phép sai lệch nhỏ hơn 50m)", "content_en": "Actual/NIMS: Location of the cable box (allowable deviation within 50m)", "content_kh": "ជាក់ស្តែង/NIMS: ទីតាំងប្រអប់ខ្សែ (អាចមានករណីបន្លំចូល 50m)", "max_score": 0, "is_critical": true },
+    { "id": 6, "checklist_id": 1, "category": "Đánh nhãn tủ", "content_vn": "Có sơn mã tủ theo quy định và đúng theo thiết kế", "content_en": "Properly painted cabinet code as per regulations and design specifications.", "content_kh": "ប្រអប់ត្រូវបានលាបបពណ៌ត្រឹមត្រូវតាមកំណត់និងការរចនាដែលបានកំណត់", "max_score": 0, "is_critical": true },
+    { "id": 7, "checklist_id": 1, "category": "Dán tem nhãn thuê bao tại tủ", "content_vn": "Thuê bao phải được dán tem nhãn đúng theo quy định. (100% thuê bao có nhãn, nhãn dán thẳng hàng giữa răng lược hoặc phía trên răng lược, đầy đủ thông tin)", "content_en": "Subscribers are labeled according to regulations: 100% of subscribers have labels, labels are aligned between the comb teeth or above the comb teeth, and include complete information.", "content_kh": "អតិថិជនត្រូវបានដាក់ស្លាកតាមបទប្បញ្ញត្តិ៖ 100% នៃអតិថិជនមានស្លាកសញ្ញា ស្លាកត្រូវតម្រឹមអោយស្មើរ​ ស្និតធ្មេញ ឬពីលើស្និតធ្មេញ និងរួមបញ្ចូលព័ត៌មានពេញលេញ។", "max_score": 0, "is_critical": true },
+    { "id": 8, "checklist_id": 1, "category": "Độ cao treo tủ", "content_vn": "- ≥ 2,5m (trường hợp hết chỗ treo theo khoảng cách yêu cầu sẽ không đánh giá)", "content_en": "- ≥ 2.5m (If no space is available to meet the required distance, it will not be evaluated).", "content_kh": "-≥ 2,5m (ក្នុងករណីមិនមានកន្លែងដាក់តាមចម្ងាយដែលត្រូវបានទាមទារនឹងមិនត្រូវបានវាយតម្លៃ)", "max_score": 0, "is_critical": true },
+    { "id": 9, "checklist_id": 1, "category": "Độ cao treo tủ", "content_vn": "- Tại vùng ngập lũ ≥ 3m (trường hợp hết chỗ treo theo khoảng cách yêu cầu sẽ không đánh giá)", "content_en": "- In flood-prone areas: ≥ 3m (If no space is available to meet the required distance, it will not be evaluated).", "content_kh": "-នៅតំបន់ជំនន់ទឹក ≥ 3m (ក្នុងករណីមិនមានកន្លែងដាក់តាមចម្ងាយដែលត្រូវបានទាមទារនឹងមិនត្រូវបានវាយតម្លៃ)", "max_score": 0, "is_critical": true },
+    { "id": 10, "checklist_id": 1, "category": "Đai treo tủ", "content_vn": "- Sử dụng 2 dây đai inox được giữ chặt bằng khóa đai", "content_en": "- Use 2 stainless steel straps secured tightly with strap locks.", "content_kh": "-ប្រើខ្សែដែក inox ចំនួន 2 ដែលត្រូវបានកាន់ដោយសោខ្សែ", "max_score": 4, "is_critical": false },
+    { "id": 11, "checklist_id": 1, "category": "Đai treo tủ", "content_vn": "- Không bung tai tủ cáp", "content_en": "- No cable cabinet ears should be detached.", "content_kh": "- មិនត្រូវផ្តាច់ត្រចៀកទូរដាក់ខ្សែឡើយ។", "max_score": 7, "is_critical": false },
+    { "id": 12, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Cố định đầu cáp bằng đai thít tại vị trí có vỏ cáp", "content_en": "- Secure the cable head with a cable tie at the position of the cable sheath.", "content_kh": "- ធានាក្បាលខ្សែដោយចងខ្សែនៅទីតាំងនៃសំបកខ្សែ។", "max_score": 5, "is_critical": false },
+    { "id": 13, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Bắt vít giữ cáp tại lỗ định vị", "content_en": "- Use screws to secure the cable at the positioning hole.", "content_kh": "- ប្រើគួរីយ៉េ ដើម្បីធានាខ្សែអោយជាប់មាំនៅរន្ធដាក់ទីតាំង។", "max_score": 5, "is_critical": false },
+    { "id": 14, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Có quấn băng dính tại vị trí cổ cáp", "content_en": "- Wrap adhesive tape around the cable neck.", "content_kh": "- រុំស្គុតការពារ ជុំវិញកខ្សែ។", "max_score": 3, "is_critical": false },
+    { "id": 15, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Vị trí ra ống lỏng tại cổ cáp không bị gập gãy", "content_en": "- Ensure the loose tube at the cable neck is not bent or broken.", "content_kh": "- ត្រូវប្រាកដថាកាប្លិ២ខ​ នៅកខ្សែមិនកោង ឬខូច។", "max_score": 0, "is_critical": true },
+    { "id": 16, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Cáp phải đi vào ống nhựa màu vàng khi xuống tủ thuê bao. (yêu cầu 100% cáp phải đi vào ống nhựa vàng)", "content_en": "- Cables must enter yellow plastic tubes when routed into the subscriber cabinet. (100% of the cables are required to pass through yellow plastic tubes).", "content_kh": "-ខ្សែត្រូវតែទៅក្នុងបំពង់ប្លាស្ទិកពណ៌លឿងពេលចូលក្នុងប្រអប់អតិថិជន (តម្រូវការត្រូវខ្សែ 100% ត្រូវតែទៅក្នុងបំពង់ប្លាស្ទិកលឿង)", "max_score": 4, "is_critical": false },
+    { "id": 17, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Độ võng dây thuê bao khi nhập tủ đảm bảo trong khoảng cách cho phép 10cm ÷ 30cm từ đáy tủ đến bụng cáp.", "content_en": "- The slack of the subscriber cable when entering the cabinet is maintained within the allowable range of 10 cm to 30 cm from the bottom of the cabinet to the cable curve.", "content_kh": "-ភាពយឺតនៃខ្សែអតិថិជននៅពេលចូលទៅក្នុងប្រអប់ត្រូវបានរក្សាទុកក្នុងជួរដែលអាចអនុញ្ញាតបានពី 10 សង់ទីម៉ែត្រទៅ 30 សង់ទីម៉ែត្រពីបាតនៃទូទៅខ្សែកោង។", "max_score": 4, "is_critical": false },
+    { "id": 18, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Cáp trước khi nhập tủ phải được bó gọn gàng theo quy định. (yêu cầu ≥4 cáp/lỗ cao su phải được bó gọn)", "content_en": "- Cables must be neatly bundled according to regulations before entering the cabinet. (At least 4 cables per rubber hole must be properly bundled).", "content_kh": "-ខ្សែបន្ទាប់ពីការបញ្ចូលតុត្រូវត្រូវបានបត់ស្ទូចតាមការកំណត់ (តម្រូវការត្រូវតែ ≥4 ខ្សែ/ច្រកពិសេសគួរត្រូវតែបត់ស្ទូច)", "max_score": 4, "is_critical": false },
+    { "id": 19, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Lỗ cáp nhập trạm phải được bịt kín khít tránh côn trùng bụi bẩn vào tủ", "content_en": "- The cable entry holes into the cabinet must be tightly sealed to prevent insects and dust from entering.", "content_kh": "-រន្ធបញ្ចូលខ្សែចូលទៅក្នុងទូត្រូវតែបិទយ៉ាងតឹង ដើម្បីការពារសត្វល្អិត និងធូលីចូល។", "max_score": 0, "is_critical": true },
+    { "id": 20, "checklist_id": 1, "category": "Cáp nhập tủ", "content_vn": "- Không cho dây rường vào tủ cáp", "content_en": "- Do not allow reinforcing wires to enter the cable cabinet.", "content_kh": "- មិនអនុញ្ញាតឱ្យទ្រនុងពង្រឹងខ្សែចូលទៅក្នុងទូដាក់ខ្សែ។", "max_score": 5, "is_critical": false },
+    { "id": 21, "checklist_id": 1, "category": "Đi dây trong tủ", "content_vn": "- Cắt đúng ống lỏng", "content_en": "- Properly cut the loose tube.", "content_kh": "-កាត់បំពង់ខ្សែឱ្យបានត្រឹមត្រូវ។", "max_score": 3, "is_critical": false },
+    { "id": 22, "checklist_id": 1, "category": "Đi dây trong tủ", "content_vn": "- Đi ống lỏng, dây bộ chia gọn gàng trong các gai cuộn cáp đúng quy cách", "content_en": "- Arrange the loose tube and splitter cables neatly within the cable spool hooks according to standards.", "content_kh": "- រៀបចំ​ខ្សែក្នុង​បំពង់ និង​ខ្សែ​បំបែក​ឱ្យ​បាន​ស្អាត​នៅ​ក្នុង​ទំពក់​ខ្សែ​តាម​ស្តង់ដារ។", "max_score": 3, "is_critical": false },
+    { "id": 23, "checklist_id": 1, "category": "Đi dây trong tủ", "content_vn": "- Không có điểm gập, gãy cáp", "content_en": "- Ensure no bends or breaks in the cables.", "content_kh": "- ធានា​ថា​មិន​មាន​ការ​បត់​ឬ​ដាច់​ក្នុង​ខ្សែ។", "max_score": 0, "is_critical": true },
+    { "id": 24, "checklist_id": 1, "category": "Đi dây trong tủ", "content_vn": "- Thu hồi dây thừa không sử dụng", "content_en": "- Recall unused excess cables.", "content_kh": "- ប្រមូលទុកវិញខ្សែដែលមិនត្រូវការប្រើប្រាស់", "max_score": 5, "is_critical": false },
+    { "id": 25, "checklist_id": 1, "category": "Lắp đặt/cố định bộ chia", "content_vn": "- Lắp đặt bộ chia đúng vị trí, cố định chắc chắn", "content_en": "- Install the splitter in the correct position and secure it firmly.", "content_kh": "- ដំឡើងឧបករណ៍បំបែកនៅទីតាំងត្រឹមត្រូវ ហើយធានាវាឱ្យរឹងមាំ។", "max_score": 5, "is_critical": false },
+    { "id": 26, "checklist_id": 1, "category": "Khay hàn cáp", "content_vn": "- Lắp đặt đúng quy cách, chắc chắn, có đậy nắp", "content_en": "- Install according to standards, securely, and with a cover in place.", "content_kh": "- ដំឡើងតាមស្តង់ដារ សុវត្ថិភាព និងមានគម្របនៅត្រឹមត្រូវ។", "max_score": 5, "is_critical": false },
+    { "id": 27, "checklist_id": 1, "category": "Khay hàn cáp", "content_vn": "- Có lạt cố định ống lỏng đi vào khay hàn", "content_en": "- Use ties to secure the loose tube entering the splicing tray.", "content_kh": "- ប្រើខ្សែរឹតដើម្បីធានាបំពង់រលុងដែលចូលទៅក្នុងថាសផ្សា។", "max_score": 4, "is_critical": false },
+    { "id": 28, "checklist_id": 1, "category": "Khay hàn cáp", "content_vn": "- Đi dây gọn gàng, trong các khe giữ đúng quy cách", "content_en": "- Arrange cables neatly within the designated grooves according to standards.", "content_kh": "- រៀបចំខ្សែឱ្យស្អាតក្នុងចង្អូរដែលបានកំណត់តាមស្តង់ដារ។", "max_score": 5, "is_critical": false },
+    { "id": 29, "checklist_id": 1, "category": "Khay hàn cáp", "content_vn": "- Ống nung đặt đúng vị trí, theo thứ tự trong khay hàn", "content_en": "- Place the heat-shrink tubing in the correct position and order within the splicing tray.", "content_kh": "- Place the heat-shrink tubing in the correct position and order within the splicing tray.", "max_score": 5, "is_critical": false },
+    { "id": 30, "checklist_id": 1, "category": "Bộ chia", "content_vn": "- Đánh nhãn bộ chia đúng quy định", "content_en": "- Label the splitter according to regulations.", "content_kh": "- Label the splitter according to regulations.", "max_score": 4, "is_critical": false },
+    { "id": 31, "checklist_id": 1, "category": "Bộ chia", "content_vn": "- Đánh nhãn các đầu ra và cắm đúng vị trí, thứ tự", "content_en": "- Label all output ports and ensure they are plugged in the correct position and order.", "content_kh": "- Label all output ports and ensure they are plugged in the correct position and order.", "max_score": 5, "is_critical": false },
+    { "id": 32, "checklist_id": 1, "category": "Giá cắm adapter", "content_vn": "- Các đầu adapter chưa sử dụng phải có đầu bịt chống bụi", "content_en": "- Unused adapter ports must have dust caps.", "content_kh": "- ច្រកអាដាប់ទ័រអតិថិជនដែលមិនប្រើត្រូវតែមានគំរបការពារធូលី។", "max_score": 5, "is_critical": false },
+    { "id": 33, "checklist_id": 1, "category": "Đấu nối", "content_vn": "- Các dây nhảy phải đánh số thứ tự", "content_en": "- Patch cords must be numbered sequentially.", "content_kh": "- ខ្សែ Patch cords ត្រូវតែមានលេខរៀងៗខ្លួន", "max_score": 0, "is_critical": true },
+    { "id": 34, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Tủ, hộp không rỉ sét, không móp méo, cánh tủ không bung mất.", "content_en": "- Cabinets and boxes must be free from rust, dents, and intact doors.", "content_kh": "-ទូ និងប្រអប់ត្រូវតែគ្មានច្រេះ គ្មានប្រេះ និងទ្វារត្រូវតែស្អាត។", "max_score": 0, "is_critical": true },
+    { "id": 35, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Đối với tủ / hộp cáp đặt trên bệ phải được cố định chắc chắn, không nghiêng, đổ", "content_en": "- Cabinets/boxes placed on a pedestal must be securely fixed, not tilted or toppled.", "content_kh": "-ទូ/ប្រអប់ដាក់នៅលើជើងទម្រត្រូវតែត្រូវបានជួសជុលដោយសុវត្ថិភាព មិនត្រូវផ្អៀង ឬដួលរលំឡើយ។", "max_score": 0, "is_critical": true },
+    { "id": 36, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Kín khít chống nước mưa và côn trùng xâm nhập", "content_en": "- Must be tightly sealed to prevent rainwater and insects from entering.", "content_kh": "- ត្រូវ​បិទ​ជិត​ដើម្បី​ការពារ​ទឹកភ្លៀង និង​សត្វល្អិត​ចូល​។", "max_score": 0, "is_critical": true },
+    { "id": 37, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Vệ sinh bên ngoài và bên trong tủ cáp, hộp cáp", "content_en": "- Clean both the exterior and interior of the cabinet/box.", "content_kh": "- សម្អាតទាំងខាងក្រៅ និងខាងក្នុងនៃទូ/ប្រអប់។", "max_score": 0, "is_critical": true },
+    { "id": 38, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Các phiến MDF hoặc khay hàn cáp không hỏng, rạn nứt", "content_en": "- MDF panels or splicing trays must not be damaged or cracked.", "content_kh": "- បន្ទះ MDF ឬថាសបិទមិនត្រូវខូចឬប្រេះទេ។", "max_score": 5, "is_critical": false },
+    { "id": 39, "checklist_id": 1, "category": "Tủ/hộp cáp", "content_vn": "Vệ sinh, phát quang cây cối xung quanh", "content_en": "- Clean and trim surrounding vegetation.", "content_kh": "- សម្អាត និងកាត់ស្មៅដើមឈើ ជុំវិញុ។", "max_score": 5, "is_critical": false },
+
+    { "id": 40, "checklist_id": 2, "category": "A. CSDL", "content_vn": "Thực tế và NIMS: Có hạ tầng sẵn sàng cho kinh doanh", "content_en": "Actual and NIMS: Infrastructure readiness for business", "content_kh": "-ជាក់ស្តែង និង NIMS: ការរៀបចំគ្រឹះស្ថានសម្រាប់អាជីវកម្ម", "max_score": 0, "is_critical": true },
+    { "id": 41, "checklist_id": 2, "category": "A. CSDL", "content_vn": "Thực tế/NIMS: Số lượng sợi sử dụng", "content_en": "Actual/NIMS: Number of fibers in use", "content_kh": "-ជាក់ស្តែង/NIMS: ចំនួនសរសៃដែលកំពុងប្រើប្រាស់", "max_score": 0, "is_critical": true },
+    { "id": 42, "checklist_id": 2, "category": "A. CSDL", "content_vn": "Thực tế/NIMS: Tên tủ", "content_en": "Actual/NIMS: Cabinet name", "content_kh": "-ជាក់ស្តែង/NIMS: ឈ្មោះប្រអប់", "max_score": 0, "is_critical": true },
+    { "id": 43, "checklist_id": 2, "category": "A. CSDL", "content_vn": "Thực tế/NIMS: Chủng loại tủ", "content_en": "Actual/NIMS: Cabinet type", "content_kh": "-ជាក់ស្តែង/NIMS: ប្រភេទប្រអប់", "max_score": 0, "is_critical": true },
+    { "id": 44, "checklist_id": 2, "category": "A. CSDL", "content_vn": "Thực tế/NIMS: Vị trí tủ hộp cáp (cho phép sai lệch nhỏ hơn 50m)", "content_en": "Actual/NIMS: Location of the cable box (allowable deviation within 50m)", "content_kh": "-ជាក់ស្តែង/NIMS: ទីតាំងប្រអប់ខ្សែ (អាចមានករណីបន្លំចូល 50m)", "max_score": 0, "is_critical": true },
+    { "id": 45, "checklist_id": 2, "category": "B. Bên ngoài (Tủ cáp) - Đánh nhãn tủ", "content_vn": "- Có sơn mã tủ theo quy định và đúng theo thiết kế", "content_en": "- Properly painted cabinet code as per regulations and design specifications.", "content_kh": "-ប្រអប់ត្រូវបានលាបបពណ៌ត្រឹមត្រូវតាមកំណត់និងការរចនាដែលបានកំណត់", "max_score": 0, "is_critical": true },
+    { "id": 46, "checklist_id": 2, "category": "B. Bên ngoài - Dán tem nhãn thuê bao tại tủ", "content_vn": "Thuê bao phải được dán tem nhãn đúng theo quy định. (100% thuê bao có nhãn, nhãn dán thẳng hàng giữa răng lược hoặc phía trên răng lược, đầy đủ thông tin)", "content_en": "- Subscribers are labeled according to regulations: 100% of subscribers have labels, labels are aligned between the comb teeth or above the comb teeth, and include complete information.", "content_kh": "ខ្សែរអតិថិជនត្រូវមានស្លាកសម្គាល់តាមបទប្បញ្ញត្តិ៖​100%​​​ ស្លាកសញ្ញាសម្គាល់ត្រូវតម្រឹមអោយស្មើរនឹង​ស្និតធ្មេញឬពីលើស្និតធ្មេញនិងរួមបញ្ចូលព័ត៌មានពេញលេញ។", "max_score": 0, "is_critical": true },
+    { "id": 47, "checklist_id": 2, "category": "B. Bên ngoài - Độ cao treo tủ", "content_vn": "- ≥ 2,5m (trường hợp hết chỗ treo theo khoảng cách yêu cầu sẽ không đánh giá)", "content_en": "- ≥ 2.5m (If no space is available to meet the required distance, it will not be evaluated).", "content_kh": "\"-≥ 2,5m (ក្នុងករណីមិនមានកន្លែងដាក់តាមចម្ងាយដែលត្រូវបានទាមទារនឹងមិនត្រូវបានវាយតម្លៃ)\"", "max_score": 0, "is_critical": true },
+    { "id": 48, "checklist_id": 2, "category": "B. Bên ngoài - Độ cao treo tủ", "content_vn": "- Tại vùng ngập lũ ≥ 3m (trường hợp hết chỗ treo theo khoảng cách yêu cầu sẽ không đánh giá)", "content_en": "- In flood-prone areas: ≥ 3m (If no space is available to meet the required distance, it will not be evaluated).", "content_kh": "-នៅតំបន់ជំនន់ទឹក ≥ 3m (ក្នុងករណីមិនមានកន្លែងដាក់តាមចម្ងាយដែលត្រូវបានទាមទារនឹងមិនត្រូវបានវាយតម្លៃ)", "max_score": 0, "is_critical": true },
+    { "id": 49, "checklist_id": 2, "category": "B. Bên ngoài - Đai treo tủ", "content_vn": "- Sử dụng 2 dây đai inox được giữ chặt bằng khóa đai", "content_en": "- Use 2 stainless steel straps secured tightly with strap locks.", "content_kh": "-ប្រើខ្សែដែក inox ចំនួន 2 ដែលត្រូវបានកាន់ដោយសោខ្សែ", "max_score": 4, "is_critical": false },
+    { "id": 50, "checklist_id": 2, "category": "B. Bên ngoài - Đai treo tủ", "content_vn": "- Không bung tai tủ cáp", "content_en": "- No cable cabinet ears should be detached.", "content_kh": "- មិនត្រូវផ្តាច់ត្រចៀកទូរដាក់ខ្សែឡើយ។", "max_score": 4, "is_critical": false },
+    { "id": 51, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Cố định đầu cáp bằng đai thít tại vị trí có vỏ cáp", "content_en": "- Secure the cable head with a cable tie at the position of the cable sheath.", "content_kh": "- ធានាក្បាលខ្សែដោយចងខ្សែនៅទីតាំងនៃសំបកខ្សែ។", "max_score": 4, "is_critical": false },
+    { "id": 52, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Bắt vít giữ cáp tại lỗ định vị", "content_en": "- Use screws to secure the cable at the positioning hole.", "content_kh": "- ប្រើគួរីយ៉េ ដើម្បីធានាខ្សែអោយជាប់មាំនៅរន្ធដាក់ទីតាំង។", "max_score": 4, "is_critical": false },
+    { "id": 53, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Có quấn băng dính tại vị trí cổ cáp", "content_en": "- Wrap adhesive tape around the cable neck.", "content_kh": "- រុំស្គុតការពារ ជុំវិញកខ្សែ។", "max_score": 4, "is_critical": false },
+    { "id": 54, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Vị trí ra ống lỏng tại cổ cáp không bị gập gãy", "content_en": "- Ensure the loose tube at the cable neck is not bent or broken.", "content_kh": "- ត្រូវប្រាកដថាកាប្លិ២ខ​ នៅកខ្សែមិនកោង ឬខូច។", "max_score": 0, "is_critical": true },
+    { "id": 55, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Cáp phải đi vào ống nhựa màu vàng khi xuống tủ thuê bao. (yêu cầu 100% cáp phải đi vào ống nhựa vàng)", "content_en": "- Cables must enter yellow plastic tubes when routed into the subscriber cabinet. (100% of the cables are required to pass through yellow plastic tubes).", "content_kh": "-ខ្សែត្រូវតែចូលក្នុងបំពង់ប្លាស្ទិកពណ៌លឿងមុនពេលចូលក្នុងប្រអប់អតិថិជន (ខ្សែ​ 100% ត្រូវតែទៅក្នុងបំពង់ប្លាស្ទិកលឿង)", "max_score": 4, "is_critical": false },
+    { "id": 56, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Độ võng dây thuê bao khi nhập tủ đảm bảo trong khoảng cách cho phép 10cm ÷ 30cm từ đáy tủ đến bụng cáp.", "content_en": "- The slack of the subscriber cable when entering the cabinet is maintained within the allowable range of 10 cm to 30 cm from the bottom of the cabinet to the cable curve.", "content_kh": "-ភាពយឺតនៃខ្សែអតិថិជននៅពេលចូលទៅក្នុងប្រអប់ត្រូវបានរក្សាទុកក្នុងជួរដែលអាចអនុញ្ញាតបានពី 10 សង់ទីម៉ែត្រទៅ 30 សង់ទីម៉ែត្រពីបាតនៃទូទៅខ្សែកោង។", "max_score": 4, "is_critical": false },
+    { "id": 57, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Cáp trước khi nhập tủ phải được bó gọn gàng theo quy định. (yêu cầu ≥4 cáp/lỗ cao su phải được bó gọn)", "content_en": "- Cables must be neatly bundled according to regulations before entering the cabinet. (At least 4 cables per rubber hole must be properly bundled).", "content_kh": "-ខ្សែបន្ទាប់ពីការបញ្ចូលតុត្រូវត្រូវបានបត់ស្ទូចតាមការកំណត់ (តម្រូវការត្រូវតែ ≥4 ខ្សែ/ច្រកពិសេសគួរត្រូវតែបត់ស្ទូច)", "max_score": 4, "is_critical": false },
+    { "id": 58, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Lỗ cáp nhập trạm phải được bịt kín khít tránh côn trùng bụi bẩn vào tủ", "content_en": "- The cable entry holes into the cabinet must be tightly sealed to prevent insects and dust from entering.", "content_kh": "-រន្ធខ្សែចូលក្នុងប្រអប់ត្រូវតែបិទយ៉ាងជិតដើម្បីការពារសត្វល្អិត និងធូលីចូល។", "max_score": 0, "is_critical": true },
+    { "id": 59, "checklist_id": 2, "category": "B. Bên ngoài - Cáp nhập tủ", "content_vn": "- Không cho dây rường vào tủ cáp", "content_en": "- Do not allow reinforcing wires to enter the cable cabinet.", "content_kh": "- មិនអនុញ្ញាតឱ្យទ្រនុងដែករបស់ខ្សែចូលទៅក្នុងប្រអប់។", "max_score": 2, "is_critical": false },
+    { "id": 60, "checklist_id": 2, "category": "B. Bên ngoài - Đi dây trong tủ", "content_vn": "- Cắt đúng ống lỏng", "content_en": "- Properly cut the loose tube.", "content_kh": "-កាត់បំពង់ខ្សែឱ្យបានត្រឹមត្រូវ។", "max_score": 2, "is_critical": false },
+    { "id": 61, "checklist_id": 2, "category": "B. Bên ngoài - Đi dây trong tủ", "content_vn": "- Đi ống lỏng, dây bộ chia gọn gàng trong các gai cuộn cáp đúng quy cách", "content_en": "- Arrange the loose tube and splitter cables neatly within the cable spool hooks according to standards.", "content_kh": "- រៀបចំ​ខ្សែក្នុង​បំពង់ និង​ខ្សែ​បំបែក​ឱ្យ​បាន​ស្អាត​នៅ​ក្នុង​ទំពក់​ខ្សែ​តាម​ស្តង់ដារ។", "max_score": 2, "is_critical": false },
+    { "id": 62, "checklist_id": 2, "category": "B. Bên ngoài - Đi dây trong tủ", "content_vn": "- Không có điểm gập, gãy cáp", "content_en": "- Ensure no bends or breaks in the cables.", "content_kh": "- ធានា​ថា​មិន​មាន​ការ​បត់​ឬ​ដាច់​ក្នុង​ខ្សែ។", "max_score": 0, "is_critical": true },
+    { "id": 63, "checklist_id": 2, "category": "B. Bên ngoài - Đi dây trong tủ", "content_vn": "- Thu hồi dây thừa không sử dụng", "content_en": "- Recall unused excess cables.", "content_kh": "- ខ្សែដែលមិនត្រូវការប្រើប្រាស់ត្រូវប្រមូលទុកវិញ", "max_score": 2, "is_critical": false },
+    { "id": 64, "checklist_id": 2, "category": "B. Bên ngoài - Lắp đặt/cố định bộ chia", "content_vn": "- Lắp đặt bộ chia đúng vị trí, cố định chắc chắn", "content_en": "- Install the splitter in the correct position and secure it firmly.", "content_kh": "- ដំឡើងឧបករណ៍បំបែកនៅទីតាំងត្រឹមត្រូវ ហើយធានាវាឱ្យរឹងមាំ។", "max_score": 3, "is_critical": false },
+    { "id": 65, "checklist_id": 2, "category": "B. Bên ngoài - Khay hàn cáp", "content_vn": "- Lắp đặt đúng quy cách, chắc chắn, có đậy nắp", "content_en": "- Install according to standards, securely, and with a cover in place.", "content_kh": "- ដំឡើងតាមស្តង់ដារ សុវត្ថិភាព និងមានគម្របនៅត្រឹមត្រូវ។", "max_score": 3, "is_critical": false },
+    { "id": 66, "checklist_id": 2, "category": "B. Bên ngoài - Khay hàn cáp", "content_vn": "- Có lạt cố định ống lỏng đi vào khay hàn", "content_en": "- Use ties to secure the loose tube entering the splicing tray.", "content_kh": "- ប្រើខ្សែរឹតដើម្បីធានាបំពង់រលុងដែលចូលទៅក្នុងថាសផ្សា។", "max_score": 2, "is_critical": false },
+    { "id": 67, "checklist_id": 2, "category": "B. Bên ngoài - Khay hàn cáp", "content_vn": "- Đi dây gọn gàng, trong các khe giữ đúng quy cách", "content_en": "- Arrange cables neatly within the designated grooves according to standards.", "content_kh": "- រៀបចំខ្សែឱ្យស្អាតក្នុងចង្អូរដែលបានកំណត់តាមស្តង់ដារ។", "max_score": 3, "is_critical": false },
+    { "id": 68, "checklist_id": 2, "category": "B. Bên ngoài - Khay hàn cáp", "content_vn": "- Ống nung đặt đúng vị trí, theo thứ tự trong khay hàn", "content_en": "- Place the heat-shrink tubing in the correct position and order within the splicing tray.", "content_kh": "-បំពង់ត្រូវតែដាក់ត្រឹមត្រូវនៅទីតាំង និងតាមលំដាប់ក្នុងប្រអប់", "max_score": 3, "is_critical": false },
+    { "id": 69, "checklist_id": 2, "category": "B. Bên ngoài - Bộ chia", "content_vn": "- Đánh nhãn bộ chia đúng quy định", "content_en": "- Label the splitter according to regulations.", "content_kh": "-ស្លាកសម្គាល់ត្រូវមានតាមគោលការណ៍ដែលបានកំណត់", "max_score": 4, "is_critical": false },
+    { "id": 70, "checklist_id": 2, "category": "B. Bên ngoài - Bộ chia", "content_vn": "- Đánh nhãn các đầu ra và cắm đúng vị trí, thứ tự", "content_en": "- Label all output ports and ensure they are plugged in the correct position and order.", "content_kh": "-ដាក់ស្លាកសម្គាល់នៅលើច្រកចេញ និងដាក់បិទតាមទីតាំង និងលំដាប់ត្រឹមត្រូវ", "max_score": 4, "is_critical": false },
+    { "id": 71, "checklist_id": 2, "category": "B. Bên ngoài - Giá cắm adapter", "content_vn": "- Các đầu adapter chưa sử dụng phải có đầu bịt chống bụi", "content_en": "- Unused adapter ports must have dust caps.", "content_kh": "- ច្រកអាដាប់ទ័រអតិថិជនដែលមិនប្រើត្រូវតែមានគំរបការពារធូលី។", "max_score": 4, "is_critical": false },
+    { "id": 72, "checklist_id": 2, "category": "B. Bên ngoài - Đấu nối", "content_vn": "- Các dây nhảy phải đánh số thứ tự", "content_en": "- Patch cords must be numbered sequentially.", "content_kh": "- ខ្សែ Patch cords ត្រូវតែមានលេខរៀងៗខ្លួន", "max_score": 0, "is_critical": true },
+    { "id": 73, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Tủ, hộp không rỉ sét, không móp méo, cánh tủ không bung mất.", "content_en": "- Cabinets and boxes must be free from rust, dents, and intact doors.", "content_kh": "-ប្រអប់ត្រូវតែគ្មានច្រេះឬគ្មានប្រេះ និងទ្វារត្រូវតែស្អាត។", "max_score": 0, "is_critical": true },
+    { "id": 74, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Đối với tủ / hộp cáp đặt trên bệ phải được cố định chắc chắn, không nghiêng, đổ", "content_en": "- Cabinets/boxes placed on a pedestal must be securely fixed, not tilted or toppled.", "content_kh": "-ទូ/ប្រអប់ដាក់នៅលើជើងទម្រត្រូវតែត្រូវបានជួសជុលដោយសុវត្ថិភាព មិនត្រូវផ្អៀង ឬដួលរលំឡើយ។", "max_score": 0, "is_critical": true },
+    { "id": 75, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Kín khít chống nước mưa và côn trùng xâm nhập", "content_en": "- Must be tightly sealed to prevent rainwater and insects from entering.", "content_kh": "- ត្រូវ​បិទ​ជិត​ដើម្បី​ការពារ​ទឹកភ្លៀង និង​សត្វល្អិត​ចូល​។", "max_score": 0, "is_critical": true },
+    { "id": 76, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Vệ sinh bên ngoài và bên trong tủ cáp, hộp cáp", "content_en": "- Clean both the exterior and interior of the cabinet/box.", "content_kh": "- សម្អាតទាំងខាងក្រៅ និងខាងក្នុងនៃទូ/ប្រអប់។", "max_score": 0, "is_critical": true },
+    { "id": 77, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Các phiến MDF hoặc khay hàn cáp không hỏng, rạn nứt", "content_en": "- MDF panels or splicing trays must not be damaged or cracked.", "content_kh": "- បន្ទះ MDF ឬថាសបិទមិនត្រូវខូចឬប្រេះទេ។", "max_score": 2, "is_critical": false },
+    { "id": 78, "checklist_id": 2, "category": "B. Bên ngoài - Tủ/hộp cáp", "content_vn": "Vệ sinh, phát quang cây cối xung quanh", "content_en": "- Clean and trim surrounding vegetation.", "content_kh": "- សម្អាត និងកាត់ស្មៅដើមឈើ ជុំវិញុ។", "max_score": 2, "is_critical": false },
+    { "id": 79, "checklist_id": 2, "category": "C. Triển khai trong nhà khách hàng - Cáp lastmile", "content_vn": "- Cáp phải cắt một đoạn dây gia cường (20-40cm) để cắt sét và quấn thành vòng bẫy nước nếu cáp dốc vào nhà (vị trí nhập cáp).", "content_en": "The cable must cut a piece of reinforcement (20-40cm) to cut lightning and wrap the water trap circle if the cable slopes into the house (entry position)", "content_kh": "-ខ្សែមុនចូលផ្ទះអតិថិជនត្រូវតែកាត់ទ្រនុងកាប (20-40cm) ដើម្បកុំអោយចរន្តអគ្គីសនីនិងទឹកចូលក្នុងផ្ទះអតិថិជន (ទីតាំងចូល)", "max_score": 0, "is_critical": true },
+    { "id": 80, "checklist_id": 2, "category": "C. Triển khai trong nhà - Cáp LAN, HDMI", "content_vn": "- Cáp phải được cố định chắc chắn và đảm bảo tính thẩm mỹ.", "content_en": "- The cable must be securely fixed and aesthetically arranged.", "content_kh": "- ខ្សែត្រូវតែត្រូវតែរៀបចំយ៉ាងម៉ត់ចត់ហើយធានាថាមានសោភណ្ឌភាព", "max_score": 2, "is_critical": false },
+    { "id": 81, "checklist_id": 2, "category": "C. Triển khai trong nhà - Cáp LAN, HDMI", "content_vn": "- Quy cách đi dây thiết bị (cáp mạng đi men góc tường, được cố định bằng lạt hoặc kẹp nhựa)", "content_en": "Device cable routing standards (network cables should follow wall corners and be secured with ties or plastic clips).", "content_kh": "-ការដំឡើងខ្សែរបស់ឧបករណ៍ត្រូវតាមស្តង់ដារ​ (ខ្សែបណ្តាញទៅជាប់ជើងជញ្ជាំង ហើយខ្សែរត្រូវតែវចង", "max_score": 3, "is_critical": false },
+    { "id": 82, "checklist_id": 2, "category": "C. Triển khai trong nhà - Cáp LAN, HDMI", "content_vn": "- Tất cả các dây cáp phải được đi gọn gàng.", "content_en": "All cables must be neatly arranged.", "content_kh": "- ខ្សែទាំងអស់ត្រូវតែត្រូវបានដាក់រៀបចំយ៉ាងស្អាត", "max_score": 3, "is_critical": false },
+    { "id": 83, "checklist_id": 2, "category": "C. Triển khai trong nhà - Lắp đặt thiết bị", "content_vn": "- ONT phải được lắp đặt đúng vị trí (cao hơn 1,5m, không đặt gần bếp gas...).", "content_en": "The ONT must be installed in the correct position (higher than 1.5m, not near a gas stove, etc.).", "content_kh": "-ONT ត្រូវបានដំឡើងនៅទីតាំងត្រឹមត្រូវ (ខ្ពស់ជាង 1.5 ម៉ែត្រ មិនដាក់ជិតបំពង់ឧស្ម័នហ្គេស...)", "max_score": 4, "is_critical": false },
+    { "id": 84, "checklist_id": 2, "category": "C. Triển khai trong nhà - Lắp đặt thiết bị", "content_vn": "- Góc của ăng-ten wifi phải được điều chỉnh đúng cách. (1 mặt sàn 2 anten đựng đứng vuông góc với mặt sàn, khi phủ 2 mặt sàn, 01 anten dựng đứng và 01 anten nằm ngang)", "content_en": "The angle of the Wi-Fi antenna must be properly adjusted (For one floor: both antennas stand upright perpendicular to the floor; for two floors: one antenna stands upright, and the other lies horizontally).", "content_kh": "-មុំរបស់អង់តែន Wi-Fi ត្រូវបានកែតម្រង់ត្រឹមត្រូវ។ (1 ផ្ទៃដី 2 អង់តែនត្រូវតែឈរយ៉ាងស្របជាមួយផ្ទៃដី, នៅពេលដែលគ្របដណ្តប់ 2 ផ្ទៃដី, 01 អង់តែនឈរនិង 01 អង់តែនត្រង់)", "max_score": 4, "is_critical": false },
+    { "id": 85, "checklist_id": 2, "category": "C. Triển khai trong nhà - Lắp đặt thiết bị", "content_vn": "- Cáp tại ONT: Cáp được luồng trong khay theo quy định", "content_en": "Cable at ONT: The cable must be routed within the tray as per regulations.", "content_kh": "-ខ្សែនៅ ONT​ ខ្សែត្រូវតែដាក់ក្នុងប្រអប់តាមគោលការណ៍", "max_score": 4, "is_critical": false },
+    { "id": 86, "checklist_id": 2, "category": "C. Triển khai trong nhà - Lắp đặt thiết bị", "content_vn": "- ONT phải được dán nhãn đúng quy định.", "content_en": "The ONT must be labeled according to regulations.", "content_kh": "-ONT ត្រូវមានស្លាកសម្គាល់តាមគោលការណ៍របស់ក្រុមហ៊ុន", "max_score": 6, "is_critical": false },
+    { "id": 87, "checklist_id": 2, "category": "D. Kiểm tra vật tư trên mBCCS", "content_vn": "Kiểm tra giữa thực tế và hệ thống BCCS (Cáp quang không được vượt quá 3% so với hệ thống)", "content_en": "Check between reality and the BCCS system (Optic cable must not exceed 3% compared to the system).", "content_kh": "-ការត្រួតពិនិត្យរវាងទិន្នន័យគោលជាក់ស្តែង និងប្រព័ន្ធ system BCCS (ខ្សែកាបមិនត្រូវលើស 3% បើប្រៀបនឹងប្រព័ន្ធ)", "max_score": 0, "is_critical": true }
+  ],
+  "inspection_batches": [
+    {
+      "id": 1,
+      "name": "Bảo dưỡng Q1/2026 - Trạm BTS-TAK-01",
+      "user_id": 2,
+      "checklist_id": 1,
+      "start_date": "2026-03-01",
+      "end_date": "2026-03-31",
+      "target_count": 85,
+      "status": "active"
+    }
+  ],
+  "plan_details": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "cabinet_code": "CAB-BTS-TAK-001",
+      "status": "planned"
+    },
+    {
+      "id": 2,
+      "batch_id": 1,
+      "cabinet_code": "CAB-BTS-TAK-002",
+      "status": "planned"
+    }
+  ]
+}

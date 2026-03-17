@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class InspectionBatch extends Model
+{
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'user_id',
+        'checklist_id',
+        'start_date',
+        'end_date',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
+    /**
+     * Get the user (inspector) assigned to this batch.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the checklist used for this batch.
+     */
+    public function checklist(): BelongsTo
+    {
+        return $this->belongsTo(Checklist::class);
+    }
+
+    /**
+     * Get the plan details for this batch.
+     */
+    public function planDetails(): HasMany
+    {
+        return $this->hasMany(PlanDetail::class, 'batch_id');
+    }
+
+    /**
+     * Get the inspections for this batch.
+     */
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(Inspection::class);
+    }
+}
