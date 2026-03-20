@@ -95,6 +95,9 @@ When auto-applying an agent, inform the user:
 
 ## TIER 0: UNIVERSAL RULES (Always Active)
 
+### 🔄 Auto-Commit Protocol (Global Mandatory)
+- **Commit After Completion**: Every time a logical task, feature, or bugfix is successfully completed and verified, you MUST automatically commit and push the codebase to GitHub (`git add . && git commit -m "..." && git push`). Do not wait for the user to prompt for a commit. Use descriptive conventional commit messages.
+
 ### 🌐 Language Handling
 
 When user's prompt is NOT in English:
