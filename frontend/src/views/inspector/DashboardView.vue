@@ -1,124 +1,144 @@
 <template>
-  <div class="space-y-5">
-    <!-- Welcome -->
-    <div class="rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 p-5 text-white">
-      <h2 class="text-lg font-bold leading-tight">Xin chào, {{ userName }}!</h2>
-      <p class="text-white/70 text-sm mt-1">{{ todayFormatted }}</p>
-    </div>
-
-    <!-- Stats -->
-    <div v-if="!loading" class="space-y-3">
-      <!-- Hero Stat -->
-      <div class="rounded-2xl bg-white border border-slate-200 p-5 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Tổng nhiệm vụ</p>
-          <p class="text-3xl font-bold text-slate-900 mt-1 tracking-tight">{{ stats.totalPlans }}</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center">
-          <ListTodo class="w-6 h-6 text-primary-600" />
+  <div class="w-full h-full md:absolute md:inset-0 md:bg-slate-50 relative overflow-y-auto">
+    <!-- Responsive layout chassis: Tight on mobile, wide on desktop -->
+    <div class="p-4 md:p-8 space-y-5 md:space-y-8 max-w-5xl mx-auto pb-28 flex flex-col min-w-0">
+      
+      <!-- Welcome Card -->
+      <div class="rounded-[20px] md:rounded-[24px] bg-slate-900 md:bg-white md:border border-slate-200 p-5 md:p-8 shadow-sm md:shadow-md text-white md:text-slate-900 relative overflow-hidden flex items-center justify-between">
+        <div class="relative z-10">
+          <h2 class="text-xl md:text-2xl font-bold leading-tight tracking-tight">Xin chào, {{ userName }}!</h2>
+          <p class="text-slate-300 md:text-slate-500 text-sm md:text-base mt-1.5 md:mt-2 font-medium">{{ todayFormatted }}</p>
         </div>
       </div>
 
-      <!-- 2x2 Stat Grid -->
-      <div class="grid grid-cols-2 gap-3">
-        <div class="rounded-2xl bg-white border border-slate-200 p-4">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-2.5">
-            <Clock class="w-4.5 h-4.5 text-amber-500" />
+      <!-- Stats System -->
+      <div v-if="!loading" class="flex flex-col md:flex-row gap-3 md:gap-5">
+        
+        <!-- Hero Stat (Total Plans) -->
+        <div class="rounded-[20px] md:rounded-[24px] bg-white border border-slate-200 p-5 md:p-6 flex-1 md:min-w-[280px] shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-[11px] md:text-sm text-slate-500 font-bold uppercase tracking-widest mb-1 md:mb-1.5">Tổng nhiệm vụ</p>
+            <p class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">{{ stats.totalPlans }}</p>
           </div>
-          <p class="text-2xl font-bold text-slate-900 tracking-tight">{{ stats.planned }}</p>
-          <p class="text-[11px] text-slate-400 font-medium mt-0.5">Chưa kiểm tra</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center mb-2.5">
-            <Check class="w-4.5 h-4.5 text-emerald-500" />
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-[16px] md:rounded-[20px] bg-primary-50 flex items-center justify-center">
+            <ListTodo class="w-7 h-7 md:w-8 md:h-8 text-primary-600" />
           </div>
-          <p class="text-2xl font-bold text-slate-900 tracking-tight">{{ stats.done }}</p>
-          <p class="text-[11px] text-slate-400 font-medium mt-0.5">Đã hoàn thành</p>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-2.5">
-            <FileStack class="w-4.5 h-4.5 text-primary-500" />
-          </div>
-          <p class="text-2xl font-bold text-slate-900 tracking-tight">{{ stats.totalBatches }}</p>
-          <p class="text-[11px] text-slate-400 font-medium mt-0.5">Lô kiểm tra</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center mb-2.5">
-            <ShieldCheck class="w-4.5 h-4.5 text-emerald-600" />
-          </div>
-          <p class="text-2xl font-bold text-slate-900 tracking-tight">{{ completionPercent }}%</p>
-          <p class="text-[11px] text-slate-400 font-medium mt-0.5">Tiến độ</p>
-        </div>
-      </div>
-    </div>
 
-    <!-- Active Batches -->
-    <div>
-      <h3 class="text-base font-bold text-slate-900 mb-3">Lô đang hoạt động</h3>
-
-      <div v-if="loading" class="flex justify-center py-10">
-        <Loader2 class="w-7 h-7 animate-spin text-primary-500" />
-      </div>
-
-      <div v-else-if="activeBatches.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-          <FileStack class="w-7 h-7 text-slate-300" />
-        </div>
-        <p class="font-semibold text-slate-700">Chưa có lô kiểm tra nào</p>
-        <p class="text-sm text-slate-400 mt-1">Khi admin tạo lô mới, bạn sẽ thấy ở đây</p>
-      </div>
-
-      <div v-else class="space-y-3">
-        <button
-          v-for="batch in activeBatches"
-          :key="batch.id"
-          @click="goToBatch(batch.id)"
-          class="w-full text-left rounded-2xl bg-white border border-slate-200 p-5 active:scale-[0.98] transition-all cursor-pointer"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex-1 min-w-0 pr-3">
-              <h4 class="font-bold text-slate-900 truncate leading-tight">{{ batch.name }}</h4>
-              <p class="text-xs text-slate-400 mt-1">{{ batch.checklist?.name || 'Checklist' }}</p>
+        <!-- Secondary Stats Grid ("Pro Max" Style) -->
+        <!-- Mobile: 2x2 grid. Desktop: 1x4 grid. -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-[2.5]">
+          <!-- Stat 1 -->
+          <div class="rounded-[18px] md:rounded-[20px] bg-white border border-slate-200 p-4 md:p-5 shadow-sm">
+            <div class="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[14px] bg-amber-50 flex items-center justify-center mb-3">
+              <Clock class="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
             </div>
-            <span
-              class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-              :class="batch.status === 'completed'
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'bg-amber-50 text-amber-600'"
-            >
-              {{ statusLabel(batch.status) }}
-            </span>
+            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.planned }}</p>
+            <p class="text-[11px] md:text-[13px] text-slate-500 font-medium mt-1 truncate">Chưa kiểm tra</p>
+          </div>
+          
+          <!-- Stat 2 -->
+          <div class="rounded-[18px] md:rounded-[20px] bg-white border border-slate-200 p-4 md:p-5 shadow-sm">
+            <div class="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[14px] bg-emerald-50 flex items-center justify-center mb-3">
+              <Check class="w-5 h-5 md:w-6 md:h-6 text-emerald-500" />
+            </div>
+            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.done }}</p>
+            <p class="text-[11px] md:text-[13px] text-slate-500 font-medium mt-1 truncate">Đã hoàn thành</p>
           </div>
 
-          <!-- Progress -->
-          <div class="mt-4">
-            <div class="flex items-center justify-between text-xs mb-1.5">
-              <span class="text-slate-400 font-medium">Tiến độ</span>
-              <span class="font-bold" :class="batchProgress(batch) === 100 ? 'text-emerald-600' : 'text-primary-600'">
-                {{ batchProgress(batch) }}%
+          <!-- Stat 3 -->
+          <div class="rounded-[18px] md:rounded-[20px] bg-white border border-slate-200 p-4 md:p-5 shadow-sm">
+            <div class="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[14px] bg-blue-50 flex items-center justify-center mb-3">
+              <FileStack class="w-5 h-5 md:w-6 md:h-6 text-primary-500" />
+            </div>
+            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.totalBatches }}</p>
+            <p class="text-[11px] md:text-[13px] text-slate-500 font-medium mt-1 truncate">Lô đề xuất</p>
+          </div>
+
+          <!-- Stat 4 -->
+          <div class="rounded-[18px] md:rounded-[20px] bg-white border border-slate-200 p-4 md:p-5 shadow-sm">
+            <div class="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[14px] bg-emerald-50 flex items-center justify-center mb-3">
+              <ShieldCheck class="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
+            </div>
+            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ completionPercent }}%</p>
+            <p class="text-[11px] md:text-[13px] text-slate-500 font-medium mt-1 truncate">Tổng tiến độ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Batches Section -->
+      <div>
+        <h3 class="text-[17px] md:text-xl font-bold text-slate-900 mb-4 tracking-tight">Lô đang hoạt động</h3>
+
+        <!-- Loading -->
+        <div v-if="loading" class="flex flex-col items-center justify-center py-12 md:py-20">
+          <Loader2 class="w-8 h-8 animate-spin text-slate-400 mb-4" />
+          <p class="text-sm font-medium text-slate-500">Đang tải biểu đồ...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="activeBatches.length === 0" class="flex flex-col items-center justify-center py-16 md:py-24 text-center">
+          <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-5">
+            <FileStack class="w-8 h-8 text-slate-300" />
+          </div>
+          <p class="font-bold text-slate-800 text-lg md:text-xl tracking-tight">Không có lô kiểm tra nào</p>
+          <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Khi quản trị viên tạo và giao lô kiểm tra, chúng sẽ xuất hiện tại đây.</p>
+        </div>
+
+        <!-- Batches List -->
+        <div v-else class="space-y-3.5 md:space-y-4">
+          <button
+            v-for="batch in activeBatches"
+            :key="batch.id"
+            @click="goToBatch(batch.id)"
+            class="w-full text-left rounded-[20px] md:rounded-[24px] bg-white border border-slate-200 p-5 md:p-6 active:scale-[0.98] transition-all cursor-pointer shadow-sm hover:shadow-md"
+          >
+            <!-- Batch Header -->
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0 pr-3">
+                <h4 class="font-bold text-[15px] md:text-lg text-slate-900 truncate leading-tight">{{ batch.name }}</h4>
+                <p class="text-[13px] md:text-sm text-slate-500 font-medium mt-1.5 truncate">{{ batch.checklist?.name || 'Mẫu Checklist tiêu chuẩn' }}</p>
+              </div>
+              <span
+                class="shrink-0 text-[10px] md:text-xs font-bold uppercase tracking-wider px-2.5 md:px-3 py-1.5 rounded-lg"
+                :class="batch.status === 'completed'
+                  ? 'bg-emerald-50 text-emerald-600'
+                  : 'bg-amber-50 text-amber-600'"
+              >
+                {{ statusLabel(batch.status) }}
               </span>
             </div>
-            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                class="h-full rounded-full transition-all duration-500"
-                :class="batchProgress(batch) === 100 ? 'bg-emerald-500' : 'bg-primary-500'"
-                :style="{ width: batchProgress(batch) + '%' }"
-              ></div>
-            </div>
-          </div>
 
-          <!-- Meta -->
-          <div class="flex items-center gap-4 mt-3 text-xs text-slate-400">
-            <span class="flex items-center gap-1">
-              <Calendar class="w-3.5 h-3.5" />
-              {{ formatDate(batch.start_date) }} — {{ formatDate(batch.end_date) }}
-            </span>
-            <span class="flex items-center gap-1">
-              <FileStack class="w-3.5 h-3.5" />
-              {{ batch.plan_details?.length || 0 }} tủ
-            </span>
-          </div>
-        </button>
+            <!-- Enhanced Progress Bar -->
+            <div class="mt-5 md:mt-6">
+              <div class="flex items-center justify-between text-[11px] md:text-[13px] mb-2 md:mb-2.5">
+                <span class="text-slate-500 font-bold uppercase tracking-widest">Tiến độ</span>
+                <span class="font-black tracking-tight" :class="batchProgress(batch) === 100 ? 'text-emerald-600' : 'text-primary-600'">
+                  {{ batchProgress(batch) }}%
+                </span>
+              </div>
+              <div class="w-full h-2 md:h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-700 ease-out"
+                  :class="batchProgress(batch) === 100 ? 'bg-emerald-500' : 'bg-primary-500'"
+                  :style="{ width: batchProgress(batch) + '%' }"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Meta Data (Date & Count) -->
+            <div class="flex items-center gap-4 mt-4 md:mt-5 text-[11.5px] md:text-sm text-slate-500 font-medium">
+              <span class="flex items-center gap-1.5">
+                <Calendar class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
+                {{ formatDate(batch.start_date) }} — {{ formatDate(batch.end_date) }}
+              </span>
+              <span class="flex items-center gap-1.5">
+                <FileStack class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
+                {{ batch.plan_details?.length || 0 }} tủ
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
