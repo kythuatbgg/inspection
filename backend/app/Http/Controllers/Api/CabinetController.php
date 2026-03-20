@@ -27,12 +27,12 @@ class CabinetController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = trim($request->search);
+            $search = strtolower(trim($request->search));
 
             $query->where(function ($builder) use ($search) {
                 $builder
-                    ->where('cabinet_code', 'like', "%{$search}%")
-                    ->orWhere('bts_site', 'like', "%{$search}%");
+                    ->whereRaw('LOWER(cabinet_code) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(bts_site) LIKE ?', ["%{$search}%"]);
             });
         }
 
