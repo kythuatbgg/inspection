@@ -323,9 +323,9 @@
           <!-- Rollback (Reopen) Button -->
           <div class="mt-4 md:mt-0 flex shrink-0 border-t border-green-200/60 pt-4 md:border-t-0 md:pt-0">
             <button @click="handleReopen" :disabled="reopening" class="w-full md:w-auto px-6 py-2.5 md:py-2 border border-green-200 bg-white text-green-700 md:text-gray-700 md:border-gray-200 text-sm font-bold rounded-xl hover:bg-green-50 md:hover:bg-gray-50 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm">
-              <Undo2 class="w-4 h-4" />
-              <Loader2 class="w-4 h-4 animate-spin outline-none" />
-              Mở lại lô (Hoàn tác)
+              <Loader2 v-if="reopening" class="w-4 h-4 animate-spin outline-none" />
+              <Undo2 v-else class="w-4 h-4" />
+              {{ reopening ? 'Đang thao tác...' : 'Mở lại lô (Hoàn tác)' }}
             </button>
           </div>
         </div>
