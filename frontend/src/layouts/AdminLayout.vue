@@ -84,7 +84,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings } from 'lucide-vue-next'
+import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings, ClipboardList } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -96,6 +96,7 @@ const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/batches', label: 'Lô kiểm tra', icon: FileStack },
   { path: '/admin/cabinets', label: 'Tủ cáp', icon: Server },
+  { path: '/admin/checklists', label: 'Checklist', icon: ClipboardList },
   { path: '/admin/users', label: 'Người dùng', icon: Users },
   { path: '/admin/settings', label: 'Cài đặt', icon: Settings }
 ]

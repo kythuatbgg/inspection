@@ -34,13 +34,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cabinets', CabinetController::class);
 
     Route::get('checklists/{checklist}/items', [ChecklistController::class, 'items']);
-    Route::apiResource('checklists', ChecklistController::class);
+    Route::apiResource('checklists', ChecklistController::class)->only(['index', 'show']);
 
     Route::get('batches', [BatchController::class, 'index']);
     Route::get('batches/{batch}', [BatchController::class, 'show']);
 
     // Manager-only routes (admin + manager)
     Route::middleware('manager')->group(function () {
+        // Checklist management
+        Route::post('checklists', [ChecklistController::class, 'store']);
+        Route::put('checklists/{checklist}', [ChecklistController::class, 'update']);
+        Route::delete('checklists/{checklist}', [ChecklistController::class, 'destroy']);
+        Route::post('checklists/{checklist}/clone', [ChecklistController::class, 'clone']);
+        Route::post('checklists/{checklist}/items', [ChecklistController::class, 'storeItem']);
+        Route::put('checklists/{checklist}/items/{item}', [ChecklistController::class, 'updateItem']);
+        Route::delete('checklists/{checklist}/items/{item}', [ChecklistController::class, 'destroyItem']);
         Route::post('batches', [BatchController::class, 'store']);
         Route::put('batches/{batch}', [BatchController::class, 'update']);
         Route::delete('batches/{batch}', [BatchController::class, 'destroy']);

@@ -60,6 +60,16 @@ const routes = [
         component: () => import('../views/admin/UserDetailView.vue')
       },
       {
+        path: 'checklists',
+        name: 'admin-checklists',
+        component: () => import('../views/admin/ChecklistsView.vue')
+      },
+      {
+        path: 'checklists/:id',
+        name: 'admin-checklist-detail',
+        component: () => import('../views/admin/ChecklistDetailView.vue')
+      },
+      {
         path: 'settings',
         name: 'admin-settings',
         component: () => import('../views/admin/SettingsView.vue')
