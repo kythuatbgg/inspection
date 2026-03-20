@@ -218,12 +218,8 @@
       </div>
       
       <!-- MAP VIEW -->
-      <div v-show="viewMode === 'map'" class="card p-1 md:p-4">
-        <CabinetMap v-if="cabinets.length > 0" :cabinets="cabinets" class="h-[calc(100vh-280px)] min-h-[400px] w-full rounded-lg" />
-        <div v-else class="h-[calc(100vh-280px)] min-h-[400px] rounded-lg bg-gray-100 flex flex-col items-center justify-center">
-          <MapPin class="w-12 h-12 text-gray-300 mb-3" />
-          <p class="text-gray-500 font-medium">Không có dữ liệu trên bản đồ</p>
-        </div>
+      <div v-if="mapEverOpened" v-show="viewMode === 'map'" class="card p-1 md:p-4">
+        <CabinetMap ref="cabinetMapRef" :cabinets="cabinets" class="h-[calc(100vh-280px)] min-h-[400px] w-full rounded-lg" />
       </div>
 
       <!-- WEB VIEW PAGINATION -->
@@ -414,7 +410,7 @@
 <script setup>
 import { FileDown, ShieldCheck, AlertTriangle, Plus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileStack, Trash2, FileEdit, MapPin, Server, Search, ArrowUpToLine, ArrowDownToLine, Menu } from 'lucide-vue-next'
 
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import cabinetService from '@/services/cabinetService.js'
 import CabinetFormModal from '@/components/admin/CabinetFormModal.vue'
 import CabinetMap from '@/components/admin/CabinetMap.vue'
@@ -428,10 +424,23 @@ const perPageOptions = [
 ]
 
 const viewMode = ref('list')
+const mapEverOpened = ref(false)
+const cabinetMapRef = ref(null)
 const loading = ref(true)
 const error = ref(null)
 const cabinets = ref([])
 const fileInput = ref(null)
+
+// Lazy-init map on first switch, invalidateSize on subsequent switches
+watch(viewMode, async (mode) => {
+  if (mode === 'map') {
+    if (!mapEverOpened.value) {
+      mapEverOpened.value = true
+    }
+    await nextTick()
+    cabinetMapRef.value?.refresh()
+  }
+})
 
 const pagination = ref({
   current_page: 1,

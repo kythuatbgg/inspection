@@ -141,6 +141,15 @@ onMounted(() => {
   initMap()
 })
 
+const refresh = () => {
+  if (map) {
+    map.invalidateSize()
+    updateMarkers()
+  }
+}
+
+defineExpose({ refresh })
+
 onUnmounted(() => {
   if (mapContainer.value) {
     mapContainer.value.removeEventListener('click', handlePopupClick)
