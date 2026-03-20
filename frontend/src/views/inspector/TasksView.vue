@@ -1,107 +1,173 @@
-﻿<template>
+<template>
   <div class="space-y-4">
-    <!-- Tabs -->
-    <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+    <!-- Segmented Filter -->
+    <div class="bg-slate-100 rounded-2xl p-1 flex gap-1">
       <button
         v-for="tab in tabs"
         :key="tab.value"
         @click="activeTab = tab.value"
-        class="px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors active:scale-95"
+        class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all"
         :class="activeTab === tab.value
-          ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20'
-          : 'bg-slate-100 text-slate-600'"
+          ? 'bg-white text-slate-900 shadow-sm'
+          : 'text-slate-500 active:bg-white/50'"
       >
         {{ tab.label }}
-        <span v-if="tab.count !== undefined" class="ml-1 opacity-80">({{ tab.count }})</span>
+        <span
+          v-if="!loading"
+          class="min-w-[20px] h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center leading-none"
+          :class="activeTab === tab.value
+            ? 'bg-primary-600 text-white'
+            : 'bg-slate-200 text-slate-500'"
+        >{{ getCount(tab.value) }}</span>
       </button>
     </div>
 
+    <!-- Loading -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <Loader2 class="w-7 h-7 animate-spin text-primary-500" />
+    </div>
+
     <!-- Task List -->
-    <div v-if="!loading" class="space-y-3">
+    <div v-else class="space-y-3">
       <button
-        v-for="task in filteredTasks"
+        v-for="task in paginatedTasks"
         :key="task.planId"
         @click="goToInspection(task)"
-        class="w-full text-left rounded-lg bg-white border border-slate-200 p-4 hover:border-primary-300 hover:shadow-sm active:scale-[0.98] transition-all"
+        class="w-full text-left rounded-2xl bg-white border border-slate-200 p-4 active:scale-[0.98] transition-all cursor-pointer"
       >
         <div class="flex items-center justify-between">
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-0 pr-3">
             <div class="flex items-center gap-2">
               <h4 class="font-bold text-slate-900">{{ task.cabinetCode }}</h4>
               <span
-                class="text-xs font-semibold px-2 py-0.5 rounded-full"
-                :class="task.status === 'done'
-                  ? 'bg-success/10 text-success'
-                  : 'bg-warning/10 text-warning'"
-              >
-                {{ task.status === 'done' ? '✓ Đã kiểm tra' : 'Chưa kiểm tra' }}
-              </span>
+                v-if="task.status === 'done'"
+                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600"
+              >Đã kiểm tra</span>
+              <span
+                v-else
+                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600"
+              >Chưa kiểm tra</span>
             </div>
-            <p class="text-sm text-slate-500 mt-1 truncate">{{ task.batchName }}</p>
+            <p class="text-xs text-slate-400 mt-1.5 truncate">{{ task.batchName }}</p>
           </div>
-          <ChevronRight class="w-5 h-5 text-slate-400 shrink-0" />
+
+          <!-- Result badge -->
+          <div v-if="task.result" class="shrink-0">
+            <span
+              class="text-[10px] font-bold px-2.5 py-1 rounded-lg"
+              :class="task.result === 'PASS' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'"
+            >
+              {{ task.result === 'PASS' ? 'ĐẠT' : 'K.ĐẠT' }}
+            </span>
+          </div>
+          <ChevronRight v-else class="w-5 h-5 text-slate-300 shrink-0" />
         </div>
 
-        <!-- Meta -->
-        <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
-          <span v-if="task.btsSite" class="flex items-center gap-1">
-            <MapPin class="w-3.5 h-3.5" />
-            {{ task.btsSite }}
-          </span>
+        <div class="flex items-center gap-3 mt-2.5 text-[11px] text-slate-400">
           <span class="flex items-center gap-1">
-            <Calendar class="w-3.5 h-3.5" />
+            <Calendar class="w-3 h-3" />
             {{ task.dateRange }}
           </span>
-        </div>
-
-        <!-- Result if done -->
-        <div v-if="task.result" class="mt-2 pt-2 border-t border-slate-200">
-          <span
-            class="text-xs font-bold px-2 py-0.5 rounded-full"
-            :class="task.result === 'pass' ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
-          >{{ task.result === 'pass' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}</span>
-          <span v-if="task.score !== null" class="text-xs text-slate-500 ml-2">Điểm: {{ task.score }}</span>
+          <span v-if="task.score != null" class="flex items-center gap-1 font-semibold text-primary-600">
+            Điểm: {{ task.score }}
+          </span>
         </div>
       </button>
 
       <!-- Empty State -->
-      <div v-if="filteredTasks.length === 0" class="text-center py-10">
-        <ClipboardIcon class="w-16 h-16 mx-auto text-gray-300" />
-        <p class="font-semibold text-slate-700 mt-4">Không có nhiệm vụ nào</p>
-        <p class="text-sm text-slate-500 mt-1">
-          {{ activeTab === 'planned' ? 'Tất cả tủ đã được kiểm tra!' : 'Chưa có nhiệm vụ trong mục này' }}
-        </p>
+      <div v-if="paginatedTasks.length === 0" class="flex flex-col items-center justify-center py-14 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+          <ClipboardList class="w-7 h-7 text-slate-300" />
+        </div>
+        <p class="font-semibold text-slate-700">Không có nhiệm vụ</p>
+        <p class="text-sm text-slate-400 mt-1">{{ activeTab === 'all' ? 'Chưa có nhiệm vụ nào được giao' : 'Không có kết quả phù hợp' }}</p>
       </div>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="filteredTasks.length > perPage" class="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-slate-200">
+      <!-- Previous -->
+      <button
+        @click="goToPage(currentPage - 1)"
+        :disabled="currentPage === 1"
+        class="flex items-center gap-2 min-h-[56px] px-5 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        :class="currentPage === 1 ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-700 active:bg-slate-200'"
+      >
+        <ChevronLeft class="w-5 h-5" />
+        <span class="hidden sm:inline">Trước</span>
+      </button>
+
+      <!-- Page Info -->
+      <div class="flex items-center gap-2 text-sm">
+        <span class="text-slate-600">Trang</span>
+        <span class="font-bold text-slate-900">{{ currentPage }}</span>
+        <span class="text-slate-400">/</span>
+        <span class="font-bold text-slate-900">{{ totalPages }}</span>
+      </div>
+
+      <!-- Next -->
+      <button
+        @click="goToPage(currentPage + 1)"
+        :disabled="currentPage >= totalPages"
+        class="flex items-center gap-2 min-h-[56px] px-5 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        :class="currentPage >= totalPages ? 'bg-slate-100 text-slate-400' : 'bg-primary-600 text-white active:bg-primary-700'"
+      >
+        <span class="hidden sm:inline">Sau</span>
+        <ChevronRight class="w-5 h-5" />
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ClipboardIcon, Calendar, MapPin, ChevronRight } from 'lucide-vue-next'
+import { Calendar, ChevronLeft, ChevronRight, ClipboardList, Loader2 } from 'lucide-vue-next'
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/services/api.js'
 import batchService from '@/services/batchService.js'
+import api from '@/services/api.js'
 
 const router = useRouter()
-const loading = ref(true)
-const activeTab = ref('all')
-const allTasks = ref([])
 
-const tabs = computed(() => [
-  { label: 'Tất cả', value: 'all', count: allTasks.value.length },
-  { label: 'Chưa kiểm tra', value: 'planned', count: allTasks.value.filter(t => t.status === 'planned').length },
-  { label: 'Đã hoàn thành', value: 'done', count: allTasks.value.filter(t => t.status === 'done').length }
-])
+const loading = ref(true)
+const allTasks = ref([])
+const activeTab = ref('all')
+const currentPage = ref(1)
+const perPage = 5
+const totalTasks = ref(0)
+
+const tabs = [
+  { label: 'Tất cả', value: 'all' },
+  { label: 'Chưa kiểm tra', value: 'planned' },
+  { label: 'Đã hoàn thành', value: 'done' }
+]
+
+watch(activeTab, () => {
+  currentPage.value = 1
+})
 
 const filteredTasks = computed(() => {
   if (activeTab.value === 'all') return allTasks.value
   return allTasks.value.filter(t => t.status === activeTab.value)
 })
 
-const goToInspection = (task) => {
-  router.push({ name: 'inspector-inspection', params: { planId: task.planId } })
+const paginatedTasks = computed(() => {
+  const start = (currentPage.value - 1) * perPage
+  const end = start + perPage
+  return filteredTasks.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(filteredTasks.value.length / perPage) || 1)
+
+const goToPage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  // TODO: Fetch tasks for specific page
+}
+
+const getCount = (tab) => {
+  if (tab === 'all') return allTasks.value.length
+  return allTasks.value.filter(t => t.status === tab).length
 }
 
 const formatDateRange = (start, end) => {
@@ -113,15 +179,18 @@ const formatDateRange = (start, end) => {
   return `${fmt(start)} — ${fmt(end)}`
 }
 
+const goToInspection = (task) => {
+  router.push({ name: 'inspector-inspection', params: { planId: task.planId } })
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await batchService.getBatches({ per_page: 100 })
+    const res = await batchService.getBatches({ per_page: 100, approval_status: 'approved' })
     const batches = res.data || res || []
     
     const tasks = []
     
-    // Fetch plan details for each batch
     await Promise.all(
       batches.map(async (batch) => {
         try {
@@ -129,40 +198,29 @@ const fetchData = async () => {
           const plans = plansRes.data?.data || plansRes.data || []
           
           for (const plan of plans) {
-            // Try to get inspection result
-            let result = null, score = null
-            if (plan.status === 'done') {
-              try {
-                const inspRes = await api.get(`/plans/${plan.id}/inspection`)
-                const insp = inspRes.data?.data
-                if (insp) {
-                  result = insp.final_result
-                  score = insp.total_score
-                }
-              } catch { /* no inspection yet */ }
-            }
+            // Lấy inspection từ plan đã eager load sẵn - KHÔNG gọi API riêng
+            const inspection = plan.inspection || null
+            const result = inspection?.final_result || null
+            const score = inspection?.total_score ?? null
 
             tasks.push({
               planId: plan.id,
-              batchId: batch.id,
-              batchName: batch.name,
               cabinetCode: plan.cabinet_code,
-              btsSite: plan.cabinet?.bts_site || '',
+              batchName: batch.name,
               status: plan.status,
-              dateRange: formatDateRange(batch.start_date, batch.end_date),
               result,
-              score
+              score,
+              dateRange: formatDateRange(batch.start_date, batch.end_date)
             })
           }
-        } catch (e) {
-          console.error(`Failed to load plans for batch ${batch.id}:`, e)
-        }
+        } catch { /* skip if fails */ }
       })
     )
-
+    
     allTasks.value = tasks
+    totalTasks.value = tasks.length
   } catch (e) {
-    console.error('Failed to load tasks:', e)
+    console.error('Failed to fetch tasks:', e)
   } finally {
     loading.value = false
   }
