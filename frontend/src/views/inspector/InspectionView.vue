@@ -105,13 +105,17 @@
           </div>
 
           <div v-for="(group, category) in groupedItems" :key="category" class="mb-5">
-            <!-- Category Header -->
-            <div class="bg-gray-50 px-4 py-2 rounded-xl mb-3 border border-gray-100">
-              <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
-            </div>
+            <!-- Category Header (Collapsible) -->
+            <button @click="toggleCategory(category)" type="button" class="w-full bg-gray-50 px-4 py-3 rounded-xl mb-3 border border-gray-100 flex items-center justify-between hover:bg-gray-100 active:scale-[0.99] transition-all">
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
+                <span class="text-xs font-medium text-gray-400">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
+              </div>
+              <ChevronDown class="w-4 h-4 text-gray-400 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
+            </button>
 
             <!-- Items -->
-            <div class="space-y-4">
+            <div v-show="!collapsedCategories[category]" class="space-y-4">
               <div
                 v-for="item in group"
                 :key="item.id"
@@ -218,7 +222,7 @@
           class="w-full min-h-[50px] rounded-xl font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           :class="isValidToSubmit ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md shadow-primary-600/20' : 'bg-gray-200 text-gray-500 cursor-not-allowed'"
         >
-          <Loader2 class="animate-spin w-5 h-5" />
+          <Loader2 v-if="submitting" class="animate-spin w-5 h-5" />
           {{ submitting ? 'Đang lưu...' : (isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất thông tin (${answeredCount}/${checklistItems.length})`) }}
         </button>
       </div>
@@ -227,7 +231,7 @@
 </template>
 
 <script setup>
-import { Loader2, ShieldCheck, Plus, ChevronLeft } from 'lucide-vue-next'
+import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown } from 'lucide-vue-next'
 
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
@@ -297,6 +301,14 @@ const groupedItems = computed(() => {
   return groups
 })
 
+const collapsedCategories = ref({})
+const toggleCategory = (category) => {
+  collapsedCategories.value = { ...collapsedCategories.value, [category]: !collapsedCategories.value[category] }
+}
+const getCategoryAnswered = (group) => {
+  return group.filter(item => itemDetails.value[item.id] != null).length
+}
+
 const setResult = (itemId, isFailed) => {
   if (!itemDetails.value[itemId]) {
     itemDetails.value[itemId] = { is_failed: isFailed, image_url: null, note: '' }
@@ -345,8 +357,9 @@ const scoreSummary = computed(() => {
     }
   })
 
-  // Logic PASS/FAIL: (total_score >= 80) AND (critical_count <= 1)
-  const willPass = totalScore >= 80 && criticalCount <= 1
+  const minPassScore = plan.value?.batch?.checklist?.min_pass_score ?? 70
+  const maxCriticalAllowed = plan.value?.batch?.checklist?.max_critical_allowed ?? 0
+  const willPass = totalScore >= minPassScore && criticalCount <= maxCriticalAllowed
 
   return { totalScore, maxScore, criticalCount, willPass }
 })
