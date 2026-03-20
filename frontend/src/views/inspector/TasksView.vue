@@ -201,7 +201,7 @@ const formatDateRange = (start, end) => {
 }
 
 const goToInspection = (task) => {
-  router.push({ name: 'inspector-inspection', params: { planId: task.planId } })
+  router.push({ name: 'inspector-tasks-inspection', params: { planId: task.planId } })
 }
 
 const fetchData = async () => {

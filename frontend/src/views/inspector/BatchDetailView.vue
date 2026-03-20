@@ -168,7 +168,7 @@ const goBack = () => {
 
 const goToInspection = (plan) => {
   router.push({
-    name: 'inspector-inspection',
+    name: 'inspector-batch-inspection',
     params: { planId: plan.id }
   })
 }
