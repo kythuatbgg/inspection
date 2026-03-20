@@ -1,9 +1,9 @@
 <template>
-  <div class="space-y-4 pb-28">
+  <div class="space-y-4 pb-28 md:pb-6 p-4 md:p-6 md:min-h-full">
     <template v-if="!loading && plan">
       <!-- Header / Cabinet Info -->
       <div class="rounded-2xl bg-white border border-slate-200 p-5">
-        <button @click="goBack" class="flex items-center gap-1 text-sm text-primary-600 font-medium mb-3 -ml-1 active:opacity-70">
+        <button @click="goBack" class="md:hidden flex items-center gap-1 text-sm text-primary-600 font-medium mb-3 -ml-1 active:opacity-70">
           <ChevronLeft class="w-4 h-4" />
           Quay lại
         </button>
@@ -229,9 +229,9 @@
       <button @click="fetchData" class="mt-3 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold active:scale-95 transition-all">Thử lại</button>
     </div>
 
-    <!-- Bottom Scoring Summary + Submit (Fixed) -->
-    <div v-if="!loading && plan && !existingInspection && checklistItems.length > 0 && currentStep === 2" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto z-40">
-      <div class="bg-white border-t border-slate-100 shadow-[0_-8px_16px_-8px_rgba(0,0,0,0.08)] px-5 py-3 rounded-t-2xl">
+    <!-- Bottom Scoring Summary + Submit (Fixed on mobile, sticky on desktop) -->
+    <div v-if="!loading && plan && !existingInspection && checklistItems.length > 0 && currentStep === 2" class="fixed md:sticky bottom-16 md:bottom-0 left-0 right-0 max-w-md md:max-w-none w-full mx-auto md:mx-0 z-40">
+      <div class="bg-white border-t border-slate-100 shadow-[0_-8px_16px_-8px_rgba(0,0,0,0.08)] md:shadow-none px-5 py-3 rounded-t-2xl md:rounded-b-2xl md:mt-4">
         <!-- Score summary -->
         <div class="flex items-center justify-between text-sm mb-3">
           <div class="flex items-center gap-3">
