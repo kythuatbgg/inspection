@@ -16,7 +16,7 @@
             </div>
           </button>
           <button
-            @click="viewMode = 'map'; fetchMapData()"
+            @click="viewMode = 'map'"
             class="px-4 py-2 min-h-[44px] rounded-lg items-center text-sm font-semibold transition-all"
             :class="viewMode === 'map' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
           >
@@ -59,7 +59,7 @@
             <Menu class="w-5 h-5" />
           </button>
           <button
-            @click="viewMode = 'map'; fetchMapData()"
+            @click="viewMode = 'map'"
             class="w-12 h-10 flex items-center justify-center rounded-[12px] transition-all duration-200"
             :class="viewMode === 'map' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-400 active:bg-gray-200/50'"
           >
@@ -120,8 +120,10 @@
       {{ error }}
     </div>
 
-    <div v-else-if="viewMode === 'list'" class="space-y-4">
-      <div class="hidden lg:block card overflow-hidden">
+    <div v-else class="space-y-4">
+      <!-- LIST VIEW -->
+      <div v-show="viewMode === 'list'" class="space-y-4">
+        <div class="hidden lg:block card overflow-hidden">
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -211,6 +213,15 @@
         <div v-if="cabinets.length === 0" class="flex flex-col items-center justify-center py-12 px-4 bg-white rounded-[24px] border border-gray-100 shadow-sm mt-4">
           <FileStack class="w-16 h-16 text-gray-300 mb-4" />
           <p class="text-gray-500 font-medium text-center">Không có tủ cáp nào<br/><span class="text-sm text-gray-400 font-normal">Thêm tủ mới hoặc thay đổi bộ lọc</span></p>
+        </div>
+      </div>
+      
+      <!-- MAP VIEW -->
+      <div v-show="viewMode === 'map'" class="card p-1 md:p-4">
+        <CabinetMap v-if="cabinets.length > 0" :cabinets="cabinets" class="h-[calc(100vh-280px)] min-h-[400px] w-full rounded-lg" />
+        <div v-else class="h-[calc(100vh-280px)] min-h-[400px] rounded-lg bg-gray-100 flex flex-col items-center justify-center">
+          <MapPin class="w-12 h-12 text-gray-300 mb-3" />
+          <p class="text-gray-500 font-medium">Không có dữ liệu trên bản đồ</p>
         </div>
       </div>
 
@@ -313,13 +324,6 @@
             <ChevronRight class="w-6 h-6 group-active:translate-x-1 transition-transform" />
           </button>
         </div>
-      </div>
-    </div>
-
-    <div v-else-if="viewMode === 'map'" class="card p-4">
-      <CabinetMap v-if="mapData.length > 0" :cabinets="mapData" class="h-[500px] rounded-lg" />
-      <div v-else class="h-[500px] rounded-lg bg-gray-100 flex items-center justify-center">
-        <p class="text-gray-500">Đang tải bản đồ...</p>
       </div>
     </div>
 
@@ -426,7 +430,6 @@ const viewMode = ref('list')
 const loading = ref(true)
 const error = ref(null)
 const cabinets = ref([])
-const mapData = ref([])
 const fileInput = ref(null)
 
 const pagination = ref({
@@ -585,14 +588,7 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const fetchMapData = async () => {
-  try {
-    const data = await cabinetService.getCabinetsMap()
-    mapData.value = Array.isArray(data) ? data : []
-  } catch (requestError) {
-    console.error(requestError)
-  }
-}
+
 
 const handleSearch = () => {
   clearTimeout(searchTimeout)
