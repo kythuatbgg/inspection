@@ -7,12 +7,11 @@
       <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-40">
         <!-- Header/Logo area -->
         <div class="p-5 border-b border-slate-100 flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shrink-0">
+          <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shrink-0 shadow-inner">
             <ShieldCheck class="w-5 h-5 text-white" />
           </div>
           <div class="min-w-0">
-            <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none truncate">FBB Inspection</h1>
-            <p class="text-[11px] text-slate-400 font-medium mt-0.5 truncate">{{ userName }}</p>
+            <h1 class="text-lg font-black bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight leading-none truncate">Inspector</h1>
           </div>
         </div>
 
@@ -33,15 +32,23 @@
         </nav>
 
         <!-- Status and Logout -->
-        <div class="p-4 border-t border-slate-100 space-y-3">
-          <div class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider"
-            :class="isOnline ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'"
-          >
-            <span class="w-2 h-2 rounded-full shrink-0" :class="isOnline ? 'bg-emerald-500' : 'bg-red-500'"></span>
-            {{ isOnline ? 'Online' : 'Offline' }}
+        <div class="p-4 border-t border-slate-100 flex flex-col gap-2">
+          <!-- Profile Info -->
+          <div class="flex items-center gap-3 px-3 py-2 mb-1">
+            <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+              <span class="text-sm font-bold text-slate-600">{{ userName.charAt(0) }}</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-bold text-slate-900 truncate tracking-tight">{{ userName }}</p>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full shadow-sm" :class="isOnline ? 'bg-emerald-500' : 'bg-red-500'"></span>
+                <span class="text-[10px] uppercase font-bold tracking-wider" :class="isOnline ? 'text-emerald-600' : 'text-red-500'">{{ isOnline ? 'Online' : 'Offline' }}</span>
+              </div>
+            </div>
           </div>
-          <button @click="handleLogout" class="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors font-medium">
-            <LogOut class="w-5 h-5 shrink-0" :stroke-width="2" />
+          <!-- Logout Button -->
+          <button @click="handleLogout" class="flex items-center justify-center gap-2 px-3 py-2.5 w-full rounded-xl bg-slate-50 text-red-500 hover:bg-red-50 hover:text-red-600 active:scale-95 transition-all font-semibold">
+            <LogOut class="w-4.5 h-4.5 shrink-0" />
             <span class="text-sm">Đăng xuất</span>
           </button>
         </div>
@@ -54,13 +61,10 @@
         <header class="md:hidden bg-white border-b border-slate-100 px-5 pb-4 pt-5 sticky top-0 z-40">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center">
+              <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shadow-inner">
                 <ShieldCheck class="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-none">FBB Inspection</h1>
-                <p class="text-[11px] text-slate-400 font-medium mt-0.5">{{ userName }}</p>
-              </div>
+              <h1 class="text-[17px] font-black bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight leading-none">Inspector</h1>
             </div>
 
             <!-- Status -->

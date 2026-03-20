@@ -3,14 +3,6 @@
     <!-- Responsive layout chassis: Tight on mobile, wide on desktop -->
     <div class="p-4 md:p-8 space-y-5 md:space-y-8 max-w-5xl mx-auto pb-28 flex flex-col min-w-0">
       
-      <!-- Welcome Card -->
-      <div class="rounded-[20px] md:rounded-[24px] bg-slate-900 md:bg-white md:border border-slate-200 p-5 md:p-8 shadow-sm md:shadow-md text-white md:text-slate-900 relative overflow-hidden flex items-center justify-between">
-        <div class="relative z-10">
-          <h2 class="text-xl md:text-2xl font-bold leading-tight tracking-tight">Xin chào, {{ userName }}!</h2>
-          <p class="text-slate-300 md:text-slate-500 text-sm md:text-base mt-1.5 md:mt-2 font-medium">{{ todayFormatted }}</p>
-        </div>
-      </div>
-
       <!-- Stats System -->
       <div v-if="!loading" class="flex flex-col md:flex-row gap-3 md:gap-5">
         
@@ -149,22 +141,12 @@ import { FileStack, Calendar, ShieldCheck, Check, Clock, ListTodo, Loader2 } fro
 
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import batchService from '@/services/batchService.js'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 const loading = ref(true)
 const batches = ref([])
-
-const userName = computed(() => authStore.user?.name || 'Nhân viên')
-
-const todayFormatted = computed(() => {
-  const d = new Date()
-  const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
-  return `${days[d.getDay()]}, ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
-})
 
 const activeBatches = computed(() => {
   return batches.value.filter(b => b.status !== 'completed')
