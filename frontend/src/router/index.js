@@ -122,7 +122,14 @@ const routes = [
       {
         path: 'tasks',
         name: 'inspector-tasks',
-        component: () => import('../views/inspector/TasksView.vue')
+        component: () => import('../views/inspector/TasksView.vue'),
+        children: [
+          {
+            path: 'inspect/:planId',
+            name: 'inspector-tasks-inspection',
+            component: () => import('../views/inspector/InspectionView.vue')
+          }
+        ]
       },
       {
         path: 'proposals',
@@ -132,12 +139,14 @@ const routes = [
       {
         path: 'batch/:id',
         name: 'inspector-batch-detail',
-        component: () => import('../views/inspector/BatchDetailView.vue')
-      },
-      {
-        path: 'inspect/:planId',
-        name: 'inspector-inspection',
-        component: () => import('../views/inspector/InspectionView.vue')
+        component: () => import('../views/inspector/BatchDetailView.vue'),
+        children: [
+          {
+            path: 'inspect/:planId',
+            name: 'inspector-batch-inspection',
+            component: () => import('../views/inspector/InspectionView.vue')
+          }
+        ]
       }
     ]
   }
