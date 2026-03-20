@@ -16,7 +16,8 @@ class BatchController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = InspectionBatch::with(['user:id,name,username', 'checklist:id,name']);
+        $query = InspectionBatch::with(['user:id,name,username', 'checklist:id,name'])
+            ->withCount('planDetails as plans_count');
 
         if ($request->has('search') && $request->search) {
             $searchTerm = strtolower($request->search);
