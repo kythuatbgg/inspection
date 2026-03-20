@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-5 pb-28">
     <template v-if="!loading && plan">
       <!-- Header / Cabinet Info -->
@@ -80,7 +80,8 @@
               class="w-full min-h-[48px] rounded-lg font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               :class="(isValidStep1 && !isAnyUploading) ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
             >
-              {{ isAnyUploading ? 'Đang tải ảnh lên...' : 'Tiếp tục kiểm tra →' }}
+              <Loader2 v-if="isAnyUploading" class="animate-spin w-5 h-5" />
+              <span v-else>Tiếp tục kiểm tra →</span>
             </button>
           </div>
         </div>
@@ -223,7 +224,7 @@
           :class="isValidToSubmit ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/20' : 'bg-slate-200 text-slate-500 cursor-not-allowed'"
         >
           <Loader2 v-if="submitting" class="animate-spin w-5 h-5" />
-          {{ submitting ? 'Đang lưu...' : (isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất thông tin (${answeredCount}/${checklistItems.length})`) }}
+          <span v-else>{{ isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất thông tin (${answeredCount}/${checklistItems.length})` }}</span>
         </button>
       </div>
     </div>

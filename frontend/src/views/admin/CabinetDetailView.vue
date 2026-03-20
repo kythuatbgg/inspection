@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-6">
     <!-- Back Button -->
     <button @click="goBack" class="flex items-center gap-2 text-slate-500 hover:text-slate-900 min-h-[44px] -ml-1 px-2 rounded-lg transition-colors">
@@ -173,8 +173,9 @@
           <div v-if="saveError" class="p-3 bg-danger/10 text-danger text-sm rounded">{{ saveError }}</div>
           <div class="flex gap-3">
             <button type="button" @click="editMode = false" class="btn-secondary flex-1 min-h-[56px]">Hủy</button>
-            <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[56px]">
-              {{ saving ? 'Đang lưu...' : 'Lưu' }}
+            <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[56px] flex items-center justify-center">
+              <Loader2 v-if="saving" class="w-4 h-4 animate-spin" />
+              <span v-else>Lưu</span>
             </button>
           </div>
         </form>
@@ -189,8 +190,9 @@
         <p class="text-slate-600 mb-4">Xóa tủ cáp {{ cabinet?.cabinet_code }}?</p>
         <div class="flex gap-3">
           <button @click="showDelete = false" class="btn-secondary flex-1 min-h-[56px]">Hủy</button>
-          <button @click="deleteCabinet" :disabled="deleting" class="btn-primary bg-red-600 hover:bg-red-700 flex-1 min-h-[56px]">
-            {{ deleting ? 'Đang xóa...' : 'Xóa' }}
+          <button @click="deleteCabinet" :disabled="deleting" class="btn-primary bg-red-600 hover:bg-red-700 flex-1 min-h-[56px] flex items-center justify-center">
+            <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
+            <span v-else>Xóa</span>
           </button>
         </div>
       </div>

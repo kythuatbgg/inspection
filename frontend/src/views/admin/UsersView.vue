@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <div class="hidden md:flex items-center justify-between gap-4">
       <div>
@@ -376,8 +376,9 @@
               <button type="button" @click="closeModal()" class="btn-secondary flex-1 min-h-[52px]">
                 Hủy
               </button>
-              <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[52px]">
-                {{ saving ? 'Đang lưu...' : 'Lưu' }}
+              <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[52px] flex items-center justify-center gap-2">
+                <Loader2 v-if="saving" class="w-4 h-4 animate-spin" />
+                <span v-else>Lưu</span>
               </button>
             </div>
           </form>
@@ -399,8 +400,9 @@
           <button @click="showDeleteConfirm = false" class="btn-secondary flex-1 min-h-[52px]">
             Hủy
           </button>
-          <button @click="deleteUser" :disabled="deleting" class="flex-1 min-h-[52px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors">
-            {{ deleting ? 'Đang xóa...' : 'Xóa' }}
+          <button @click="deleteUser" :disabled="deleting" class="flex-1 min-h-[52px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+            <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
+            <span v-else>Xóa</span>
           </button>
         </div>
       </div>

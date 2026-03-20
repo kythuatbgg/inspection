@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold text-slate-900">Cài đặt hệ thống</h1>
@@ -81,9 +81,11 @@
               :disabled="cleaningUp"
               class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-2"
             >
-              <Loader2 class="w-4 h-4 animate-spin" />
-              <Trash2 class="w-4 h-4" />
-              {{ cleaningUp ? 'Đang dọn...' : 'Chạy dọn dẹp' }}
+              <Loader2 v-if="cleaningUp" class="w-4 h-4 animate-spin" />
+              <template v-else>
+                <Trash2 class="w-4 h-4" />
+                <span>Chạy dọn dẹp</span>
+              </template>
             </button>
           </div>
 

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <!-- DESKTOP HEADER -->
     <div class="hidden md:flex items-center justify-between">
@@ -417,8 +417,9 @@
 
         <div class="flex gap-3">
           <button @click="closeImportModal" class="btn-secondary flex-1 min-h-[56px]">Đóng</button>
-          <button @click="importCabinets" :disabled="!selectedFile || importing" class="btn-primary flex-1 min-h-[56px]">
-            {{ importing ? 'Đang import...' : 'Import' }}
+          <button @click="importCabinets" :disabled="!selectedFile || importing" class="btn-primary flex-1 min-h-[56px] flex items-center justify-center gap-2">
+            <Loader2 v-if="importing" class="w-4 h-4 animate-spin" />
+            <span v-else>Import</span>
           </button>
         </div>
       </div>

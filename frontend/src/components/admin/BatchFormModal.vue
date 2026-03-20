@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <Teleport to="body">
     <Transition name="modal-backdrop">
       <div v-if="modelValue" class="fixed inset-0 z-50 bg-black/50" @click="close"></div>
@@ -138,9 +138,10 @@
             <button
               @click="handleSubmit"
               :disabled="submitting || !isFormValid"
-              class="flex-1 min-h-[48px] rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="flex-1 min-h-[48px] rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
-              {{ submitting ? 'Đang tạo...' : 'Tạo lô' }}
+              <Loader2 v-if="submitting" class="w-5 h-5 animate-spin" />
+              <span v-else>Tạo lô</span>
             </button>
           </div>
         </div>

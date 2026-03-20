@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-5 pb-24 md:pb-0 min-w-0">
     <!-- Header -->
     <div class="flex items-center justify-between gap-3">
@@ -121,7 +121,7 @@
           <button @click="showCreateModal = false" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200">Hủy</button>
           <button @click="handleCreate" :disabled="creating || !createForm.name.trim()" class="flex-1 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2">
             <Loader2 v-if="creating" class="w-4 h-4 animate-spin" />
-            {{ creating ? 'Đang tạo...' : 'Tạo' }}
+            <span v-else>Tạo</span>
           </button>
         </div>
       </div>
@@ -144,7 +144,7 @@
           <button @click="showDeleteConfirm = false" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200">Hủy</button>
           <button @click="handleDelete" :disabled="deleting" class="flex-1 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 flex items-center justify-center gap-2">
             <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
-            {{ deleting ? 'Đang xóa...' : 'Xác nhận xóa' }}
+            <span v-else>Xác nhận xóa</span>
           </button>
         </div>
       </div>

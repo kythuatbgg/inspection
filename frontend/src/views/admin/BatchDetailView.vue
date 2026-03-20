@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-6 pb-24 md:pb-0">
     <!-- Back + Title + Actions -->
     <div class="flex items-center gap-3">
@@ -321,8 +321,10 @@
         <div v-if="batch.status !== 'completed' && canClose" class="pt-6 md:pt-8 md:flex md:flex-col md:items-end">
           <button @click="handleClose" :disabled="closing" class="w-full md:w-auto md:px-10 min-h-[56px] md:min-h-[48px] bg-primary-600 text-white text-base md:text-sm font-bold rounded-lg md:rounded-lg hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm shadow-primary-600/20 flex items-center justify-center gap-2">
             <Loader2 v-if="closing" class="w-5 h-5 md:w-4 md:h-4 animate-spin" />
-            <Lock v-else class="w-5 h-5 md:w-4 md:h-4" />
-            {{ closing ? 'Đang kết thúc...' : 'Kết thúc lô' }}
+            <template v-else>
+              <Lock class="w-5 h-5 md:w-4 md:h-4" />
+              <span>Kết thúc lô</span>
+            </template>
           </button>
           <p class="text-center md:text-right text-xs text-slate-500 mt-3 md:mt-2 flex items-center justify-center md:justify-end gap-1.5">
             <Info class="w-4 h-4 md:w-3 md:h-3 text-primary-500" />
@@ -345,8 +347,10 @@
           <div class="mt-4 md:mt-0 flex shrink-0 border-t border-green-200/60 pt-4 md:border-t-0 md:pt-0">
             <button @click="handleReopen" :disabled="reopening" class="w-full md:w-auto px-6 py-2.5 md:py-2 border border-green-200 bg-white text-success md:text-slate-700 md:border-slate-200 text-sm font-bold rounded-lg hover:bg-success/10 md:hover:bg-slate-50 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm">
               <Loader2 v-if="reopening" class="w-4 h-4 animate-spin outline-none" />
-              <Undo2 v-else class="w-4 h-4" />
-              {{ reopening ? 'Đang thao tác...' : 'Mở lại lô (Hoàn tác)' }}
+              <template v-else>
+                <Undo2 class="w-4 h-4" />
+                <span>Mở lại lô (Hoàn tác)</span>
+              </template>
             </button>
           </div>
         </div>
@@ -509,7 +513,7 @@
           <button @click="showDeleteConfirm = false" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors">Hủy</button>
           <button @click="confirmDelete" :disabled="deleting" class="flex-1 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center gap-2">
             <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
-            {{ deleting ? 'Đang xóa...' : 'Xác nhận xóa' }}
+            <span v-else>Xác nhận xóa</span>
           </button>
         </div>
       </div>
@@ -556,7 +560,7 @@
           <button @click="showSwapModal = false" class="flex-[1] py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors">Hủy</button>
           <button @click="confirmSwap" :disabled="swapping || !swapSelectedCode" class="flex-[2] py-2.5 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-2">
             <Loader2 v-if="swapping" class="w-4 h-4 animate-spin" />
-            {{ swapping ? 'Đang thay thế...' : 'Xác nhận thay thế' }}
+            <span v-else>Xác nhận thay thế</span>
           </button>
         </div>
       </div>

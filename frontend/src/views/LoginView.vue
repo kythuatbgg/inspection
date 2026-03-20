@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700">
     <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
       <div class="text-center mb-8">
@@ -36,9 +36,10 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
+          <span v-else>Đăng nhập</span>
         </button>
       </form>
 
@@ -53,6 +54,7 @@
 </template>
 
 <script setup>
+import { Loader2 } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'

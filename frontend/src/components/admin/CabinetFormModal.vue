@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black/50" @click="close"></div>
@@ -84,8 +84,8 @@
         <div class="flex gap-3 pt-4">
           <button type="button" @click="close" class="btn-secondary flex-1 min-h-[56px]">Hủy</button>
           <button type="submit" :disabled="loading" class="btn-primary flex-1 min-h-[56px] flex items-center justify-center gap-2">
-            <Loader2 class="animate-spin w-5 h-5" />
-            <span>{{ isEdit ? 'Cập nhật' : 'Thêm mới' }}</span>
+            <Loader2 v-if="loading" class="animate-spin w-5 h-5" />
+            <span v-else>{{ isEdit ? 'Cập nhật' : 'Thêm mới' }}</span>
           </button>
         </div>
       </form>

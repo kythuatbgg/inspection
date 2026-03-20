@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-6 pb-24 md:pb-0 min-w-0">
     <!-- Back + Title -->
     <div class="flex items-center gap-3">
@@ -170,7 +170,7 @@
           <button @click="showItemForm = false" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200">Hủy</button>
           <button @click="saveItem" :disabled="savingItem || !itemForm.category.trim() || !itemForm.content_vn.trim()" class="flex-1 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2">
             <Loader2 v-if="savingItem" class="w-4 h-4 animate-spin" />
-            {{ savingItem ? 'Đang lưu...' : 'Lưu' }}
+            <span v-else>Lưu</span>
           </button>
         </div>
       </div>
