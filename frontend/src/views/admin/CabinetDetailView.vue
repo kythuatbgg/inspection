@@ -1,73 +1,148 @@
 <template>
-  <div class="space-y-6 pb-20 lg:pb-6">
+  <div class="space-y-4 md:space-y-6 pb-24 md:pb-6">
     <!-- Back Button -->
-    <button @click="goBack" class="flex items-center gap-2 text-gray-600 hover:text-gray-900">
-      <span>←</span> Quay lại
+    <button @click="goBack" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 min-h-[44px] -ml-1 px-2 rounded-xl transition-colors">
+      <ArrowLeft class="w-5 h-5" />
+      <span class="text-sm font-medium">Quay lại</span>
     </button>
 
     <!-- Loading -->
     <div v-if="loading" class="card p-8 text-center">
+      <Loader2 class="w-8 h-8 text-gray-400 animate-spin mx-auto mb-3" />
       <p class="text-gray-500">Đang tải...</p>
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="card p-8 text-center">
-      <p class="text-red-500">{{ error }}</p>
+      <AlertCircle class="w-10 h-10 text-red-400 mx-auto mb-3" />
+      <p class="text-red-500 font-medium">{{ error }}</p>
     </div>
 
     <!-- Cabinet Detail -->
     <div v-else-if="cabinet" class="space-y-4">
-      <!-- Header -->
-      <div class="card p-6">
+      <!-- DESKTOP Header -->
+      <div class="hidden md:block card p-6">
         <div class="flex items-start justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ cabinet.cabinet_code }}</h1>
-            <p class="text-gray-500 mt-1">{{ cabinet.bts_site }}</p>
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center">
+              <Server class="w-7 h-7 text-primary-600" />
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">{{ cabinet.cabinet_code }}</h1>
+              <p class="text-gray-500 mt-0.5 flex items-center gap-1.5">
+                <MapPin class="w-4 h-4" />
+                {{ cabinet.bts_site }}
+              </p>
+            </div>
           </div>
           <div class="flex gap-2">
-            <button @click="openEdit" class="btn-secondary min-h-[56px] px-4">
-              Sửa
+            <button @click="openEdit" class="btn-secondary min-h-[44px] px-5 flex items-center gap-2 text-sm font-semibold rounded-xl">
+              <FileEdit class="w-4 h-4" /> Sửa
             </button>
-            <button @click="confirmDelete" class="btn-primary bg-red-600 hover:bg-red-700 min-h-[56px] px-4">
-              Xóa
+            <button @click="confirmDelete" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 min-h-[44px] px-5 flex items-center gap-2 text-sm font-semibold rounded-xl transition-colors">
+              <Trash2 class="w-4 h-4" /> Xóa
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Info Grid -->
+      <!-- MOBILE Header -->
+      <div class="md:hidden">
+        <div class="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="flex-shrink-0 w-14 h-14 rounded-[18px] bg-primary-50 flex items-center justify-center">
+              <Server class="w-7 h-7 text-primary-600" />
+            </div>
+            <div class="flex-1 pt-1">
+              <h1 class="text-xl font-bold text-gray-900 tracking-tight">{{ cabinet.cabinet_code }}</h1>
+              <p class="text-sm font-medium text-gray-500 flex items-center gap-1 mt-0.5">
+                <MapPin class="w-4 h-4" />
+                {{ cabinet.bts_site }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button @click="openEdit" class="flex-1 min-h-[48px] bg-white border border-gray-200 rounded-[14px] text-gray-700 font-semibold text-sm flex items-center justify-center gap-2 active:bg-gray-50 transition-colors">
+              <FileEdit class="w-5 h-5 text-gray-400" /> Sửa
+            </button>
+            <button @click="confirmDelete" class="flex-1 min-h-[48px] bg-red-50/50 border border-red-100 rounded-[14px] text-red-600 font-semibold text-sm flex items-center justify-center gap-2 active:bg-red-100 transition-colors">
+              <Trash2 class="w-5 h-5" /> Xóa
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="card p-4">
-          <h3 class="font-semibold text-gray-700 mb-3">Thông tin tủ cáp</h3>
+        <div class="bg-white rounded-[20px] md:rounded-xl p-5 shadow-sm border border-gray-100 md:border-gray-200">
+          <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <Info class="w-4 h-4 text-gray-400" />
+            Thông tin tủ cáp
+          </h3>
           <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-500">BTS Site:</span>
-              <span class="font-medium">{{ cabinet.bts_site }}</span>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">BTS Site</span>
+              <span class="font-semibold text-gray-900">{{ cabinet.bts_site }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Tọa độ:</span>
-              <span>{{ cabinet.lat }}, {{ cabinet.lng }}</span>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Tọa độ</span>
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-gray-700">{{ cabinet.lat }}, {{ cabinet.lng }}</span>
+                <a
+                  v-if="cabinet.lat && cabinet.lng"
+                  :href="`https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}`"
+                  target="_blank"
+                  rel="noopener"
+                  class="hidden sm:inline-flex items-center gap-1 text-xs text-blue-600 font-semibold bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg transition-colors"
+                  title="Mở Google Maps"
+                >
+                  <Navigation class="w-3.5 h-3.5" />
+                  Chỉ đường
+                </a>
+              </div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Ghi chú:</span>
-              <span>{{ cabinet.note || '-' }}</span>
+            <div class="flex justify-between items-start">
+              <span class="text-gray-500 pt-0.5">Ghi chú</span>
+              <span class="text-gray-700 text-right max-w-[60%] leading-relaxed">{{ cabinet.note || '—' }}</span>
             </div>
           </div>
         </div>
 
-        <div class="card p-4">
-          <h3 class="font-semibold text-gray-700 mb-3">Trạng thái</h3>
+        <div class="bg-white rounded-[20px] md:rounded-xl p-5 shadow-sm border border-gray-100 md:border-gray-200">
+          <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <Clock class="w-4 h-4 text-gray-400" />
+            Trạng thái
+          </h3>
           <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-500">Ngày tạo:</span>
-              <span>{{ formatDate(cabinet.created_at) }}</span>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Ngày tạo</span>
+              <span class="font-medium text-gray-700">{{ formatDate(cabinet.created_at) }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Cập nhật:</span>
-              <span>{{ formatDate(cabinet.updated_at) }}</span>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Cập nhật</span>
+              <span class="font-medium text-gray-700">{{ formatDate(cabinet.updated_at) }}</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Google Maps CTA (Mobile) -->
+      <div v-if="cabinet.lat && cabinet.lng" class="md:hidden">
+        <a
+          :href="`https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}`"
+          target="_blank"
+          rel="noopener"
+          class="flex items-center gap-4 bg-blue-50 border border-blue-100 rounded-[20px] p-4 active:bg-blue-100 transition-colors"
+        >
+          <div class="w-12 h-12 rounded-[14px] bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <Navigation class="w-6 h-6 text-blue-600" />
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-blue-900 text-sm">Chỉ đường trên Google Maps</p>
+            <p class="text-xs text-blue-600 mt-0.5">{{ cabinet.lat }}, {{ cabinet.lng }}</p>
+          </div>
+          <ChevronRight class="w-5 h-5 text-blue-400 flex-shrink-0" />
+        </a>
       </div>
     </div>
 
@@ -76,13 +151,11 @@
       <div class="absolute inset-0 bg-black/50" @click="editMode = false"></div>
       <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Sửa tủ cáp</h3>
-
         <form @submit.prevent="saveCabinet" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">BTS Site</label>
             <input v-model="editForm.bts_site" class="input-field min-h-[56px]" required />
           </div>
-
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Vĩ độ</label>
@@ -93,16 +166,11 @@
               <input v-model.number="editForm.lng" type="number" step="0.000001" class="input-field min-h-[56px]" required />
             </div>
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
             <textarea v-model="editForm.note" rows="3" class="input-field min-h-[56px]"></textarea>
           </div>
-
-          <div v-if="saveError" class="p-3 bg-red-50 text-red-600 text-sm rounded">
-            {{ saveError }}
-          </div>
-
+          <div v-if="saveError" class="p-3 bg-red-50 text-red-600 text-sm rounded">{{ saveError }}</div>
           <div class="flex gap-3">
             <button type="button" @click="editMode = false" class="btn-secondary flex-1 min-h-[56px]">Hủy</button>
             <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[56px]">
@@ -131,6 +199,7 @@
 </template>
 
 <script setup>
+import { ArrowLeft, Loader2, AlertCircle, Server, MapPin, FileEdit, Trash2, Info, Navigation, Clock, ChevronRight } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import cabinetService from '@/services/cabinetService.js'
