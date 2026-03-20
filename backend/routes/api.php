@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('batches/{batch}/plans', [PlanDetailController::class, 'index']);
+    Route::get('inspector/tasks', [PlanDetailController::class, 'tasks']);
     Route::get('plans/{plan}', [PlanDetailController::class, 'show']);
     Route::patch('plans/{plan}/complete', [PlanDetailController::class, 'markComplete']);
 

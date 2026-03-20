@@ -7,9 +7,82 @@ use App\Models\PlanDetail;
 use App\Models\InspectionBatch;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Builder;
 
 class PlanDetailController extends Controller
 {
+    /**
+     * Get flattened inspector tasks with real task pagination.
+     */
+    public function tasks(Request $request): JsonResponse
+    {
+        if ($request->user()->role !== 'inspector') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $status = $request->input('status', 'all');
+        $perPage = min((int) $request->input('per_page', 10), 100);
+
+        $baseQuery = PlanDetail::query()
+            ->with([
+                'inspection',
+                'batch:id,name,start_date,end_date,user_id,approval_status',
+            ])
+            ->whereHas('batch', function (Builder $query) use ($request) {
+                $query->where('user_id', $request->user()->id)
+                    ->where('approval_status', 'approved');
+            });
+
+        $counts = [
+            'all' => (clone $baseQuery)->count(),
+            'planned' => (clone $baseQuery)->where('plan_details.status', 'planned')->count(),
+            'done' => (clone $baseQuery)->where('plan_details.status', 'done')->count(),
+        ];
+
+        $query = clone $baseQuery;
+
+        if (in_array($status, ['planned', 'done'], true)) {
+            $query->where('plan_details.status', $status);
+        }
+
+        $tasks = $query
+            ->join('inspection_batches', 'plan_details.batch_id', '=', 'inspection_batches.id')
+            ->orderByRaw("CASE WHEN plan_details.status = 'planned' THEN 0 ELSE 1 END")
+            ->orderBy('inspection_batches.start_date')
+            ->orderBy('inspection_batches.id', 'desc')
+            ->orderBy('plan_details.id')
+            ->select('plan_details.*')
+            ->paginate($perPage);
+
+        $data = $tasks->getCollection()->map(function (PlanDetail $plan) {
+            return [
+                'planId' => $plan->id,
+                'cabinetCode' => $plan->cabinet_code,
+                'batchName' => $plan->batch?->name,
+                'status' => $plan->status,
+                'result' => $plan->inspection?->final_result,
+                'score' => $plan->inspection?->total_score,
+                'dateRange' => trim(
+                    collect([
+                        optional($plan->batch?->start_date)->format('j/n'),
+                        optional($plan->batch?->end_date)->format('j/n'),
+                    ])->filter()->implode(' — ')
+                ),
+            ];
+        });
+
+        return response()->json([
+            'data' => $data,
+            'counts' => $counts,
+            'current_page' => $tasks->currentPage(),
+            'last_page' => $tasks->lastPage(),
+            'per_page' => $tasks->perPage(),
+            'total' => $tasks->total(),
+            'from' => $tasks->firstItem(),
+            'to' => $tasks->lastItem(),
+        ]);
+    }
+
     /**
      * Get plan details for a batch
      */

@@ -31,6 +31,18 @@
           <Loader2 class="w-7 h-7 animate-spin text-primary-500" />
         </div>
 
+        <!-- Error -->
+        <div v-else-if="errorMessage" class="rounded-2xl border border-red-200 bg-red-50 p-4 text-center">
+          <p class="font-semibold text-red-700">Không thể tải danh sách nhiệm vụ</p>
+          <p class="mt-1 text-sm text-red-600">{{ errorMessage }}</p>
+          <button
+            @click="fetchData(currentPage)"
+            class="mt-4 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-all active:bg-red-700"
+          >
+            Thử lại
+          </button>
+        </div>
+
         <!-- Task List -->
         <div v-else class="space-y-3">
           <button
@@ -90,7 +102,7 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="filteredTasks.length > perPage" class="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-slate-200">
+        <div v-if="totalItems > perPage" class="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-slate-200">
           <button
             @click="goToPage(currentPage - 1)"
             :disabled="currentPage === 1"
@@ -141,7 +153,6 @@ import { Calendar, ChevronLeft, ChevronRight, ClipboardList, Loader2 } from 'luc
 
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
 
 const router = useRouter()
@@ -151,11 +162,14 @@ const isDetailOpen = computed(() => !!route.params.planId)
 const isActiveTask = (id) => route.params.planId == id
 
 const loading = ref(true)
-const allTasks = ref([])
+const errorMessage = ref('')
+const tasks = ref([])
+const counts = ref({ all: 0, planned: 0, done: 0 })
 const activeTab = ref('all')
 const currentPage = ref(1)
-const perPage = 5
-const totalTasks = ref(0)
+const perPage = 10
+const totalPages = ref(1)
+const totalItems = ref(0)
 
 const tabs = [
   { label: 'Tất cả', value: 'all' },
@@ -164,88 +178,54 @@ const tabs = [
 ]
 
 watch(activeTab, () => {
-  currentPage.value = 1
+  fetchData(1)
 })
 
-const filteredTasks = computed(() => {
-  if (activeTab.value === 'all') return allTasks.value
-  return allTasks.value.filter(t => t.status === activeTab.value)
-})
-
-const paginatedTasks = computed(() => {
-  const start = (currentPage.value - 1) * perPage
-  const end = start + perPage
-  return filteredTasks.value.slice(start, end)
-})
-
-const totalPages = computed(() => Math.ceil(filteredTasks.value.length / perPage) || 1)
+const paginatedTasks = computed(() => tasks.value)
 
 const goToPage = (page) => {
   if (page < 1 || page > totalPages.value) return
-  currentPage.value = page
-  // TODO: Fetch tasks for specific page
+  fetchData(page)
 }
 
 const getCount = (tab) => {
-  if (tab === 'all') return allTasks.value.length
-  return allTasks.value.filter(t => t.status === tab).length
-}
-
-const formatDateRange = (start, end) => {
-  const fmt = (d) => {
-    if (!d) return ''
-    const dt = new Date(d)
-    return `${dt.getDate()}/${dt.getMonth() + 1}`
-  }
-  return `${fmt(start)} — ${fmt(end)}`
+  return counts.value[tab] || 0
 }
 
 const goToInspection = (task) => {
   router.push({ name: 'inspector-tasks-inspection', params: { planId: task.planId } })
 }
 
-const fetchData = async () => {
+const fetchData = async (page = currentPage.value) => {
   loading.value = true
+  errorMessage.value = ''
   try {
-    const res = await batchService.getBatches({ per_page: 100, approval_status: 'approved' })
-    const batches = res.data || res || []
-    
-    const tasks = []
-    
-    await Promise.all(
-      batches.map(async (batch) => {
-        try {
-          const plansRes = await api.get(`/batches/${batch.id}/plans`)
-          const plans = plansRes.data?.data || plansRes.data || []
-          
-          for (const plan of plans) {
-            // Lấy inspection từ plan đã eager load sẵn - KHÔNG gọi API riêng
-            const inspection = plan.inspection || null
-            const result = inspection?.final_result || null
-            const score = inspection?.total_score ?? null
+    const res = await api.get('/inspector/tasks', {
+      silent: true,
+      params: {
+        page,
+        per_page: perPage,
+        status: activeTab.value
+      }
+    })
 
-            tasks.push({
-              planId: plan.id,
-              cabinetCode: plan.cabinet_code,
-              batchName: batch.name,
-              status: plan.status,
-              result,
-              score,
-              dateRange: formatDateRange(batch.start_date, batch.end_date)
-            })
-          }
-        } catch { /* skip if fails */ }
-      })
-    )
-    
-    allTasks.value = tasks
-    totalTasks.value = tasks.length
+    tasks.value = res.data?.data || []
+    counts.value = res.data?.counts || { all: 0, planned: 0, done: 0 }
+    currentPage.value = res.data?.current_page || 1
+    totalPages.value = res.data?.last_page || 1
+    totalItems.value = res.data?.total || 0
   } catch (e) {
     console.error('Failed to fetch tasks:', e)
+    errorMessage.value = e.response?.data?.message || 'Vui lòng kiểm tra kết nối và thử lại.'
+    tasks.value = []
+    counts.value = { all: 0, planned: 0, done: 0 }
+    currentPage.value = 1
+    totalPages.value = 1
+    totalItems.value = 0
   } finally {
     loading.value = false
   }
 }
 
-onMounted(fetchData)
+onMounted(() => fetchData(1))
 </script>
