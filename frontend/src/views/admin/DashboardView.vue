@@ -4,48 +4,48 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
-            <FileStack class="w-5 h-5 text-blue-400" />
+          <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
+            <FileStack class="w-5 h-5 text-primary-600" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-100">{{ stats.totalBatches }}</p>
-            <p class="text-sm text-gray-500">Lô kiểm tra</p>
+            <p class="text-2xl font-bold text-slate-900">{{ stats.totalBatches }}</p>
+            <p class="text-sm text-slate-500">Lô kiểm tra</p>
           </div>
         </div>
       </div>
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-green-500/15 flex items-center justify-center">
-            <ShieldCheck class="w-5 h-5 text-green-600" />
+          <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+            <ShieldCheck class="w-5 h-5 text-success" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-100">{{ stats.passed }}</p>
-            <p class="text-sm text-gray-500">Đạt</p>
+            <p class="text-2xl font-bold text-slate-900">{{ stats.passed }}</p>
+            <p class="text-sm text-slate-500">Đạt</p>
           </div>
         </div>
       </div>
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-red-500/15 flex items-center justify-center">
-            <XCircle class="w-5 h-5 text-red-600" />
+          <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+            <XCircle class="w-5 h-5 text-danger" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-100">{{ stats.failed }}</p>
-            <p class="text-sm text-gray-500">Không đạt</p>
+            <p class="text-2xl font-bold text-slate-900">{{ stats.failed }}</p>
+            <p class="text-sm text-slate-500">Không đạt</p>
           </div>
         </div>
       </div>
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
-            <Clock class="w-5 h-5 text-amber-600" />
+          <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+            <Clock class="w-5 h-5 text-warning" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-100">{{ stats.pending }}</p>
-            <p class="text-sm text-gray-500">Đang chờ</p>
+            <p class="text-2xl font-bold text-slate-900">{{ stats.pending }}</p>
+            <p class="text-sm text-slate-500">Đang chờ</p>
           </div>
         </div>
       </div>
@@ -53,12 +53,12 @@
 
     <!-- Recent Batches -->
     <div class="card">
-      <div class="p-4 border-b border-gray-700/30">
-        <h2 class="text-lg font-semibold text-gray-100">Lô kiểm tra gần đây</h2>
+      <div class="p-4 border-b border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900">Lô kiểm tra gần đây</h2>
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="p-4 text-center text-gray-500">
+      <div v-if="loading" class="p-4 text-center text-slate-500">
         Đang tải...
       </div>
 
@@ -69,16 +69,16 @@
 
       <!-- Data -->
       <div v-else class="divide-y divide-gray-100">
-        <div v-for="batch in recentBatches" :key="batch.id" class="p-4 flex items-center justify-between hover:bg-dark-bg">
+        <div v-for="batch in recentBatches" :key="batch.id" class="p-4 flex items-center justify-between hover:bg-slate-50">
           <div>
-            <p class="font-medium text-gray-100">{{ batch.name || batch.title }}</p>
-            <p class="text-sm text-gray-500">{{ batch.plans_count || 0 }} tủ cáp • {{ formatDate(batch.created_at) }}</p>
+            <p class="font-medium text-slate-900">{{ batch.name || batch.title }}</p>
+            <p class="text-sm text-slate-500">{{ batch.plans_count || 0 }} tủ cáp • {{ formatDate(batch.created_at) }}</p>
           </div>
           <span :class="getStatusClass(batch.status)">{{ getStatusLabel(batch.status) }}</span>
         </div>
 
         <!-- Empty -->
-        <div v-if="recentBatches.length === 0" class="p-4 text-center text-gray-500">
+        <div v-if="recentBatches.length === 0" class="p-4 text-center text-slate-500">
           Chưa có lô kiểm tra nào
         </div>
       </div>

@@ -2,20 +2,20 @@
   <div class="space-y-5 pb-28">
     <template v-if="!loading && plan">
       <!-- Header / Cabinet Info -->
-      <div class="rounded-2xl bg-dark-surface border border-gray-700/50 p-5 shadow-lg shadow-black/10">
-        <button @click="goBack" class="flex items-center gap-1 text-sm text-primary-400 font-medium mb-3 -ml-1 active:opacity-70">
+      <div class="rounded-lg bg-white border border-slate-200 p-5 shadow-sm">
+        <button @click="goBack" class="flex items-center gap-1 text-sm text-primary-600 font-medium mb-3 -ml-1 active:opacity-70">
           <ChevronLeft class="w-4 h-4" />
           Quay lại
         </button>
         <div class="flex items-start justify-between">
           <div>
-            <h2 class="text-lg font-bold text-gray-100">{{ plan.cabinet_code }}</h2>
-            <p v-if="plan.cabinet?.bts_site" class="text-sm text-gray-500 mt-1">{{ plan.cabinet.bts_site }}</p>
+            <h2 class="text-lg font-bold text-slate-900">{{ plan.cabinet_code }}</h2>
+            <p v-if="plan.cabinet?.bts_site" class="text-sm text-slate-500 mt-1">{{ plan.cabinet.bts_site }}</p>
           </div>
           <span
             v-if="existingInspection"
             class="text-xs font-bold px-2.5 py-1 rounded-full text-center"
-            :class="existingInspection.final_result?.toUpperCase() === 'PASS' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'"
+            :class="existingInspection.final_result?.toUpperCase() === 'PASS' ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
           >
             {{ existingInspection.final_result?.toUpperCase() === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
           </span>
@@ -23,9 +23,9 @@
       </div>
 
       <!-- Already inspected notice -->
-      <div v-if="existingInspection" class="rounded-2xl bg-green-500/10 border border-green-500/20 p-5">
-        <p class="text-sm font-semibold text-green-300">✓ Tủ này đã được kiểm tra</p>
-        <p class="text-sm text-green-400 mt-1">Điểm: {{ existingInspection.total_score }} · Lỗi nghiêm trọng: {{ existingInspection.critical_errors_count }}</p>
+      <div v-if="existingInspection" class="rounded-lg bg-success/10 border border-green-200 p-5">
+        <p class="text-sm font-semibold text-green-800">✓ Tủ này đã được kiểm tra</p>
+        <p class="text-sm text-success mt-1">Điểm: {{ existingInspection.total_score }} · Lỗi nghiêm trọng: {{ existingInspection.critical_errors_count }}</p>
       </div>
 
       <!-- Main Form Flow (if not inspected) -->
@@ -34,9 +34,9 @@
         <!-- Draft Status Indicator -->
         <div v-if="draftStatus" class="text-xs font-medium px-3 py-1.5 rounded-lg mb-4 flex items-center gap-1.5 transition-all"
              :class="{
-               'bg-green-500/10 text-green-600': draftStatus === 'saved',
-               'bg-blue-500/10 text-blue-400': draftStatus === 'restored',
-               'bg-dark-bg text-gray-500': draftStatus === 'saving'
+               'bg-success/10 text-success': draftStatus === 'saved',
+               'bg-primary-50 text-primary-600': draftStatus === 'restored',
+               'bg-slate-50 text-slate-500': draftStatus === 'saving'
              }">
           <span v-if="draftStatus === 'saving'">⏳ Đang lưu nháp...</span>
           <span v-else-if="draftStatus === 'saved'">💾 Đã lưu nháp lúc {{ draftTime }}</span>
@@ -45,13 +45,13 @@
 
         <!-- Step Indicator -->
         <div class="flex items-center gap-2 mb-6">
-          <button @click="currentStep = 1" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-400' : 'border-gray-700/50 text-gray-500'">1. Ảnh tổng thể</button>
-          <button @click="goToStep2" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-400' : 'border-gray-700/50 text-gray-500'" :disabled="!isValidStep1">2. Chi tiết Checklist</button>
+          <button @click="currentStep = 1" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'">1. Ảnh tổng thể</button>
+          <button @click="goToStep2" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'" :disabled="!isValidStep1">2. Chi tiết Checklist</button>
         </div>
 
         <!-- STEP 1: Overall Photos -->
         <div v-show="currentStep === 1" class="space-y-4">
-          <div class="bg-blue-500/10 text-blue-300 p-4 rounded-xl border border-blue-500/20 mb-4">
+          <div class="bg-primary-50 text-primary-800 p-4 rounded-lg border border-blue-100 mb-4">
             <p class="text-sm font-medium">📷 Yêu cầu: Vui lòng chụp ít nhất 4 ảnh tổng thể bề ngoài của tủ trước khi tiến hành kiểm tra chi tiết.</p>
           </div>
           
@@ -67,7 +67,7 @@
             </div>
             
             <!-- Allow adding more than 4 if needed -->
-            <button @click="addPhotoSlot" type="button" v-if="overallPhotos.length < 8 && overallPhotos.every(p => p)" class="aspect-square rounded-xl border-2 border-dashed border-gray-600 flex flex-col items-center justify-center text-gray-500 hover:bg-dark-bg hover:border-primary-400 hover:text-primary-500 transition-colors">
+            <button @click="addPhotoSlot" type="button" v-if="overallPhotos.length < 8 && overallPhotos.every(p => p)" class="aspect-square rounded-lg border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-primary-400 hover:text-primary-500 transition-colors">
               <Plus class="w-8 h-8 mb-1" />
               <span class="text-xs font-medium">Thêm ảnh</span>
             </button>
@@ -77,8 +77,8 @@
             <button
               @click="currentStep = 2"
               :disabled="!isValidStep1 || isAnyUploading"
-              class="w-full min-h-[48px] rounded-xl font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-              :class="(isValidStep1 && !isAnyUploading) ? 'bg-primary-500 text-white hover:bg-primary-400 shadow-lg shadow-primary-500/20' : 'bg-dark-elevated text-gray-500 cursor-not-allowed'"
+              class="w-full min-h-[48px] rounded-lg font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              :class="(isValidStep1 && !isAnyUploading) ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
             >
               {{ isAnyUploading ? 'Đang tải ảnh lên...' : 'Tiếp tục kiểm tra →' }}
             </button>
@@ -88,8 +88,8 @@
         <!-- STEP 2: Checklist Items -->
         <div v-show="currentStep === 2">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-gray-100">Danh sách kiểm tra ({{ checklistItems.length }} hạng mục)</h3>
-            <span class="text-xs font-medium text-gray-500">{{ answeredCount }}/{{ checklistItems.length }} đã chấm</span>
+            <h3 class="text-base font-bold text-slate-900">Danh sách kiểm tra ({{ checklistItems.length }} hạng mục)</h3>
+            <span class="text-xs font-medium text-slate-500">{{ answeredCount }}/{{ checklistItems.length }} đã chấm</span>
           </div>
 
           <!-- Quick Actions -->
@@ -97,7 +97,7 @@
             <button
               @click="markAllPass"
               type="button"
-              class="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-black/10"
+              class="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 active:scale-95 transition-all flex items-center gap-2 shadow-sm"
             >
               <ShieldCheck class="w-4 h-4" />
               ✓ Đạt tất cả
@@ -106,12 +106,12 @@
 
           <div v-for="(group, category) in groupedItems" :key="category" class="mb-5">
             <!-- Category Header (Collapsible) -->
-            <button @click="toggleCategory(category)" type="button" class="w-full bg-dark-bg px-4 py-3 rounded-xl mb-3 border border-gray-700/30 flex items-center justify-between hover:bg-dark-elevated active:scale-[0.99] transition-all">
+            <button @click="toggleCategory(category)" type="button" class="w-full bg-slate-50 px-4 py-3 rounded-lg mb-3 border border-slate-200 flex items-center justify-between hover:bg-slate-100 active:scale-[0.99] transition-all">
               <div class="flex items-center gap-2">
-                <h4 class="text-sm font-bold text-gray-300 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
-                <span class="text-xs font-medium text-gray-500">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
+                <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
+                <span class="text-xs font-medium text-slate-400">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
               </div>
-              <ChevronDown class="w-4 h-4 text-gray-500 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
+              <ChevronDown class="w-4 h-4 text-slate-400 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
             </button>
 
             <!-- Items -->
@@ -119,16 +119,16 @@
               <div
                 v-for="item in group"
                 :key="item.id"
-                class="rounded-2xl bg-dark-surface border border-gray-700/50 p-4 shadow-lg shadow-black/10 transition-all"
+                class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm transition-all"
                 :class="{'ring-2 ring-red-400': itemDetails[item.id]?.is_failed, 'ring-2 ring-green-400': itemDetails[item.id]?.is_failed === false}"
               >
                 <div class="flex items-start gap-3">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <p class="text-sm font-semibold text-gray-100 leading-snug">{{ item.content }}</p>
-                      <span v-if="item.is_critical" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/15 text-red-600 shrink-0">⚠ NGHIÊM TRỌNG</span>
+                      <p class="text-sm font-semibold text-slate-900 leading-snug">{{ item.content }}</p>
+                      <span v-if="item.is_critical" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-danger shrink-0">⚠ NGHIÊM TRỌNG</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Điểm tối đa: {{ item.max_score }}</p>
+                    <p class="text-xs text-slate-500 mt-1">Điểm tối đa: {{ item.max_score }}</p>
                   </div>
                 </div>
 
@@ -137,20 +137,20 @@
                   <button
                     type="button"
                     @click="setResult(item.id, false)"
-                    class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
+                    class="flex-1 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95"
                     :class="itemDetails[item.id]?.is_failed === false
-                      ? 'bg-green-600 text-white shadow-md shadow-green-600/20'
-                      : 'bg-dark-elevated text-gray-500 hover:bg-gray-700'"
+                      ? 'bg-green-600 text-white shadow-sm shadow-green-600/20'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                   >
                     ✓ Đạt
                   </button>
                   <button
                     type="button"
                     @click="setResult(item.id, true)"
-                    class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
+                    class="flex-1 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95"
                     :class="itemDetails[item.id]?.is_failed === true
-                      ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                      : 'bg-dark-elevated text-gray-500 hover:bg-gray-700'"
+                      ? 'bg-red-600 text-white shadow-sm shadow-red-600/20'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                   >
                     ✗ Không đạt
                   </button>
@@ -163,20 +163,20 @@
                 </p>
 
                 <!-- Expanded Box for Failure Notes & Image -->
-                <div v-if="itemDetails[item.id]?.is_failed" class="mt-4 p-4 bg-red-500/10/50 rounded-xl border border-red-500/20 flex flex-col gap-4">
+                <div v-if="itemDetails[item.id]?.is_failed" class="mt-4 p-4 bg-danger/10/50 rounded-lg border border-red-100 flex flex-col gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-red-300 mb-2 uppercase tracking-wide">1. Đính kèm minh chứng lỗi <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-bold text-red-800 mb-2 uppercase tracking-wide">1. Đính kèm minh chứng lỗi <span class="text-red-500">*</span></label>
                     <div class="w-32">
                       <MobileImageUploader v-model="itemDetails[item.id].image_url" />
                     </div>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-red-300 mb-2 uppercase tracking-wide">2. Ghi chú lỗi <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-bold text-red-800 mb-2 uppercase tracking-wide">2. Ghi chú lỗi <span class="text-red-500">*</span></label>
                     <textarea 
                       v-model="itemDetails[item.id].note" 
                       rows="3"
-                      class="w-full text-sm border-gray-600 rounded-xl p-3 focus:ring-red-500 focus:border-red-500 shadow-lg shadow-black/10" 
+                      class="w-full text-sm border-slate-300 rounded-lg p-3 focus:ring-red-500 focus:border-red-500 shadow-sm" 
                       placeholder="Mô tả chi tiết vấn đề gặp phải..."></textarea>
                   </div>
                 </div>
@@ -188,28 +188,28 @@
       </div>
 
       <!-- Error -->
-      <div v-if="submitError" class="rounded-2xl bg-red-500/10 border border-red-200 p-4 mt-4">
-        <p class="text-sm text-red-600 font-medium">{{ submitError }}</p>
+      <div v-if="submitError" class="rounded-lg bg-danger/10 border border-red-200 p-4 mt-4">
+        <p class="text-sm text-danger font-medium">{{ submitError }}</p>
       </div>
     </template>
 
     <div v-else-if="!loading && !plan" class="text-center py-10">
-      <p class="text-gray-500">Không thể tải dữ liệu nhiệm vụ.</p>
-      <button @click="fetchData" class="mt-3 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold">Thử lại</button>
+      <p class="text-slate-500">Không thể tải dữ liệu nhiệm vụ.</p>
+      <button @click="fetchData" class="mt-3 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-semibold">Thử lại</button>
     </div>
 
     <!-- Bottom Scoring Summary + Submit (Fixed) -->
     <div v-if="!loading && plan && !existingInspection && checklistItems.length > 0 && currentStep === 2" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto z-40">
-      <div class="bg-dark-surface border-t border-gray-700/50 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] px-4 py-3 rounded-t-3xl">
+      <div class="bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] px-4 py-3 rounded-t-3xl">
         <!-- Score summary -->
         <div class="flex items-center justify-between text-sm mb-3 px-2">
           <div class="flex items-center gap-4">
-            <span class="text-gray-500">Điểm: <span class="font-bold text-base" :class="scoreSummary.willPass ? 'text-green-600' : 'text-red-600'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
-            <span v-if="scoreSummary.criticalCount > 0" class="text-red-600 font-bold bg-red-500/10 px-2 py-0.5 rounded-md">⚠ {{ scoreSummary.criticalCount }} Lỗi</span>
+            <span class="text-slate-600">Điểm: <span class="font-bold text-base" :class="scoreSummary.willPass ? 'text-success' : 'text-danger'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
+            <span v-if="scoreSummary.criticalCount > 0" class="text-danger font-bold bg-danger/10 px-2 py-0.5 rounded-md">⚠ {{ scoreSummary.criticalCount }} Lỗi</span>
           </div>
           <span
             class="text-xs font-bold px-3 py-1.5 rounded-lg"
-            :class="scoreSummary.willPass ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'"
+            :class="scoreSummary.willPass ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
           >
             {{ scoreSummary.willPass ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
           </span>
@@ -219,8 +219,8 @@
         <button
           @click="handleSubmit"
           :disabled="!isValidToSubmit || submitting"
-          class="w-full min-h-[50px] rounded-xl font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-          :class="isValidToSubmit ? 'bg-primary-500 text-white hover:bg-primary-400 shadow-md shadow-primary-500/15' : 'bg-gray-700 text-gray-500 cursor-not-allowed'"
+          class="w-full min-h-[50px] rounded-lg font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          :class="isValidToSubmit ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/20' : 'bg-slate-200 text-slate-500 cursor-not-allowed'"
         >
           <Loader2 v-if="submitting" class="animate-spin w-5 h-5" />
           {{ submitting ? 'Đang lưu...' : (isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất thông tin (${answeredCount}/${checklistItems.length})`) }}

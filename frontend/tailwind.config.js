@@ -7,12 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#0A0E1A',
-          surface: '#111827',
-          elevated: '#1F2937',
-          border: 'rgba(55, 65, 81, 0.5)',
-        },
         primary: {
           50: '#EFF6FF',
           100: '#DBEAFE',
@@ -25,15 +19,14 @@ export default {
           800: '#1E40AF',
           900: '#1E3A8A',
         },
+        success: '#16A34A',
+        danger: '#DC2626',
+        warning: '#D97706',
         accent: '#F97316',
-        success: '#22C55E',
-        danger: '#EF4444',
-        warning: '#F59E0B',
       },
       fontFamily: {
-        sans: ['Fira Sans', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['Fira Code', 'monospace'],
-        heading: ['Fira Code', 'monospace'],
+        sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', '"Open Sans"', 'system-ui', 'sans-serif'],
       },
       minHeight: {
         'touch': '56px',

@@ -1,16 +1,16 @@
 ﻿<template>
   <div class="max-w-2xl mx-auto space-y-6">
-    <h2 class="text-lg font-semibold text-gray-100">Hồ sơ cá nhân</h2>
+    <h2 class="text-lg font-semibold text-slate-900">Hồ sơ cá nhân</h2>
 
     <!-- Profile Info -->
     <div class="card p-6">
       <div class="flex items-center gap-4 mb-6">
         <div class="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center">
-          <span class="text-2xl font-bold text-primary-400">{{ getInitials(authStore.user?.name) }}</span>
+          <span class="text-2xl font-bold text-primary-600">{{ getInitials(authStore.user?.name) }}</span>
         </div>
         <div>
-          <h3 class="text-xl font-semibold text-gray-100">{{ authStore.user?.name }}</h3>
-          <p class="text-gray-500">{{ authStore.user?.email }}</p>
+          <h3 class="text-xl font-semibold text-slate-900">{{ authStore.user?.name }}</h3>
+          <p class="text-slate-500">{{ authStore.user?.email }}</p>
           <span :class="getRoleClass(authStore.user?.role)" class="mt-1 inline-block">{{ getRoleLabel(authStore.user?.role) }}</span>
         </div>
       </div>
@@ -18,7 +18,7 @@
       <!-- Edit Form -->
       <form @submit.prevent="updateProfile" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Họ tên</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Họ tên</label>
           <input
             v-model="form.name"
             type="text"
@@ -28,7 +28,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
           <input
             v-model="form.email"
             type="email"
@@ -38,24 +38,24 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Tên đăng nhập</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Tên đăng nhập</label>
           <input
             :value="authStore.user?.username"
             type="text"
             class="input-field min-h-touch"
             disabled
           />
-          <p class="text-xs text-gray-500 mt-1">Tên đăng nhập không thể thay đổi</p>
+          <p class="text-xs text-slate-500 mt-1">Tên đăng nhập không thể thay đổi</p>
         </div>
 
         <!-- Error -->
-        <div v-if="error" class="p-3 bg-red-500/10 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-600">{{ error }}</p>
+        <div v-if="error" class="p-3 bg-danger/10 border border-red-200 rounded-lg">
+          <p class="text-sm text-danger">{{ error }}</p>
         </div>
 
         <!-- Success -->
-        <div v-if="success" class="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-          <p class="text-sm text-green-600">{{ success }}</p>
+        <div v-if="success" class="p-3 bg-success/10 border border-green-200 rounded-lg">
+          <p class="text-sm text-success">{{ success }}</p>
         </div>
 
         <button type="submit" :disabled="saving" class="btn-primary w-full min-h-touch">
@@ -66,11 +66,11 @@
 
     <!-- Change Password -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-100 mb-4">Đổi mật khẩu</h3>
+      <h3 class="text-lg font-semibold text-slate-900 mb-4">Đổi mật khẩu</h3>
 
       <form @submit.prevent="changePassword" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Mật khẩu hiện tại</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu hiện tại</label>
           <input
             v-model="passwordForm.current_password"
             type="password"
@@ -80,7 +80,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Mật khẩu mới</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu mới</label>
           <input
             v-model="passwordForm.password"
             type="password"
@@ -91,7 +91,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Xác nhận mật khẩu</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Xác nhận mật khẩu</label>
           <input
             v-model="passwordForm.password_confirmation"
             type="password"
@@ -102,13 +102,13 @@
         </div>
 
         <!-- Error -->
-        <div v-if="passwordError" class="p-3 bg-red-500/10 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-600">{{ passwordError }}</p>
+        <div v-if="passwordError" class="p-3 bg-danger/10 border border-red-200 rounded-lg">
+          <p class="text-sm text-danger">{{ passwordError }}</p>
         </div>
 
         <!-- Success -->
-        <div v-if="passwordSuccess" class="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-          <p class="text-sm text-green-600">{{ passwordSuccess }}</p>
+        <div v-if="passwordSuccess" class="p-3 bg-success/10 border border-green-200 rounded-lg">
+          <p class="text-sm text-success">{{ passwordSuccess }}</p>
         </div>
 
         <button type="submit" :disabled="changingPassword" class="btn-primary w-full min-h-touch">
@@ -231,6 +231,6 @@ onMounted(() => {
 
 <style scoped>
 .badge-neutral {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-dark-elevated text-gray-300;
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700;
 }
 </style>

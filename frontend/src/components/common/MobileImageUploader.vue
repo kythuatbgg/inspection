@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="relative w-full aspect-square bg-dark-bg border-2 border-dashed rounded-xl overflow-hidden group flex items-center justify-center transition-all shadow-lg shadow-black/10"
+  <div class="relative w-full aspect-square bg-slate-50 border-2 border-dashed rounded-lg overflow-hidden group flex items-center justify-center transition-all shadow-sm"
        :class="borderClass">
     
     <!-- Image Preview -->
@@ -12,10 +12,10 @@
         @error="onImageError"
       />
       <!-- Image load error overlay -->
-      <div v-if="imageLoadError" class="absolute inset-0 bg-red-500/10 flex flex-col items-center justify-center">
+      <div v-if="imageLoadError" class="absolute inset-0 bg-danger/10 flex flex-col items-center justify-center">
         <AlertCircle class="w-6 h-6 text-red-400 mb-1" />
         <span class="text-[10px] text-red-500 font-medium">Lỗi tải ảnh</span>
-        <button @click.prevent="retryPreview" class="mt-1 text-[10px] text-primary-400 font-bold underline">Tải lại</button>
+        <button @click.prevent="retryPreview" class="mt-1 text-[10px] text-primary-600 font-bold underline">Tải lại</button>
       </div>
       <!-- Remove button -->
       <button v-if="!imageLoadError" @click.prevent="removeImage" type="button" 
@@ -27,15 +27,15 @@
     <!-- Upload Placeholder -->
     <template v-else-if="!isUploading && !uploadError">
       <div class="flex flex-col items-center justify-center w-full h-full p-4 gap-2.5">
-        <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-dark-surface border border-gray-700/50 shadow-lg shadow-black/10 rounded-[10px] text-primary-400 hover:bg-dark-bg active:scale-95 transition-all">
+        <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-slate-200 shadow-sm rounded-[10px] text-primary-600 hover:bg-slate-50 active:scale-95 transition-all">
           <input type="file" accept="image/*" capture="environment" class="hidden" @change="onFileChange" :disabled="disabled" />
           <Camera class="w-5 h-5" />
           <span class="text-xs font-bold">Chụp ảnh</span>
         </label>
 
-        <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-dark-elevated rounded-[10px] text-gray-300 hover:bg-gray-700 active:scale-95 transition-all">
+        <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-slate-100 rounded-[10px] text-slate-700 hover:bg-slate-200 active:scale-95 transition-all">
           <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" @change="onFileChange" :disabled="disabled" />
-          <Image class="w-5 h-5 text-gray-500" />
+          <Image class="w-5 h-5 text-slate-500" />
           <span class="text-xs font-bold">Thư viện</span>
         </label>
       </div>
@@ -43,7 +43,7 @@
 
     <!-- Loading State -->
     <template v-else-if="isUploading">
-      <div class="flex flex-col items-center justify-center text-primary-400">
+      <div class="flex flex-col items-center justify-center text-primary-600">
         <Loader2 class="w-6 h-6 animate-spin mb-2" />
         <span class="text-[10px] font-medium">{{ retryCount > 0 ? `Thử lại (${retryCount}/3)...` : 'Đang tải...' }}</span>
       </div>
@@ -55,8 +55,8 @@
         <AlertCircle class="w-6 h-6 text-red-400 mb-1" />
         <span class="text-[10px] text-red-500 font-medium mb-2 leading-tight">{{ uploadError }}</span>
         <div class="flex gap-2">
-          <button @click.prevent="retryUpload" class="text-[10px] px-2.5 py-1 bg-primary-500 text-white rounded-lg font-bold">Thử lại</button>
-          <label class="text-[10px] px-2.5 py-1 bg-gray-700 text-gray-300 rounded-lg font-bold cursor-pointer">
+          <button @click.prevent="retryUpload" class="text-[10px] px-2.5 py-1 bg-primary-600 text-white rounded-lg font-bold">Thử lại</button>
+          <label class="text-[10px] px-2.5 py-1 bg-slate-200 text-slate-700 rounded-lg font-bold cursor-pointer">
             Chọn khác
             <input type="file" accept="image/*" class="hidden" @change="onFileChange" />
           </label>
@@ -99,10 +99,10 @@ const imageLoadError = ref(false)
 let lastFile = null
 
 const borderClass = computed(() => {
-  if (uploadError.value) return 'border-red-300 bg-red-500/10'
-  if (isUploading.value) return 'border-primary-300 bg-primary-500/10'
+  if (uploadError.value) return 'border-red-300 bg-danger/10'
+  if (isUploading.value) return 'border-primary-300 bg-primary-50'
   if (props.modelValue) return 'border-transparent'
-  return 'border-gray-700/50 hover:bg-dark-elevated'
+  return 'border-slate-200 hover:bg-slate-100'
 })
 
 // ---- Client-side image compression via browser-image-compression ----

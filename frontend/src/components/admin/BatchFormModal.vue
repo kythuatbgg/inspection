@@ -6,12 +6,12 @@
 
     <Transition name="modal-slide">
       <div v-if="modelValue" class="fixed inset-0 z-[51] flex items-end md:items-center justify-center">
-        <div class="bg-dark-surface w-full md:max-w-lg md:rounded-2xl rounded-t-[28px] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden" @click.stop>
+        <div class="bg-white w-full md:max-w-lg md:rounded-lg rounded-t-[28px] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden" @click.stop>
           <!-- Header -->
-          <div class="flex items-center justify-between px-5 pt-5 pb-3 md:px-6 md:pt-6 border-b border-gray-700/30">
-            <h2 class="text-lg font-bold text-gray-100">Tạo lô kiểm tra mới</h2>
-            <button @click="close" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-dark-elevated transition-colors">
-              <X class="w-5 h-5 text-gray-500" />
+          <div class="flex items-center justify-between px-5 pt-5 pb-3 md:px-6 md:pt-6 border-b border-slate-200">
+            <h2 class="text-lg font-bold text-slate-900">Tạo lô kiểm tra mới</h2>
+            <button @click="close" class="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors">
+              <X class="w-5 h-5 text-slate-500" />
             </button>
           </div>
 
@@ -19,19 +19,19 @@
           <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto overscroll-contain p-5 md:p-6 space-y-5">
             <!-- Tên lô -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1.5">Tên lô kiểm tra <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Tên lô kiểm tra <span class="text-red-500">*</span></label>
               <input
                 v-model="form.name"
                 type="text"
                 required
                 placeholder="VD: Lô kiểm tra Q1-2026 Khu vực A"
-                class="w-full px-4 py-3 min-h-[48px] rounded-xl border border-gray-600 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
+                class="w-full px-4 py-3 min-h-[48px] rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
               />
             </div>
 
             <!-- Người kiểm tra -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1.5">Người kiểm tra <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Người kiểm tra <span class="text-red-500">*</span></label>
               <MobileBottomSheet
                 v-model="form.user_id"
                 :options="userOptions"
@@ -43,7 +43,7 @@
 
             <!-- Checklist -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1.5">Checklist <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Checklist <span class="text-red-500">*</span></label>
               <MobileBottomSheet
                 v-model="form.checklist_id"
                 :options="checklistOptions"
@@ -56,7 +56,7 @@
             <!-- Date Range -->
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1.5">Ngày bắt đầu <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span class="text-red-500">*</span></label>
                 <MobileDatePicker
                   v-model="form.start_date"
                   label="Ngày bắt đầu"
@@ -67,7 +67,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1.5">Ngày kết thúc <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc <span class="text-red-500">*</span></label>
                 <MobileDatePicker
                   v-model="form.end_date"
                   label="Ngày kết thúc"
@@ -81,8 +81,8 @@
 
             <!-- Cabinets (Multi-select) -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1.5">Chọn tủ cáp <span class="text-red-500">*</span></label>
-              <p class="text-xs text-gray-500 mb-2">Đã chọn: {{ form.cabinet_codes.length }} tủ</p>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Chọn tủ cáp <span class="text-red-500">*</span></label>
+              <p class="text-xs text-slate-500 mb-2">Đã chọn: {{ form.cabinet_codes.length }} tủ</p>
               
               <!-- Search cabinets -->
               <div class="relative mb-3">
@@ -90,55 +90,55 @@
                   v-model="cabinetSearch"
                   type="text"
                   placeholder="Tìm kiếm mã tủ..."
-                  class="w-full pl-9 pr-4 py-2.5 min-h-[44px] rounded-xl border border-gray-600 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-sm outline-none transition-all"
+                  class="w-full pl-9 pr-4 py-2.5 min-h-[44px] rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-sm outline-none transition-all"
                 />
-                <Search class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
 
               <!-- Cabinet list -->
-              <div class="border border-gray-700/50 rounded-xl max-h-[200px] overflow-y-auto overscroll-contain divide-y divide-gray-100">
+              <div class="border border-slate-200 rounded-lg max-h-[200px] overflow-y-auto overscroll-contain divide-y divide-gray-100">
                 <label
                   v-for="cab in filteredCabinets"
                   :key="cab.cabinet_code"
-                  class="flex items-center gap-3 px-4 py-3 min-h-[44px] cursor-pointer hover:bg-dark-bg transition-colors"
+                  class="flex items-center gap-3 px-4 py-3 min-h-[44px] cursor-pointer hover:bg-slate-50 transition-colors"
                 >
                   <input
                     type="checkbox"
                     :value="cab.cabinet_code"
                     v-model="form.cabinet_codes"
-                    class="w-5 h-5 rounded border-gray-600 text-primary-400 focus:ring-primary-500"
+                    class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                   />
                   <div class="flex-1 min-w-0">
-                    <span class="font-medium text-gray-100 text-sm">{{ cab.cabinet_code }}</span>
-                    <span v-if="cab.area" class="text-gray-500 text-xs ml-2">{{ cab.area }}</span>
+                    <span class="font-medium text-slate-900 text-sm">{{ cab.cabinet_code }}</span>
+                    <span v-if="cab.area" class="text-slate-500 text-xs ml-2">{{ cab.area }}</span>
                   </div>
                 </label>
-                <div v-if="filteredCabinets.length === 0" class="px-4 py-3 text-sm text-gray-500 text-center">
+                <div v-if="filteredCabinets.length === 0" class="px-4 py-3 text-sm text-slate-500 text-center">
                   Không tìm thấy tủ nào
                 </div>
               </div>
             </div>
 
             <!-- Validation Errors -->
-            <div v-if="formError" class="p-3 bg-red-500/10 border border-red-200 rounded-xl space-y-1">
+            <div v-if="formError" class="p-3 bg-danger/10 border border-red-200 rounded-lg space-y-1">
               <template v-if="Object.keys(fieldErrors).length > 0">
-                <p v-for="(msgs, field) in fieldErrors" :key="field" class="text-sm text-red-600">
+                <p v-for="(msgs, field) in fieldErrors" :key="field" class="text-sm text-danger">
                   • {{ Array.isArray(msgs) ? msgs[0] : msgs }}
                 </p>
               </template>
-              <p v-else class="text-sm text-red-600">{{ formError }}</p>
+              <p v-else class="text-sm text-danger">{{ formError }}</p>
             </div>
           </form>
 
           <!-- Footer -->
-          <div class="px-5 py-4 md:px-6 border-t border-gray-700/30 flex gap-3">
-            <button type="button" @click="close" class="flex-1 min-h-[48px] rounded-xl border border-gray-600 text-gray-300 font-medium hover:bg-dark-bg transition-colors">
+          <div class="px-5 py-4 md:px-6 border-t border-slate-200 flex gap-3">
+            <button type="button" @click="close" class="flex-1 min-h-[48px] rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors">
               Hủy
             </button>
             <button
               @click="handleSubmit"
               :disabled="submitting || !isFormValid"
-              class="flex-1 min-h-[48px] rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="flex-1 min-h-[48px] rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {{ submitting ? 'Đang tạo...' : 'Tạo lô' }}
             </button>

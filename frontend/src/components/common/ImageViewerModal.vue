@@ -7,7 +7,7 @@
       </button>
       
       <!-- Controls -->
-      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[110] flex items-center justify-between gap-1 sm:gap-3 bg-gray-900/80 px-4 py-2.5 rounded-2xl backdrop-blur-xl border border-white/10 shadow-2xl w-[90%] sm:w-auto max-w-sm">
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[110] flex items-center justify-between gap-1 sm:gap-3 bg-gray-900/80 px-4 py-2.5 rounded-lg backdrop-blur-xl border border-white/10 shadow-2xl w-[90%] sm:w-auto max-w-sm">
         <button @click="zoomOut" class="p-2.5 sm:p-2 text-white hover:text-primary-400 active:scale-95 transition-transform outline-none"><ZoomIn class="w-6 h-6" /></button>
         <div class="text-white/80 text-xs font-mono font-bold w-12 text-center pointer-events-none">{{ Math.round(scale * 100) }}%</div>
         <button @click="zoomIn" class="p-2.5 sm:p-2 text-white hover:text-primary-400 active:scale-95 transition-transform outline-none"><ZoomOut class="w-6 h-6" /></button>

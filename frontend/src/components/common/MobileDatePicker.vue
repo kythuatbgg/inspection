@@ -8,17 +8,17 @@
       class="w-full flex items-center justify-between px-4 py-3 min-h-[52px] text-left transition-all duration-200"
       :class="[
         isMobile
-          ? 'rounded-[16px] border border-transparent bg-dark-elevated/80 active:bg-dark-elevated'
-          : 'rounded-xl border border-gray-600 bg-dark-surface hover:border-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
+          ? 'rounded-[16px] border border-transparent bg-slate-50/80 active:bg-slate-100'
+          : 'rounded-lg border border-slate-300 bg-white hover:border-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
         triggerClass,
         isOpen && !isMobile ? 'border-primary-500 ring-2 ring-primary-500/20' : '',
         error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
       ]"
     >
-      <span :class="modelValue ? 'text-gray-100 font-medium' : 'text-gray-500'" class="truncate">
+      <span :class="modelValue ? 'text-slate-900 font-medium' : 'text-slate-400'" class="truncate">
         {{ formattedDate || placeholder }}
       </span>
-      <Calendar class="w-5 h-5 text-gray-500 shrink-0 ml-2" />
+      <Calendar class="w-5 h-5 text-slate-400 shrink-0 ml-2" />
     </button>
 
     <!-- Desktop Dropdown -->
@@ -26,22 +26,22 @@
       <Transition name="dropdown">
         <div
           v-if="isOpen && !isMobile"
-          class="fixed z-[100] bg-dark-surface rounded-xl border border-gray-700/50 shadow-lg shadow-gray-200/50 p-4"
+          class="fixed z-[100] bg-white rounded-lg border border-slate-200 shadow-sm shadow-gray-200/50 p-4"
           :style="dropdownStyle"
           ref="dropdownRef"
         >
           <div class="flex items-center justify-between mb-4">
-            <button type="button" @click="changeMonth(-1)" class="p-1 hover:bg-dark-elevated rounded-lg transition-colors">
-              <ChevronLeft class="w-5 h-5 text-gray-500" />
+            <button type="button" @click="changeMonth(-1)" class="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+              <ChevronLeft class="w-5 h-5 text-slate-600" />
             </button>
-            <div class="font-semibold text-gray-100">{{ monthNames[currentMonth] }} {{ currentYear }}</div>
-            <button type="button" @click="changeMonth(1)" class="p-1 hover:bg-dark-elevated rounded-lg transition-colors">
-              <ChevronRight class="w-5 h-5 text-gray-500" />
+            <div class="font-semibold text-slate-900">{{ monthNames[currentMonth] }} {{ currentYear }}</div>
+            <button type="button" @click="changeMonth(1)" class="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+              <ChevronRight class="w-5 h-5 text-slate-600" />
             </button>
           </div>
           
           <div class="grid grid-cols-7 gap-1 mb-2">
-            <div v-for="day in ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']" :key="day" class="text-center text-xs font-medium text-gray-500 py-1">
+            <div v-for="day in ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']" :key="day" class="text-center text-xs font-medium text-slate-500 py-1">
               {{ day }}
             </div>
           </div>
@@ -55,10 +55,10 @@
               :disabled="isDisabled"
               class="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors"
               :class="[
-                !isCurrentMonth ? 'text-gray-300' : 'text-gray-300',
-                isSelected ? 'bg-primary-500 text-white font-semibold hover:bg-primary-400' : '',
-                !isSelected && isToday ? 'bg-primary-500/10 text-primary-700 font-semibold' : '',
-                !isSelected && !isDisabled ? 'hover:bg-dark-elevated' : '',
+                !isCurrentMonth ? 'text-gray-300' : 'text-slate-700',
+                isSelected ? 'bg-primary-600 text-white font-semibold hover:bg-primary-700' : '',
+                !isSelected && isToday ? 'bg-primary-50 text-primary-700 font-semibold' : '',
+                !isSelected && !isDisabled ? 'hover:bg-slate-100' : '',
                 isDisabled ? 'opacity-50 cursor-not-allowed text-gray-300' : ''
               ]"
             >
@@ -77,32 +77,32 @@
 
       <Transition name="sheet-slide">
         <div v-if="isOpen && isMobile" class="fixed inset-x-0 bottom-0 z-[61] flex flex-col">
-          <div class="bg-dark-surface rounded-t-[28px] shadow-2xl flex flex-col safe-bottom">
+          <div class="bg-white rounded-t-[28px] shadow-2xl flex flex-col safe-bottom">
             <!-- Drag Handle -->
             <div class="flex justify-center pt-3 pb-1">
               <div class="w-10 h-1 rounded-full bg-gray-300"></div>
             </div>
 
             <!-- Title -->
-            <div class="px-5 pb-3 border-b border-gray-700/30 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-gray-100">{{ label || 'Chọn ngày' }}</h3>
-              <button @click="close" class="p-2 -mr-2 text-primary-400 font-semibold text-sm">Xong</button>
+            <div class="px-5 pb-3 border-b border-slate-200 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-slate-900">{{ label || 'Chọn ngày' }}</h3>
+              <button @click="close" class="p-2 -mr-2 text-primary-600 font-semibold text-sm">Xong</button>
             </div>
 
             <!-- Calendar -->
             <div class="p-5">
               <div class="flex items-center justify-between mb-4">
-                <button type="button" @click="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-dark-elevated rounded-xl transition-colors active:bg-gray-700">
-                  <ChevronLeft class="w-5 h-5 text-gray-500" />
+                <button type="button" @click="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors active:bg-slate-200">
+                  <ChevronLeft class="w-5 h-5 text-slate-600" />
                 </button>
-                <div class="font-bold text-gray-100 text-base">{{ monthNames[currentMonth] }} {{ currentYear }}</div>
-                <button type="button" @click="changeMonth(1)" class="w-10 h-10 flex items-center justify-center hover:bg-dark-elevated rounded-xl transition-colors active:bg-gray-700">
-                  <ChevronRight class="w-5 h-5 text-gray-500" />
+                <div class="font-bold text-slate-900 text-base">{{ monthNames[currentMonth] }} {{ currentYear }}</div>
+                <button type="button" @click="changeMonth(1)" class="w-10 h-10 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors active:bg-slate-200">
+                  <ChevronRight class="w-5 h-5 text-slate-600" />
                 </button>
               </div>
               
               <div class="grid grid-cols-7 gap-x-1 gap-y-2 mb-2">
-                <div v-for="day in ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']" :key="day" class="text-center text-[13px] font-bold text-gray-500 py-1">
+                <div v-for="day in ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']" :key="day" class="text-center text-[13px] font-bold text-slate-500 py-1">
                   {{ day }}
                 </div>
               </div>
@@ -116,10 +116,10 @@
                   :disabled="isDisabled"
                   class="aspect-square w-full max-w-[40px] mx-auto rounded-full flex items-center justify-center text-[15px] transition-colors active:scale-95"
                   :class="[
-                    !isCurrentMonth ? 'text-gray-300' : 'text-gray-100 font-medium',
-                    isSelected ? 'bg-primary-500 text-white font-bold shadow-md shadow-primary-500/20' : '',
-                    !isSelected && isToday ? 'bg-primary-500/10 text-primary-700 font-bold border border-primary-200' : '',
-                    !isSelected && !isDisabled && !isToday ? 'active:bg-dark-elevated' : '',
+                    !isCurrentMonth ? 'text-gray-300' : 'text-slate-900 font-medium',
+                    isSelected ? 'bg-primary-600 text-white font-bold shadow-sm shadow-primary-600/30' : '',
+                    !isSelected && isToday ? 'bg-primary-50 text-primary-700 font-bold border border-primary-200' : '',
+                    !isSelected && !isDisabled && !isToday ? 'active:bg-slate-100' : '',
                     isDisabled ? 'opacity-40 cursor-not-allowed text-gray-300' : ''
                   ]"
                 >
@@ -132,7 +132,7 @@
               <button 
                 type="button" 
                 @click="selectToday" 
-                class="w-full py-3.5 rounded-xl bg-dark-bg text-gray-300 font-semibold active:bg-dark-elevated transition-colors"
+                class="w-full py-3.5 rounded-lg bg-slate-50 text-slate-700 font-semibold active:bg-slate-100 transition-colors"
               >
                 Hôm nay
               </button>

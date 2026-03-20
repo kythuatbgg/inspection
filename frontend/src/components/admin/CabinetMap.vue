@@ -78,7 +78,7 @@ const updateMarkers = () => {
     // Create a custom div icon
     const customIcon = L.divIcon({
       html: `
-        <div class="relative flex items-center justify-center w-10 h-10 bg-primary-500 text-white rounded-full border-4 border-white shadow-md font-bold text-sm transform -translate-x-1/2 -translate-y-1/2">
+        <div class="relative flex items-center justify-center w-10 h-10 bg-primary-600 text-white rounded-full border-4 border-white shadow-sm font-bold text-sm transform -translate-x-1/2 -translate-y-1/2">
           ${count}
         </div>
       `,
@@ -93,11 +93,11 @@ const updateMarkers = () => {
       const hasCoords = cabinet.lat && cabinet.lng
       const mapsUrl = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}` : ''
       return `
-        <div class="flex items-center justify-between gap-2 py-1.5 border-b border-gray-700/30 last:border-0">
-          <span class="font-medium text-gray-100 text-sm">${cabinet.cabinet_code}</span>
+        <div class="flex items-center justify-between gap-2 py-1.5 border-b border-slate-200 last:border-0">
+          <span class="font-medium text-slate-900 text-sm">${cabinet.cabinet_code}</span>
           <div class="flex items-center gap-1 shrink-0">
-            ${hasCoords ? `<a href="${mapsUrl}" target="_blank" rel="noopener" class="text-xs text-blue-400 hover:text-blue-700 font-semibold px-1.5 py-1 bg-blue-500/10 rounded-md" title="Điều hướng Google Maps">🧭</a>` : ''}
-            <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-xs text-primary-400 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-500/10 rounded-md">Chi tiết</a>
+            ${hasCoords ? `<a href="${mapsUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md" title="Điều hướng Google Maps">🧭</a>` : ''}
+            <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md">Chi tiết</a>
           </div>
         </div>
       `
@@ -107,11 +107,11 @@ const updateMarkers = () => {
 
     const popupHtml = `
       <div class="min-w-[220px] max-w-[300px]">
-        <div class="flex items-center justify-between border-b border-gray-700/30 pb-2 mb-2">
-          <span class="font-bold text-gray-100 text-sm">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
+          <span class="font-bold text-slate-900 text-sm">
             ${site === 'Không xác định' ? 'Không thuộc trạm' : site}
           </span>
-          <a href="${siteMapUrl}" target="_blank" rel="noopener" class="text-xs text-blue-400 hover:text-blue-700 font-semibold px-1.5 py-0.5 bg-blue-500/10 rounded flex items-center gap-1" title="Chỉ đường đến trạm">
+          <a href="${siteMapUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-0.5 bg-primary-50 rounded flex items-center gap-1" title="Chỉ đường đến trạm">
             🧭 Chỉ đường
           </a>
         </div>

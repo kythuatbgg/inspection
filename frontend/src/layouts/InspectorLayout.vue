@@ -1,56 +1,56 @@
 <template>
-  <div class="min-h-screen bg-dark-bg flex justify-center">
+  <div class="min-h-screen bg-slate-50 flex justify-center font-sans">
     <!-- Mobile Container - Centered on desktop -->
-    <div class="w-full max-w-md bg-dark-surface shadow-2xl shadow-black/30 min-h-screen flex flex-col relative">
+    <div class="w-full max-w-md bg-white shadow-sm border-x border-slate-200 min-h-screen flex flex-col relative">
 
       <!-- Top Header -->
-      <header class="bg-gradient-to-br from-primary-600 to-primary-800 text-white px-4 pb-6 pt-4 sticky top-0 z-40">
+      <header class="bg-white border-b border-slate-200 px-4 pb-4 pt-5 sticky top-0 z-40">
         <div class="flex items-center justify-between">
           <!-- Logo & User -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
-              <ShieldCheck class="w-6 h-6" />
+            <div class="w-10 h-10 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center">
+              <ShieldCheck class="w-6 h-6 text-primary-600" />
             </div>
             <div>
-              <h1 class="text-lg font-bold font-heading">FBB Inspection</h1>
-              <p class="text-xs text-white/70">{{ userName }}</p>
+              <h1 class="text-base font-bold text-slate-900 font-heading tracking-tight">FBB Inspection</h1>
+              <p class="text-xs text-slate-500 font-medium">{{ userName }}</p>
             </div>
           </div>
 
           <!-- Status Badge -->
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" :class="isOnline ? 'bg-white/15' : 'bg-red-500'">
-            <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-green-400' : 'bg-white'"></span>
+          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold uppercase tracking-wide" :class="isOnline ? 'bg-success/5 border-success/20 text-success' : 'bg-danger/5 border-danger/20 text-danger'">
+            <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
             <span>{{ isOnline ? 'Online' : 'Offline' }}</span>
           </div>
         </div>
 
         <!-- Page Title -->
-        <h2 class="text-xl font-bold mt-4 font-heading">{{ pageTitle }}</h2>
+        <h2 class="text-xl font-bold mt-5 text-slate-900 font-heading tracking-tight">{{ pageTitle }}</h2>
       </header>
 
       <!-- Main Content -->
-      <main class="flex-1 px-4 py-4 pb-24 overflow-y-auto">
+      <main class="flex-1 px-4 py-6 pb-24 overflow-y-auto bg-slate-50/50">
         <router-view />
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-dark-surface border-t border-gray-700/50 shadow-2xl shadow-black/30 z-50 safe-bottom">
+      <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 z-50 safe-bottom">
         <div class="flex items-center justify-around h-16">
           <router-link
             v-for="item in navItems"
             :key="item.path"
             :to="item.path"
             class="flex flex-col items-center justify-center flex-1 h-full min-h-touch transition-colors"
-            :class="isActive(item.path) ? 'text-primary-400' : 'text-gray-500'"
+            :class="isActive(item.path) ? 'text-primary-600' : 'text-slate-400 hover:text-slate-600'"
           >
-            <component :is="item.icon" class="w-6 h-6" />
-            <span class="text-xs font-medium mt-1">{{ item.label }}</span>
+            <component :is="item.icon" class="w-5 h-5 mb-1" :class="isActive(item.path) ? 'stroke-[2.5px]' : 'stroke-2'" />
+            <span class="text-[10px] font-semibold tracking-wide uppercase">{{ item.label }}</span>
           </router-link>
 
           <!-- Logout -->
-          <button @click="handleLogout" class="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-gray-300 transition-colors">
-            <LogOut class="w-6 h-6" />
-            <span class="text-xs font-medium mt-1">Đăng xuất</span>
+          <button @click="handleLogout" class="flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-slate-600 transition-colors">
+            <LogOut class="w-5 h-5 mb-1 stroke-2" />
+            <span class="text-[10px] font-semibold tracking-wide uppercase">Đăng xuất</span>
           </button>
         </div>
       </nav>
