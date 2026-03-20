@@ -145,6 +145,7 @@ const loading = ref(true)
 const showForm = ref(false)
 const batches = ref([])
 const activeTab = ref('pending')
+const creatorId = ref(null)
 
 const tabs = [
   { label: 'Chờ duyệt', value: 'pending' },
@@ -181,7 +182,14 @@ const goToDetail = (batch) => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await api.get('/batches', { params: { per_page: 100, created_by: authStore.user.id } })
+    // Ensure user is loaded (persists token but not user state)
+    if (!authStore.user) {
+      await authStore.fetchUser()
+    }
+    creatorId.value = authStore.user?.id
+    if (!creatorId.value) return
+
+    const res = await api.get('/batches', { params: { per_page: 100, created_by: creatorId.value } })
     batches.value = res.data?.data || []
   } catch (e) {
     console.error('Failed to load proposals:', e)
