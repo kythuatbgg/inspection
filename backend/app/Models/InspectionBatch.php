@@ -16,6 +16,7 @@ class InspectionBatch extends Model
     protected $fillable = [
         'name',
         'user_id',
+        'created_by',
         'checklist_id',
         'start_date',
         'end_date',
@@ -66,5 +67,13 @@ class InspectionBatch extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class);
+    }
+
+    /**
+     * Get the user who created this batch.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

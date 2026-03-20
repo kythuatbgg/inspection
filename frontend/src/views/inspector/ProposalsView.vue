@@ -2,7 +2,8 @@
   <div class="flex flex-col md:flex-row w-full h-full md:absolute md:inset-0">
     <!-- MASTER LIST -->
     <!-- On desktop, this behaves like a sidebar. On mobile, it's the full width screen -->
-    <div class="w-full md:w-[350px] lg:w-[400px] shrink-0 md:h-full md:overflow-y-auto md:bg-white md:border-r border-slate-200">
+    <div class="w-full md:w-[350px] lg:w-[400px] shrink-0 md:h-full md:overflow-y-auto md:bg-white md:border-r border-slate-200"
+         :class="{ 'hidden md:block': isDetailOpen }">
       
       <!-- Added pb-28 below to prevent content from hiding behind the FAB on mobile -->
       <div class="p-4 md:p-5 space-y-4 pb-28 md:pb-5">
@@ -60,7 +61,9 @@
           <button
             v-for="batch in filteredBatches"
             :key="batch.id"
-            class="w-full text-left rounded-lg bg-white border border-slate-200 p-4 transition-all cursor-default hover:bg-slate-50"
+            @click="goToDetail(batch)"
+            class="w-full text-left rounded-lg bg-white border border-slate-200 p-4 transition-all cursor-pointer hover:bg-slate-50"
+            :class="{ 'border-primary-500 ring-1 ring-primary-500 bg-primary-50/10 hover:bg-primary-50/20': isActiveTask(batch.id) }"
           >
             <div class="flex items-center justify-between">
               <div class="flex-1 min-w-0 pr-3">
@@ -99,13 +102,18 @@
       </div>
     </div>
 
-    <!-- DETAIL VIEW PLACEHOLDER (Desktop Only) -->
-    <div class="hidden md:flex flex-1 flex-col items-center justify-center h-full text-center p-8 bg-slate-50 relative min-h-screen md:min-h-0">
-      <div class="w-16 h-16 rounded-lg bg-slate-200 shadow-sm flex items-center justify-center mb-5 border border-slate-300">
-        <ClipboardEdit class="w-8 h-8 text-slate-500" />
+    <div class="flex-1 md:h-full md:overflow-y-auto bg-slate-50 md:bg-white relative min-h-screen md:min-h-0"
+         :class="{ 'hidden md:flex flex-col': !isDetailOpen }">
+      <router-view v-if="isDetailOpen" :key="$route.fullPath"></router-view>
+      
+      <!-- Desktop Placeholder (Visible when no detail route is selected) -->
+      <div v-else class="hidden md:flex flex-1 flex-col items-center justify-center h-full text-center p-8 bg-slate-50 relative min-h-screen md:min-h-0">
+        <div class="w-16 h-16 rounded-lg bg-slate-200 shadow-sm flex items-center justify-center mb-5 border border-slate-300">
+          <ClipboardEdit class="w-8 h-8 text-slate-500" />
+        </div>
+        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">Quản lý Đề xuất</h3>
+        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Chọn một đề xuất ở hệ thống bên trái hoặc tạo mới để bắt đầu.</p>
       </div>
-      <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">Quản lý Đề xuất</h3>
-      <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Chọn một đề xuất ở hệ thống bên trái hoặc tạo mới để bắt đầu.</p>
     </div>
 
     <!-- FAB (Mobile Only) -->
@@ -124,8 +132,14 @@
 <script setup>
 import { Plus, Calendar, ListTodo, ClipboardList, ClipboardEdit, Loader2 } from 'lucide-vue-next'
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
 import ProposalFormModal from '@/components/inspector/ProposalFormModal.vue'
+
+const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const loading = ref(true)
 const showForm = ref(false)
@@ -157,10 +171,17 @@ const formatDate = (dateStr) => {
   return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
+const isDetailOpen = computed(() => !!route.params.id)
+const isActiveTask = (id) => route.params.id == id
+
+const goToDetail = (batch) => {
+  router.push({ name: 'inspector-proposal-detail', params: { id: batch.id } })
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await api.get('/batches', { params: { per_page: 100 } })
+    const res = await api.get('/batches', { params: { per_page: 100, created_by: authStore.user.id } })
     batches.value = res.data?.data || []
   } catch (e) {
     console.error('Failed to load proposals:', e)

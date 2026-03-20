@@ -35,7 +35,11 @@ class BatchController extends Controller
             $query->where('approval_status', $request->approval_status);
         }
 
-        if ($request->user()->role === 'inspector') {
+        if ($request->has('created_by')) {
+            // ProposalsView: inspector sees batches they CREATED (any status)
+            $query->where('created_by', $request->created_by);
+        } elseif ($request->user()->role === 'inspector') {
+            // Dashboard/Tasks: inspector sees batches ASSIGNED to them (must be approved)
             $query->where('user_id', $request->user()->id);
         }
 
@@ -157,6 +161,7 @@ class BatchController extends Controller
         $batch = InspectionBatch::create([
             'name' => $request->name,
             'user_id' => $userId,
+            'created_by' => $request->user()->id,
             'checklist_id' => $request->checklist_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
