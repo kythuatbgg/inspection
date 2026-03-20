@@ -299,9 +299,9 @@
         <!-- Close Batch Button -->
         <div v-if="batch.status !== 'completed' && canClose" class="pt-6 md:pt-8 md:flex md:flex-col md:items-end">
           <button @click="handleClose" :disabled="closing" class="w-full md:w-auto md:px-10 min-h-[56px] md:min-h-[48px] bg-primary-600 text-white text-base md:text-sm font-bold rounded-2xl md:rounded-xl hover:bg-primary-700 active:scale-[0.98] transition-all shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2">
-            <Loader2 class="w-5 h-5 md:w-4 md:h-4 animate-spin" />
-            <Lock class="w-5 h-5 md:w-4 md:h-4" />
-            {{ closing ? 'Đang xử lý...' : 'Kết thúc lô kiểm tra' }}
+            <Loader2 v-if="closing" class="w-5 h-5 md:w-4 md:h-4 animate-spin" />
+            <Lock v-else class="w-5 h-5 md:w-4 md:h-4" />
+            {{ closing ? 'Đang kết thúc...' : 'Kết thúc lô' }}
           </button>
           <p class="text-center md:text-right text-xs text-gray-500 mt-3 md:mt-2 flex items-center justify-center md:justify-end gap-1.5">
             <Info class="w-4 h-4 md:w-3 md:h-3 text-primary-500" />
