@@ -144,9 +144,9 @@ const isActive = (path) => {
   return route.path.startsWith(path)
 }
 
-const handleLogout = () => {
-  authStore.logout()
-  router.push({ name: 'login' })
+const handleLogout = async () => {
+  await authStore.logout()
+  router.replace({ name: 'login' })
 }
 
 const updateOnlineStatus = () => {
