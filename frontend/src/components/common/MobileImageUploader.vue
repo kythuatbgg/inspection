@@ -68,14 +68,21 @@
 
 <script setup>
 import { AlertCircle, Loader2, Image, Camera, X } from 'lucide-vue-next'
+import imageCompression from 'browser-image-compression'
 
 import { ref, computed } from 'vue'
 import api from '@/services/api'
 
 const MAX_RETRIES = 3
 const MAX_FILE_SIZE = 10 * 1024 * 1024  // 10MB
-const COMPRESS_THRESHOLD = 2 * 1024 * 1024  // Compress if > 2MB
-const COMPRESS_TARGET_WIDTH = 1920
+
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 0.8,           // Target max 800KB
+  maxWidthOrHeight: 1920,   // Max dimension 1920px
+  useWebWorker: true,       // Không block UI thread
+  fileType: 'image/jpeg',   // Giữ JPEG
+  initialQuality: 0.82,     // Chất lượng cao, mắt thường không phân biệt
+}
 
 const props = defineProps({
   modelValue: { type: String, default: null },
@@ -98,44 +105,15 @@ const borderClass = computed(() => {
   return 'border-gray-200 hover:bg-gray-100'
 })
 
-// ---- Client-side image compression ----
-const compressImage = (file) => {
-  return new Promise((resolve) => {
-    if (file.size <= COMPRESS_THRESHOLD) {
-      resolve(file)
-      return
-    }
-
-    const img = new Image()
-    const canvas = document.createElement('canvas')
-    const reader = new FileReader()
-
-    reader.onload = (e) => {
-      img.onload = () => {
-        let { width, height } = img
-        
-        if (width > COMPRESS_TARGET_WIDTH) {
-          height = Math.round(height * (COMPRESS_TARGET_WIDTH / width))
-          width = COMPRESS_TARGET_WIDTH
-        }
-
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, width, height)
-
-        canvas.toBlob((blob) => {
-          if (blob && blob.size < file.size) {
-            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }))
-          } else {
-            resolve(file)
-          }
-        }, 'image/jpeg', 0.85)
-      }
-      img.src = e.target.result
-    }
-    reader.readAsDataURL(file)
-  })
+// ---- Client-side image compression via browser-image-compression ----
+const compressImage = async (file) => {
+  try {
+    const compressed = await imageCompression(file, COMPRESSION_OPTIONS)
+    return compressed
+  } catch (e) {
+    console.warn('Compression failed, using original:', e)
+    return file
+  }
 }
 
 // ---- Simple file hash for duplicate detection ----

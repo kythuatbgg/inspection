@@ -12,6 +12,7 @@
   "dependencies": {
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "axios": "^1.6.0",
+    "browser-image-compression": "^2.0.2",
     "dexie": "^3.2.0",
     "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.577.0",
