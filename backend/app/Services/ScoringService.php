@@ -22,21 +22,20 @@ class ScoringService
 
         foreach ($details as $detail) {
             if ($detail->is_failed) {
-                // FAILED + CRITICAL → đếm lỗi
                 if ($detail->item && $detail->item->is_critical) {
                     $criticalErrors++;
                 }
             } else {
-                // PASS → cộng điểm score_awarded
                 $totalScore += $detail->score_awarded;
             }
         }
 
-        // Logic PASS/FAIL:
-        // PASS = (total_score >= 80) AND (critical_errors_count <= 1)
-        // FAIL = (total_score < 80) OR (critical_errors_count > 1)
-        $passesScoreThreshold = $totalScore >= 80;
-        $passesCriticalThreshold = $criticalErrors <= 1;
+        // Use checklist thresholds (fallback to sensible defaults)
+        $minPassScore = $checklist->min_pass_score ?? 70;
+        $maxCriticalAllowed = $checklist->max_critical_allowed ?? 0;
+
+        $passesScoreThreshold = $totalScore >= $minPassScore;
+        $passesCriticalThreshold = $criticalErrors <= $maxCriticalAllowed;
 
         $finalResult = ($passesScoreThreshold && $passesCriticalThreshold) ? 'PASS' : 'FAIL';
 
