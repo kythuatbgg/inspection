@@ -390,6 +390,7 @@ For deeper guidance on specific areas:
 - [motion-graphics.md](motion-graphics.md) - Advanced: Lottie, GSAP, SVG, 3D, Particles
 - [decision-trees.md](decision-trees.md) - Context-specific templates
 - [ux-psychology.md](ux-psychology.md) - User psychology deep dive
+- [swiss-minimalism-saas.md](swiss-minimalism-saas.md) - Archetype: Swiss Minimalism SaaS Design System
 
 ---
 
