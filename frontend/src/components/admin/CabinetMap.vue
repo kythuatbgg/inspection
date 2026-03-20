@@ -89,19 +89,33 @@ const updateMarkers = () => {
     })
 
     // Generate popup HTML for listed cabinets
-    const cabinetsHtml = group.cabinets.map(cabinet => `
-      <div class="flex items-center justify-between py-1 border-b border-gray-50 last:border-0">
-        <span class="font-medium text-gray-900">${cabinet.cabinet_code}</span>
-        <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-sm text-primary-600 hover:text-primary-700 font-semibold px-2 py-1 bg-primary-50 rounded-md">Chi tiết</a>
-      </div>
-    `).join('')
+    const cabinetsHtml = group.cabinets.map(cabinet => {
+      const hasCoords = cabinet.lat && cabinet.lng
+      const mapsUrl = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}` : ''
+      return `
+        <div class="flex items-center justify-between gap-2 py-1.5 border-b border-gray-100 last:border-0">
+          <span class="font-medium text-gray-900 text-sm">${cabinet.cabinet_code}</span>
+          <div class="flex items-center gap-1 shrink-0">
+            ${hasCoords ? `<a href="${mapsUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-1.5 py-1 bg-blue-50 rounded-md" title="Điều hướng Google Maps">🧭</a>` : ''}
+            <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md">Chi tiết</a>
+          </div>
+        </div>
+      `
+    }).join('')
+
+    const siteMapUrl = `https://www.google.com/maps/dir/?api=1&destination=${group.lat},${group.lng}`
 
     const popupHtml = `
-      <div class="min-w-[200px] max-w-[280px]">
-        <div class="font-bold text-gray-900 border-b border-gray-100 pb-2 mb-2">
-          ${site === 'Không xác định' ? 'Các tủ không thuộc trạm' : 'Trạm: ' + site}
+      <div class="min-w-[220px] max-w-[300px]">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2 mb-2">
+          <span class="font-bold text-gray-900 text-sm">
+            ${site === 'Không xác định' ? 'Không thuộc trạm' : site}
+          </span>
+          <a href="${siteMapUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-1.5 py-0.5 bg-blue-50 rounded flex items-center gap-1" title="Chỉ đường đến trạm">
+            🧭 Chỉ đường
+          </a>
         </div>
-        <div class="max-h-[150px] overflow-y-auto overscroll-contain pr-1 custom-scrollbar">
+        <div class="max-h-[160px] overflow-y-auto overscroll-contain pr-1">
           ${cabinetsHtml}
         </div>
       </div>
