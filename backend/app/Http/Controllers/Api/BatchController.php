@@ -17,7 +17,10 @@ class BatchController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = InspectionBatch::with(['user:id,name,username', 'checklist:id,name'])
-            ->withCount('planDetails as plans_count');
+            ->withCount('planDetails as plans_count')
+            ->withCount(['planDetails as completed_count' => function ($q) {
+                $q->where('status', 'done');
+            }]);
 
         if ($request->has('search') && $request->search) {
             $searchTerm = strtolower($request->search);
@@ -26,6 +29,10 @@ class BatchController extends Controller
 
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->has('approval_status') && $request->approval_status) {
+            $query->where('approval_status', $request->approval_status);
         }
 
         if ($request->user()->role === 'inspector') {
@@ -91,6 +98,8 @@ class BatchController extends Controller
                 'start_date' => $batch->start_date,
                 'end_date' => $batch->end_date,
                 'status' => $batch->status,
+                'approval_status' => $batch->approval_status,
+                'approval_note' => $batch->approval_note,
                 'closed_at' => $batch->closed_at,
                 'progress' => [
                     'total' => $totalPlans,
@@ -108,9 +117,11 @@ class BatchController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $isCreatorInspector = $request->user()->role === 'inspector';
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => $isCreatorInspector ? 'nullable' : 'required|exists:users,id',
             'checklist_id' => 'required|exists:checklists,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -133,8 +144,10 @@ class BatchController extends Controller
             'cabinet_codes.*.exists' => 'Mã tủ ":input" không tồn tại.',
         ]);
 
-        $assignedUser = User::find($request->user_id);
-        if ($assignedUser->role !== 'inspector') {
+        $userId = $isCreatorInspector ? $request->user()->id : $request->user_id;
+
+        $assignedUser = User::find($userId);
+        if (!$assignedUser || $assignedUser->role !== 'inspector') {
             return response()->json([
                 'message' => 'Người được giao phải có vai trò Inspector.',
                 'errors' => ['user_id' => ['Người được giao phải có vai trò Inspector.']]
@@ -143,11 +156,12 @@ class BatchController extends Controller
 
         $batch = InspectionBatch::create([
             'name' => $request->name,
-            'user_id' => $request->user_id,
+            'user_id' => $userId,
             'checklist_id' => $request->checklist_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status' => 'pending',
+            'approval_status' => $isCreatorInspector ? 'pending' : 'approved',
         ]);
 
         foreach ($request->cabinet_codes as $cabinetCode) {
@@ -301,6 +315,7 @@ class BatchController extends Controller
                 'id' => $batch->id,
                 'name' => $batch->name,
                 'status' => $batch->status,
+                'approval_status' => $batch->approval_status,
                 'checklist' => $batch->checklist,
             ],
         ]);
@@ -516,6 +531,48 @@ class BatchController extends Controller
             'message' => "Đã thay thế tủ [{$oldCode}] bằng [{$request->new_cabinet_code}] thành công.",
             'old_cabinet_code' => $oldCode,
             'new_cabinet_code' => $request->new_cabinet_code,
+        ]);
+    }
+
+    /**
+     * Approve proposed batch (Manager only)
+     */
+    public function approve(Request $request, int $batchId): JsonResponse
+    {
+        $batch = InspectionBatch::findOrFail($batchId);
+        
+        $batch->update([
+            'approval_status' => 'approved',
+            'approval_note' => null,
+        ]);
+
+        return response()->json([
+            'message' => 'Đã phê duyệt đề xuất thành công.',
+            'data' => $batch
+        ]);
+    }
+
+    /**
+     * Reject proposed batch (Manager only)
+     */
+    public function reject(Request $request, int $batchId): JsonResponse
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ], [
+            'reason.required' => 'Vui lòng nhập lý do từ chối.'
+        ]);
+
+        $batch = InspectionBatch::findOrFail($batchId);
+        
+        $batch->update([
+            'approval_status' => 'rejected',
+            'approval_note' => $request->reason,
+        ]);
+
+        return response()->json([
+            'message' => 'Đã từ chối đề xuất.',
+            'data' => $batch
         ]);
     }
 }

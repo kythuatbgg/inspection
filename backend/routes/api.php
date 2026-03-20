@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('checklists', ChecklistController::class)->only(['index', 'show']);
 
     Route::get('batches', [BatchController::class, 'index']);
+    Route::post('batches', [BatchController::class, 'store']);
     Route::get('batches/{batch}', [BatchController::class, 'show']);
 
     // Manager-only routes (admin + manager)
@@ -49,7 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('checklists/{checklist}/items', [ChecklistController::class, 'storeItem']);
         Route::put('checklists/{checklist}/items/{item}', [ChecklistController::class, 'updateItem']);
         Route::delete('checklists/{checklist}/items/{item}', [ChecklistController::class, 'destroyItem']);
-        Route::post('batches', [BatchController::class, 'store']);
         Route::put('batches/{batch}', [BatchController::class, 'update']);
         Route::delete('batches/{batch}', [BatchController::class, 'destroy']);
         Route::get('batches/{batch}/results', [BatchController::class, 'results']);
@@ -58,6 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('batches/{batch}/cabinets', [BatchController::class, 'addCabinets']);
         Route::delete('batches/{batch}/plans/{plan}', [BatchController::class, 'removeCabinet']);
         Route::patch('batches/{batch}/plans/{plan}/swap', [BatchController::class, 'swapCabinet']);
+        Route::post('batches/{batch}/approve', [BatchController::class, 'approve']);
+        Route::post('batches/{batch}/reject', [BatchController::class, 'reject']);
 
         // Plan review
         Route::patch('plans/{plan}/review', [PlanDetailController::class, 'review']);

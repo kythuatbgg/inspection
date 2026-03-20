@@ -20,6 +20,8 @@ class InspectionBatch extends Model
         'start_date',
         'end_date',
         'status',
+        'approval_status',
+        'approval_note',
         'closed_at',
     ];
 

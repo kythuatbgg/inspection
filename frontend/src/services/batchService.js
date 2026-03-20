@@ -104,6 +104,16 @@ export const batchService = {
       force: force || undefined,
     })
     return response.data
+  },
+
+  async approveBatch(batchId) {
+    const response = await api.post(`/batches/${batchId}/approve`)
+    return response.data
+  },
+
+  async rejectBatch(batchId, reason) {
+    const response = await api.post(`/batches/${batchId}/reject`, { reason })
+    return response.data
   }
 }
 

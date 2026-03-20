@@ -125,6 +125,11 @@ const routes = [
         component: () => import('../views/inspector/TasksView.vue')
       },
       {
+        path: 'proposals',
+        name: 'inspector-proposals',
+        component: () => import('../views/inspector/ProposalsView.vue')
+      },
+      {
         path: 'batch/:id',
         name: 'inspector-batch-detail',
         component: () => import('../views/inspector/BatchDetailView.vue')

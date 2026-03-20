@@ -19,6 +19,43 @@
     <div v-else-if="error" class="text-center py-12 text-red-500">{{ error }}</div>
 
     <template v-else>
+      <!-- Pending Approval Banner -->
+      <div v-if="batch.approval_status === 'pending'" class="bg-warning/10 border border-amber-200 rounded-xl p-4 md:p-5 mb-2">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+            <AlertTriangle class="w-5 h-5 text-warning-700" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-bold text-amber-900 mb-1">Đề xuất cần duyệt</h3>
+            <p class="text-sm text-amber-800 mb-4">Inspector <strong>{{ batch.user?.name }}</strong> đã tạo đề xuất này. Bạn cần phê duyệt để lô này chính thức hoạt động.</p>
+            <div class="flex flex-wrap gap-3">
+              <button @click="handleApproveBatch" :disabled="approvingBatch" class="px-5 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2">
+                <Loader2 v-if="approvingBatch" class="w-4 h-4 animate-spin" />
+                <Check v-else class="w-4 h-4" />
+                Phê duyệt
+              </button>
+              <button @click="openRejectBatchModal" :disabled="approvingBatch" class="px-5 py-2 bg-white border border-red-200 text-danger text-sm font-bold rounded-lg hover:bg-danger/10 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2">
+                <X class="w-4 h-4" />
+                Từ chối
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rejected Info -->
+      <div v-else-if="batch.approval_status === 'rejected'" class="bg-danger/10 border border-red-200 rounded-xl p-4 md:p-5 mb-2">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <X class="w-5 h-5 text-danger" />
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-red-900 mb-1">Đề xuất đã bị từ chối</h3>
+            <p class="text-sm text-red-800">Lý do: <strong>{{ batch.approval_note }}</strong></p>
+          </div>
+        </div>
+      </div>
+
       <!-- Action Buttons Row -->
       <div v-if="batch.status !== 'completed'" class="flex flex-wrap gap-3 md:gap-2">
         <button @click="showEditModal = true" class="flex-1 md:flex-none min-w-[120px] md:min-w-0 min-h-[48px] md:min-h-[40px] px-4 py-3 md:py-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold md:font-medium rounded-[14px] md:rounded-lg hover:bg-slate-50 flex items-center justify-center gap-2 shadow-sm md:shadow-none active:scale-[0.98] transition-all">
@@ -401,6 +438,24 @@
       </div>
     </div>
 
+    <!-- Reject Batch Modal -->
+    <div v-if="showRejectBatchModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showRejectBatchModal = false">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Từ chối đề xuất lô kiểm tra</h3>
+        <p class="text-sm text-slate-500 mb-4">Mã lô: #{{ batch.id }}</p>
+
+        <textarea v-model="rejectBatchReason" rows="3" placeholder="Lý do từ chối (bắt buộc)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm resize-none"></textarea>
+
+        <div class="flex gap-3 mt-4">
+          <button @click="showRejectBatchModal = false" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200">Hủy</button>
+          <button @click="confirmRejectBatch" :disabled="rejectingBatch" class="flex-1 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2">
+            <Loader2 v-if="rejectingBatch" class="w-4 h-4 animate-spin" />
+            <span v-else>Xác nhận từ chối</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Add Cabinet Modal (Search & Select) -->
     <div v-if="showAddCabinetModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="closeAddCabinetModal">
       <div class="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl">
@@ -598,6 +653,12 @@ const closing = ref(false)
 const reopening = ref(false)
 
 const editForm = ref({ name: '', start_date: '', end_date: '' })
+
+// Batch Approval State
+const approvingBatch = ref(false)
+const showRejectBatchModal = ref(false)
+const rejectBatchReason = ref('')
+const rejectingBatch = ref(false)
 
 // View Inspection State
 const showInspectionDetail = ref(false)
@@ -852,6 +913,44 @@ const fetchBatch = async () => {
     error.value = 'Không thể tải thông tin lô kiểm tra'
   } finally {
     loading.value = false
+  }
+}
+
+// Batch Approval Actions
+const handleApproveBatch = async () => {
+  if (!confirm('Bạn có chắc chắn muốn phê duyệt đề xuất này?')) return
+  approvingBatch.value = true
+  try {
+    await batchService.approveBatch(batch.value.id)
+    alert('Đã phê duyệt đề xuất thành công')
+    await fetchBatch()
+  } catch (e) {
+    alert(e.response?.data?.message || 'Có lỗi khi phê duyệt')
+  } finally {
+    approvingBatch.value = false
+  }
+}
+
+const openRejectBatchModal = () => {
+  rejectBatchReason.value = ''
+  showRejectBatchModal.value = true
+}
+
+const confirmRejectBatch = async () => {
+  if (!rejectBatchReason.value.trim()) {
+    alert('Vui lòng nhập lý do từ chối')
+    return
+  }
+  rejectingBatch.value = true
+  try {
+    await batchService.rejectBatch(batch.value.id, rejectBatchReason.value)
+    alert('Đã từ chối đề xuất')
+    showRejectBatchModal.value = false
+    await fetchBatch()
+  } catch (e) {
+    alert(e.response?.data?.message || 'Có lỗi khi từ chối')
+  } finally {
+    rejectingBatch.value = false
   }
 }
 

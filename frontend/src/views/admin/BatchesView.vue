@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -7,6 +7,24 @@
       <button class="hidden md:flex btn-primary" @click="showFormModal = true">
         <Plus class="w-5 h-5 mr-2" />
         Tạo lô mới
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <button
+        @click="filters.approval_status = ''; handleSearch()"
+        class="px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors"
+        :class="!filters.approval_status ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
+      >
+        Tất cả lô
+      </button>
+      <button
+        @click="filters.approval_status = 'pending'; handleSearch()"
+        class="px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors"
+        :class="filters.approval_status === 'pending' ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
+      >
+        Đề xuất chờ duyệt
       </button>
     </div>
 
@@ -53,7 +71,7 @@
           <tr>
             <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Mã lô</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Tên lô</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Số tủ</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Tiến độ</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Ngày tạo</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Trạng thái</th>
             <th class="px-4 py-3 text-right text-sm font-semibold text-slate-700">Thao tác</th>
@@ -62,8 +80,11 @@
         <tbody class="divide-y divide-gray-100">
           <tr v-for="batch in batches" :key="batch.id" class="hover:bg-slate-50">
             <td class="px-4 py-3 font-medium text-slate-900">#{{ batch.id }}</td>
-            <td class="px-4 py-3 text-sm text-slate-600">{{ batch.name || batch.title }}</td>
-            <td class="px-4 py-3 text-sm text-slate-600">{{ batch.plans_count || 0 }}</td>
+            <td class="px-4 py-3 text-sm text-slate-600">
+              {{ batch.name || batch.title }}
+              <span v-if="batch.approval_status === 'pending'" class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-warning/10 text-warning-700 border border-warning/20">Đề xuất</span>
+            </td>
+            <td class="px-4 py-3 text-sm text-slate-600">{{ batch.completed_count || 0 }} / {{ batch.plans_count || 0 }}</td>
             <td class="px-4 py-3 text-sm text-slate-600">{{ formatDate(batch.created_at) }}</td>
             <td class="px-4 py-3">
               <span :class="getStatusClass(batch.status)">{{ getStatusLabel(batch.status) }}</span>
@@ -98,7 +119,10 @@
               <Package class="w-6 h-6 text-primary-600" />
             </div>
             <div class="flex-1 pt-1">
-              <h3 class="text-lg font-bold text-slate-900 tracking-tight leading-tight">{{ batch.name || batch.title }}</h3>
+              <h3 class="text-lg font-bold text-slate-900 tracking-tight leading-tight">
+                {{ batch.name || batch.title }}
+                <span v-if="batch.approval_status === 'pending'" class="ml-2 inline-block align-middle px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-warning/10 text-warning-700 border border-warning/20">Đề xuất</span>
+              </h3>
               <p class="text-sm font-medium text-slate-500 mt-0.5">Mã lô: #{{ batch.id }}</p>
             </div>
           </div>
@@ -110,7 +134,7 @@
                   <Server class="w-4 h-4 mr-1.5" />
                   Số tủ:
                 </div>
-                <span class="text-slate-900 font-semibold">{{ batch.plans_count || 0 }}</span>
+                <span class="text-slate-900 font-semibold">{{ batch.completed_count || 0 }} / {{ batch.plans_count || 0 }}</span>
             </div>
             <div class="flex items-center text-sm">
                 <div class="flex items-center text-slate-500 font-medium w-24">
@@ -275,7 +299,8 @@ const pagination = ref({
 
 const filters = ref({
   search: '',
-  status: ''
+  status: '',
+  approval_status: ''
 })
 
 let searchTimeout = null
@@ -325,6 +350,10 @@ const fetchBatches = async () => {
     // Add status
     if (filters.value.status) {
       params.status = filters.value.status
+    }
+    // Add approval_status
+    if (filters.value.approval_status) {
+      params.approval_status = filters.value.approval_status
     }
 
     const res = await batchService.getBatches(params)
