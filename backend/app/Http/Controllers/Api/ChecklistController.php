@@ -45,6 +45,9 @@ class ChecklistController extends Controller
             return [
                 'id' => $item->id,
                 'category' => $item->category,
+                'category_vn' => $item->category_vn,
+                'category_en' => $item->category_en,
+                'category_kh' => $item->category_kh,
                 'content' => $item->{"content_{$lang}"},
                 'content_vn' => $item->content_vn,
                 'content_en' => $item->content_en,
@@ -168,6 +171,9 @@ class ChecklistController extends Controller
             ChecklistItem::create([
                 'checklist_id' => $newChecklist->id,
                 'category' => $item->category,
+                'category_vn' => $item->category_vn,
+                'category_en' => $item->category_en,
+                'category_kh' => $item->category_kh,
                 'content_vn' => $item->content_vn,
                 'content_en' => $item->content_en,
                 'content_kh' => $item->content_kh,
@@ -201,6 +207,9 @@ class ChecklistController extends Controller
 
         $request->validate([
             'category' => 'required|string',
+            'category_vn' => 'nullable|string',
+            'category_en' => 'nullable|string',
+            'category_kh' => 'nullable|string',
             'content_vn' => 'required|string',
             'content_en' => 'nullable|string',
             'content_kh' => 'nullable|string',
@@ -235,6 +244,9 @@ class ChecklistController extends Controller
 
         $request->validate([
             'category' => 'sometimes|required|string',
+            'category_vn' => 'nullable|string',
+            'category_en' => 'nullable|string',
+            'category_kh' => 'nullable|string',
             'content_vn' => 'sometimes|required|string',
             'content_en' => 'nullable|string',
             'content_kh' => 'nullable|string',

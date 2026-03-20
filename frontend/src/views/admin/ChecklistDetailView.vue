@@ -93,6 +93,11 @@
                 <p class="text-sm font-bold text-slate-900">{{ item.content_vn }}</p>
                 <p v-if="item.content_en" class="text-xs text-slate-500 mt-0.5">🇬🇧 {{ item.content_en }}</p>
                 <p v-if="item.content_kh" class="text-xs text-slate-500 mt-0.5">🇰🇭 {{ item.content_kh }}</p>
+                <p v-if="item.category_en || item.category_kh" class="text-[10px] text-slate-400 mt-1">
+                  <span v-if="item.category_en">🇬🇧 {{ item.category_en }}</span>
+                  <span v-if="item.category_en && item.category_kh"> · </span>
+                  <span v-if="item.category_kh">🇰🇭 {{ item.category_kh }}</span>
+                </p>
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <span class="px-2 py-1 text-xs font-bold rounded-lg" :class="item.is_critical ? 'bg-red-100 text-danger' : 'bg-slate-100 text-slate-600'">
@@ -136,8 +141,16 @@
 
         <div class="space-y-4">
           <div>
-            <label class="text-sm font-medium text-slate-700 mb-1 block">Danh mục <span class="text-red-500">*</span></label>
-            <input v-model="itemForm.category" type="text" placeholder="VD: Vệ sinh, An toàn, Cáp quang..." class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm" />
+            <label class="text-sm font-medium text-slate-700 mb-1 block">Danh mục (Tiếng Việt) <span class="text-red-500">*</span></label>
+            <input v-model="itemForm.category" type="text" placeholder="VD: Vệ sinh, An toàn..." class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700 mb-1 block">🇬🇧 Danh mục (English)</label>
+            <input v-model="itemForm.category_en" type="text" placeholder="VD: Cleanliness, Safety..." class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700 mb-1 block">🇰🇭 Danh mục (ភាសាខ្មែរ)</label>
+            <input v-model="itemForm.category_kh" type="text" placeholder="Optional" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm" />
           </div>
           <div>
             <label class="text-sm font-medium text-slate-700 mb-1 block">Nội dung (Tiếng Việt) <span class="text-red-500">*</span></label>
@@ -200,7 +213,7 @@ const infoForm = ref({ name: '', min_pass_score: 0, max_critical_allowed: 0 })
 const showItemForm = ref(false)
 const editingItem = ref(null)
 const savingItem = ref(false)
-const itemForm = ref({ category: '', content_vn: '', content_en: '', content_kh: '', max_score: 10, is_critical: false })
+const itemForm = ref({ category: '', category_en: '', category_kh: '', content_vn: '', content_en: '', content_kh: '', max_score: 10, is_critical: false })
 
 const groupedItems = computed(() => {
   const groups = {}
@@ -249,7 +262,7 @@ const saveInfo = async () => {
 
 const openAddItem = () => {
   editingItem.value = null
-  itemForm.value = { category: '', content_vn: '', content_en: '', content_kh: '', max_score: 10, is_critical: false }
+  itemForm.value = { category: '', category_en: '', category_kh: '', content_vn: '', content_en: '', content_kh: '', max_score: 10, is_critical: false }
   showItemForm.value = true
 }
 
@@ -257,6 +270,8 @@ const openEditItem = (item) => {
   editingItem.value = item
   itemForm.value = {
     category: item.category,
+    category_en: item.category_en || '',
+    category_kh: item.category_kh || '',
     content_vn: item.content_vn,
     content_en: item.content_en || '',
     content_kh: item.content_kh || '',

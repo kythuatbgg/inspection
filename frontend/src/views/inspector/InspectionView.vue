@@ -1,58 +1,69 @@
 <template>
-  <div class="space-y-5 pb-28">
+  <div class="space-y-4 pb-28">
     <template v-if="!loading && plan">
       <!-- Header / Cabinet Info -->
-      <div class="rounded-lg bg-white border border-slate-200 p-5 shadow-sm">
+      <div class="rounded-2xl bg-white border border-slate-200 p-5">
         <button @click="goBack" class="flex items-center gap-1 text-sm text-primary-600 font-medium mb-3 -ml-1 active:opacity-70">
           <ChevronLeft class="w-4 h-4" />
           Quay lại
         </button>
         <div class="flex items-start justify-between">
           <div>
-            <h2 class="text-lg font-bold text-slate-900">{{ plan.cabinet_code }}</h2>
-            <p v-if="plan.cabinet?.bts_site" class="text-sm text-slate-500 mt-1">{{ plan.cabinet.bts_site }}</p>
+            <h2 class="text-lg font-bold text-slate-900 leading-tight">{{ plan.cabinet_code }}</h2>
+            <p v-if="plan.cabinet?.bts_site" class="text-xs text-slate-400 mt-1">{{ plan.cabinet.bts_site }}</p>
           </div>
           <span
             v-if="existingInspection"
-            class="text-xs font-bold px-2.5 py-1 rounded-full text-center"
-            :class="existingInspection.final_result?.toUpperCase() === 'PASS' ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
+            class="text-[10px] font-bold px-3 py-1 rounded-full"
+            :class="existingInspection.final_result?.toUpperCase() === 'PASS' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'"
           >
             {{ existingInspection.final_result?.toUpperCase() === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
           </span>
         </div>
       </div>
 
-      <!-- Already inspected notice -->
-      <div v-if="existingInspection" class="rounded-lg bg-success/10 border border-green-200 p-5">
-        <p class="text-sm font-semibold text-green-800">✓ Tủ này đã được kiểm tra</p>
-        <p class="text-sm text-success mt-1">Điểm: {{ existingInspection.total_score }} · Lỗi nghiêm trọng: {{ existingInspection.critical_errors_count }}</p>
+      <!-- Already inspected -->
+      <div v-if="existingInspection" class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+          <Check class="w-4 h-4 text-emerald-600" />
+        </div>
+        <div>
+          <p class="text-sm font-bold text-emerald-800">Tủ này đã được kiểm tra</p>
+          <p class="text-xs text-emerald-600 mt-0.5">Điểm: {{ existingInspection.total_score }} · Lỗi nghiêm trọng: {{ existingInspection.critical_errors_count }}</p>
+        </div>
       </div>
 
-      <!-- Main Form Flow (if not inspected) -->
+      <!-- Main Form Flow -->
       <div v-if="!existingInspection && checklistItems.length > 0">
         
-        <!-- Draft Status Indicator -->
-        <div v-if="draftStatus" class="text-xs font-medium px-3 py-1.5 rounded-lg mb-4 flex items-center gap-1.5 transition-all"
+        <!-- Draft status -->
+        <div v-if="draftStatus" class="text-xs font-medium px-3 py-2 rounded-xl mb-4 flex items-center gap-2 transition-all"
              :class="{
-               'bg-success/10 text-success': draftStatus === 'saved',
+               'bg-emerald-50 text-emerald-600': draftStatus === 'saved',
                'bg-primary-50 text-primary-600': draftStatus === 'restored',
-               'bg-slate-50 text-slate-500': draftStatus === 'saving'
+               'bg-slate-50 text-slate-400': draftStatus === 'saving'
              }">
-          <span v-if="draftStatus === 'saving'">⏳ Đang lưu nháp...</span>
-          <span v-else-if="draftStatus === 'saved'">💾 Đã lưu nháp lúc {{ draftTime }}</span>
-          <span v-else-if="draftStatus === 'restored'">🔄 Đã khôi phục bản nháp</span>
+          <Save v-if="draftStatus === 'saved'" class="w-3.5 h-3.5" />
+          <Loader2 v-else-if="draftStatus === 'saving'" class="w-3.5 h-3.5 animate-spin" />
+          <RefreshCw v-else class="w-3.5 h-3.5" />
+          <span v-if="draftStatus === 'saving'">Đang lưu nháp...</span>
+          <span v-else-if="draftStatus === 'saved'">Đã lưu nháp lúc {{ draftTime }}</span>
+          <span v-else-if="draftStatus === 'restored'">Đã khôi phục bản nháp</span>
         </div>
 
         <!-- Step Indicator -->
-        <div class="flex items-center gap-2 mb-6">
-          <button @click="currentStep = 1" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'">1. Ảnh tổng thể</button>
-          <button @click="goToStep2" class="flex-1 pb-2 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'" :disabled="!isValidStep1">2. Chi tiết Checklist</button>
+        <div class="flex items-center gap-2 mb-5">
+          <button @click="currentStep = 1" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'">1. Ảnh tổng thể</button>
+          <button @click="goToStep2" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'" :disabled="!isValidStep1">2. Chi tiết Checklist</button>
         </div>
 
         <!-- STEP 1: Overall Photos -->
         <div v-show="currentStep === 1" class="space-y-4">
-          <div class="bg-primary-50 text-primary-800 p-4 rounded-lg border border-blue-100 mb-4">
-            <p class="text-sm font-medium">📷 Yêu cầu: Vui lòng chụp ít nhất 4 ảnh tổng thể bề ngoài của tủ trước khi tiến hành kiểm tra chi tiết.</p>
+          <div class="bg-primary-50 text-primary-800 p-4 rounded-xl border border-primary-100">
+            <div class="flex items-start gap-3">
+              <Camera class="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
+              <p class="text-sm font-medium leading-relaxed">Vui lòng chụp ít nhất 4 ảnh tổng thể bề ngoài của tủ trước khi tiến hành kiểm tra chi tiết.</p>
+            </div>
           </div>
           
           <div class="grid grid-cols-2 gap-3">
@@ -63,25 +74,27 @@
                 @uploading="(v) => onUploadStateChange(index, v)"
                 @hash="(h) => onPhotoHash(index, h)"
               />
-              <div class="absolute -top-2 -left-2 w-6 h-6 bg-gray-900 text-white flex items-center justify-center rounded-full text-xs font-bold ring-2 ring-white z-10">{{ index + 1 }}</div>
+              <div class="absolute -top-2 -left-2 w-6 h-6 bg-slate-900 text-white flex items-center justify-center rounded-full text-xs font-bold ring-2 ring-white z-10">{{ index + 1 }}</div>
             </div>
             
-            <!-- Allow adding more than 4 if needed -->
-            <button @click="addPhotoSlot" type="button" v-if="overallPhotos.length < 8 && overallPhotos.every(p => p)" class="aspect-square rounded-lg border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-primary-400 hover:text-primary-500 transition-colors">
-              <Plus class="w-8 h-8 mb-1" />
+            <button @click="addPhotoSlot" type="button" v-if="overallPhotos.length < 8 && overallPhotos.every(p => p)" class="aspect-square rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 active:bg-slate-50 transition-colors">
+              <Plus class="w-7 h-7 mb-1" />
               <span class="text-xs font-medium">Thêm ảnh</span>
             </button>
           </div>
 
-          <div class="pt-6">
+          <div class="pt-4">
             <button
               @click="currentStep = 2"
               :disabled="!isValidStep1 || isAnyUploading"
-              class="w-full min-h-[48px] rounded-lg font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-              :class="(isValidStep1 && !isAnyUploading) ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
+              class="w-full min-h-[48px] rounded-xl font-bold text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              :class="(isValidStep1 && !isAnyUploading) ? 'bg-primary-600 text-white shadow-sm' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
             >
               <Loader2 v-if="isAnyUploading" class="animate-spin w-5 h-5" />
-              <span v-else>Tiếp tục kiểm tra →</span>
+              <template v-else>
+                <span>Tiếp tục kiểm tra</span>
+                <ArrowRight class="w-4 h-4" />
+              </template>
             </button>
           </div>
         </div>
@@ -89,8 +102,21 @@
         <!-- STEP 2: Checklist Items -->
         <div v-show="currentStep === 2">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-slate-900">Danh sách kiểm tra ({{ checklistItems.length }} hạng mục)</h3>
-            <span class="text-xs font-medium text-slate-500">{{ answeredCount }}/{{ checklistItems.length }} đã chấm</span>
+            <h3 class="text-sm font-bold text-slate-900">Danh sách kiểm tra ({{ checklistItems.length }})</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">{{ answeredCount }}/{{ checklistItems.length }} đã chấm</span>
+              <!-- Language Selector -->
+              <select
+                :value="currentLang"
+                @change="currentLang = $event.target.value"
+                class="h-9 pl-3 pr-8 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white cursor-pointer appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 8px center;"
+              >
+                <option v-for="opt in LANG_OPTIONS" :key="opt.value" :value="opt.value">
+                  {{ opt.flag }} {{ opt.label }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <!-- Quick Actions -->
@@ -98,87 +124,91 @@
             <button
               @click="markAllPass"
               type="button"
-              class="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 active:scale-95 transition-all flex items-center gap-2 shadow-sm"
+              class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl active:scale-95 transition-all flex items-center gap-2"
             >
               <ShieldCheck class="w-4 h-4" />
-              ✓ Đạt tất cả
+              Đạt tất cả
             </button>
           </div>
 
           <div v-for="(group, category) in groupedItems" :key="category" class="mb-5">
-            <!-- Category Header (Collapsible) -->
-            <button @click="toggleCategory(category)" type="button" class="w-full bg-slate-50 px-4 py-3 rounded-lg mb-3 border border-slate-200 flex items-center justify-between hover:bg-slate-100 active:scale-[0.99] transition-all">
+            <!-- Category Header -->
+            <button @click="toggleCategory(category)" type="button" class="w-full bg-slate-50 px-4 py-3 rounded-xl mb-3 border border-slate-200 flex items-center justify-between active:bg-slate-100 transition-colors">
               <div class="flex items-center gap-2">
-                <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
-                <span class="text-xs font-medium text-slate-400">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
+                <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
+                <span class="text-[10px] font-semibold text-slate-400">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
               </div>
               <ChevronDown class="w-4 h-4 text-slate-400 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
             </button>
 
             <!-- Items -->
-            <div v-show="!collapsedCategories[category]" class="space-y-4">
+            <div v-show="!collapsedCategories[category]" class="space-y-3">
               <div
                 v-for="item in group"
                 :key="item.id"
-                class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm transition-all"
-                :class="{'ring-2 ring-red-400': itemDetails[item.id]?.is_failed, 'ring-2 ring-green-400': itemDetails[item.id]?.is_failed === false}"
+                class="rounded-2xl bg-white border p-4 transition-all"
+                :class="{
+                  'border-emerald-200 bg-emerald-50/30': itemDetails[item.id]?.is_failed === false,
+                  'border-red-200 bg-red-50/30': itemDetails[item.id]?.is_failed === true,
+                  'border-slate-200': itemDetails[item.id]?.is_failed == null
+                }"
               >
                 <div class="flex items-start gap-3">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <p class="text-sm font-semibold text-slate-900 leading-snug">{{ item.content }}</p>
-                      <span v-if="item.is_critical" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-danger shrink-0">⚠ NGHIÊM TRỌNG</span>
+                      <p class="text-sm font-semibold text-slate-900 leading-snug">{{ getContent(item) }}</p>
+                      <span v-if="item.is_critical" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 shrink-0 uppercase tracking-wide">Nghiêm trọng</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Điểm tối đa: {{ item.max_score }}</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Điểm tối đa: {{ item.max_score }}</p>
                   </div>
                 </div>
 
                 <!-- Pass/Fail Toggle -->
-                <div class="flex items-center gap-3 mt-4">
+                <div class="flex items-center gap-2.5 mt-3">
                   <button
                     type="button"
                     @click="setResult(item.id, false)"
-                    class="flex-1 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95"
+                    class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
                     :class="itemDetails[item.id]?.is_failed === false
-                      ? 'bg-green-600 text-white shadow-sm shadow-green-600/20'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-100 text-slate-500 active:bg-slate-200'"
                   >
-                    ✓ Đạt
+                    Đạt
                   </button>
                   <button
                     type="button"
                     @click="setResult(item.id, true)"
-                    class="flex-1 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95"
+                    class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
                     :class="itemDetails[item.id]?.is_failed === true
-                      ? 'bg-red-600 text-white shadow-sm shadow-red-600/20'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                      ? 'bg-red-600 text-white'
+                      : 'bg-slate-100 text-slate-500 active:bg-slate-200'"
                   >
-                    ✗ Không đạt
+                    Không đạt
                   </button>
                 </div>
 
                 <!-- Missing info warning -->
                 <p v-if="itemDetails[item.id]?.is_failed && (!itemDetails[item.id]?.image_url || !itemDetails[item.id]?.note?.trim())" 
-                   class="text-[11px] font-medium text-red-500 mt-2 text-center animate-pulse">
-                  * Yêu cầu bắt buộc phải đính kèm ảnh và ghi chú lỗi
+                   class="text-[11px] font-medium text-red-500 mt-2 text-center">
+                  Yêu cầu bắt buộc: ảnh và ghi chú lỗi
                 </p>
 
-                <!-- Expanded Box for Failure Notes & Image -->
-                <div v-if="itemDetails[item.id]?.is_failed" class="mt-4 p-4 bg-danger/10/50 rounded-lg border border-red-100 flex flex-col gap-4">
+                <!-- Failure detail box -->
+                <div v-if="itemDetails[item.id]?.is_failed" class="mt-3 p-4 bg-red-50 rounded-xl border border-red-100 flex flex-col gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-red-800 mb-2 uppercase tracking-wide">1. Đính kèm minh chứng lỗi <span class="text-red-500">*</span></label>
+                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">1. Ảnh minh chứng <span class="text-red-500">*</span></label>
                     <div class="w-32">
                       <MobileImageUploader v-model="itemDetails[item.id].image_url" />
                     </div>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-red-800 mb-2 uppercase tracking-wide">2. Ghi chú lỗi <span class="text-red-500">*</span></label>
+                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">2. Ghi chú lỗi <span class="text-red-500">*</span></label>
                     <textarea 
                       v-model="itemDetails[item.id].note" 
                       rows="3"
-                      class="w-full text-sm border-slate-300 rounded-lg p-3 focus:ring-red-500 focus:border-red-500 shadow-sm" 
-                      placeholder="Mô tả chi tiết vấn đề gặp phải..."></textarea>
+                      class="w-full text-sm border border-red-200 rounded-xl p-3 focus:ring-red-500 focus:border-red-500 bg-white" 
+                      placeholder="Mô tả chi tiết vấn đề..."></textarea>
                   </div>
                 </div>
 
@@ -189,28 +219,31 @@
       </div>
 
       <!-- Error -->
-      <div v-if="submitError" class="rounded-lg bg-danger/10 border border-red-200 p-4 mt-4">
-        <p class="text-sm text-danger font-medium">{{ submitError }}</p>
+      <div v-if="submitError" class="rounded-xl bg-red-50 border border-red-200 p-4 mt-4">
+        <p class="text-sm text-red-600 font-medium">{{ submitError }}</p>
       </div>
     </template>
 
-    <div v-else-if="!loading && !plan" class="text-center py-10">
+    <div v-else-if="!loading && !plan" class="flex flex-col items-center justify-center py-14 text-center">
       <p class="text-slate-500">Không thể tải dữ liệu nhiệm vụ.</p>
-      <button @click="fetchData" class="mt-3 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-semibold">Thử lại</button>
+      <button @click="fetchData" class="mt-3 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold active:scale-95 transition-all">Thử lại</button>
     </div>
 
     <!-- Bottom Scoring Summary + Submit (Fixed) -->
     <div v-if="!loading && plan && !existingInspection && checklistItems.length > 0 && currentStep === 2" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto z-40">
-      <div class="bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] px-4 py-3 rounded-t-3xl">
+      <div class="bg-white border-t border-slate-100 shadow-[0_-8px_16px_-8px_rgba(0,0,0,0.08)] px-5 py-3 rounded-t-2xl">
         <!-- Score summary -->
-        <div class="flex items-center justify-between text-sm mb-3 px-2">
-          <div class="flex items-center gap-4">
-            <span class="text-slate-600">Điểm: <span class="font-bold text-base" :class="scoreSummary.willPass ? 'text-success' : 'text-danger'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
-            <span v-if="scoreSummary.criticalCount > 0" class="text-danger font-bold bg-danger/10 px-2 py-0.5 rounded-md">⚠ {{ scoreSummary.criticalCount }} Lỗi</span>
+        <div class="flex items-center justify-between text-sm mb-3">
+          <div class="flex items-center gap-3">
+            <span class="text-slate-500 text-xs">Điểm: <span class="text-base font-bold" :class="scoreSummary.willPass ? 'text-emerald-600' : 'text-red-600'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
+            <span v-if="scoreSummary.criticalCount > 0" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-50 text-red-600 flex items-center gap-1">
+              <AlertTriangle class="w-3 h-3" />
+              {{ scoreSummary.criticalCount }}
+            </span>
           </div>
           <span
-            class="text-xs font-bold px-3 py-1.5 rounded-lg"
-            :class="scoreSummary.willPass ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
+            class="text-[10px] font-bold px-3 py-1.5 rounded-full"
+            :class="scoreSummary.willPass ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'"
           >
             {{ scoreSummary.willPass ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
           </span>
@@ -220,11 +253,11 @@
         <button
           @click="handleSubmit"
           :disabled="!isValidToSubmit || submitting"
-          class="w-full min-h-[50px] rounded-lg font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-          :class="isValidToSubmit ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-600/20' : 'bg-slate-200 text-slate-500 cursor-not-allowed'"
+          class="w-full min-h-[48px] rounded-xl font-bold text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          :class="isValidToSubmit ? 'bg-primary-600 text-white shadow-sm' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
         >
           <Loader2 v-if="submitting" class="animate-spin w-5 h-5" />
-          <span v-else>{{ isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất thông tin (${answeredCount}/${checklistItems.length})` }}</span>
+          <span v-else>{{ isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất (${answeredCount}/${checklistItems.length})` }}</span>
         </button>
       </div>
     </div>
@@ -232,12 +265,15 @@
 </template>
 
 <script setup>
-import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown } from 'lucide-vue-next'
+import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown, AlertTriangle, Check, Camera, ArrowRight, Save, RefreshCw } from 'lucide-vue-next'
 
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import api from '@/services/api.js'
 import MobileImageUploader from '@/components/common/MobileImageUploader.vue'
+import { useInspectionLang } from '@/composables/useInspectionLang.js'
+
+const { currentLang, LANG_OPTIONS, getContent, getCategory } = useInspectionLang()
 
 const route = useRoute()
 const router = useRouter()
@@ -251,21 +287,18 @@ const existingInspection = ref(null)
 
 const currentStep = ref(1)
 
-// Store at least 4 overall photos
 const overallPhotos = ref([null, null, null, null])
 
 const addPhotoSlot = () => {
   overallPhotos.value.push(null)
 }
 
-// Upload state tracking (#7)
 const uploadingSlots = ref({})
 const isAnyUploading = computed(() => Object.values(uploadingSlots.value).some(v => v))
 const onUploadStateChange = (index, isUploading) => {
   uploadingSlots.value = { ...uploadingSlots.value, [index]: isUploading }
 }
 
-// File hash for duplicate detection (#3)
 const photoHashes = ref([])
 const onPhotoHash = (index, hash) => {
   const newHashes = [...photoHashes.value]
@@ -281,7 +314,6 @@ const isValidStep1 = computed(() => {
   return overallPhotos.value.length >= 4 && overallPhotos.value.slice(0, 4).every(url => !!url)
 })
 
-// Detailed state for each item: { itemId: { is_failed: boolean, image_url: string, note: string } }
 const itemDetails = ref({})
 
 const markAllPass = () => {
@@ -295,7 +327,7 @@ const markAllPass = () => {
 const groupedItems = computed(() => {
   const groups = {}
   checklistItems.value.forEach(item => {
-    const cat = item.category || 'Chung'
+    const cat = getCategory(item) || 'Chung'
     if (!groups[cat]) groups[cat] = []
     groups[cat].push(item)
   })
@@ -316,7 +348,6 @@ const setResult = (itemId, isFailed) => {
   } else {
     itemDetails.value[itemId].is_failed = isFailed
   }
-  // Force reactivity
   itemDetails.value = { ...itemDetails.value }
 }
 
@@ -419,26 +450,21 @@ const fetchData = async () => {
   try {
     const planId = route.params.planId
 
-    // ✅ OPTIMIZED: Single API call với full nested data
     const res = await api.get(`/plans/${planId}/inspection`)
 
-    // Get inspection (if exists)
     existingInspection.value = res.data?.data || null
 
-    // Get plan với nested batch -> checklist -> items
     const planData = res.data?.plan || res.data?.data
 
     if (planData) {
       plan.value = planData
 
-      // ✅ Direct access: checklist items đã có sẵn trong response
       if (planData.batch?.checklist?.items) {
         checklistItems.value = planData.batch.checklist.items
       } else if (res.data?.checklist_items) {
         checklistItems.value = res.data.checklist_items
       }
 
-      // Restore draft after data loaded (only if not already inspected)
       if (!existingInspection.value) {
         restoreDraft()
       }
@@ -452,7 +478,7 @@ const fetchData = async () => {
 
 onMounted(fetchData)
 
-// ─── Auto Draft (localStorage) ───
+// Draft
 const DRAFT_KEY = computed(() => `inspection_draft_${route.params.planId}`)
 const draftStatus = ref('')
 const draftTime = ref('')
@@ -517,15 +543,12 @@ const clearDraft = () => {
   draftStatus.value = ''
 }
 
-// Watch for changes → debounced save
 watch([currentStep, overallPhotos, itemDetails], debouncedSave, { deep: true })
 
-// Save on route leave
 onBeforeRouteLeave(() => {
   if (!existingInspection.value && plan.value) saveDraft()
 })
 
-// Save on page close/refresh
 const handleBeforeUnload = () => {
   if (!existingInspection.value && plan.value) {
     localStorage.setItem(DRAFT_KEY.value, JSON.stringify(getDraftData()))
@@ -537,13 +560,3 @@ onBeforeUnmount(() => {
   if (draftTimer) clearTimeout(draftTimer)
 })
 </script>
-
-<style scoped>
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>

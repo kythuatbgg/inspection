@@ -37,6 +37,20 @@ class InspectionController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        // Transform items to include all 3 language versions
+        $checklistItems = collect($plan->batch->checklist->items ?? [])->map(fn($item) => [
+            'id'           => $item->id,
+            'category'     => $item->category,
+            'category_vn'  => $item->category_vn,
+            'category_en'  => $item->category_en,
+            'category_kh'  => $item->category_kh,
+            'content_vn'   => $item->content_vn,
+            'content_en'   => $item->content_en,
+            'content_kh'   => $item->content_kh,
+            'max_score'    => $item->max_score,
+            'is_critical'  => (bool) $item->is_critical,
+        ]);
+
         $inspection = Inspection::where('plan_detail_id', $planId)
             ->with(['details.item', 'user:id,name'])
             ->first();
@@ -45,7 +59,7 @@ class InspectionController extends Controller
             return response()->json([
                 'data' => null,
                 'plan' => $plan,
-                'checklist_items' => $plan->batch->checklist->items ?? [],
+                'checklist_items' => $checklistItems,
                 'message' => 'No inspection found for this plan',
             ]);
         }
@@ -55,12 +69,27 @@ class InspectionController extends Controller
 
         foreach ($data['details'] as &$detail) {
             $detail['failure_proof_url'] = $detail['image_url'] ?? null;
+            // Transform nested item to include all 3 language versions
+            if (isset($detail['item']) && is_array($detail['item'])) {
+                $detail['item'] = [
+                    'id'           => $detail['item']['id'] ?? null,
+                    'category'     => $detail['item']['category'] ?? null,
+                    'category_vn'  => $detail['item']['category_vn'] ?? null,
+                    'category_en'  => $detail['item']['category_en'] ?? null,
+                    'category_kh'  => $detail['item']['category_kh'] ?? null,
+                    'content_vn'   => $detail['item']['content_vn'] ?? null,
+                    'content_en'   => $detail['item']['content_en'] ?? null,
+                    'content_kh'   => $detail['item']['content_kh'] ?? null,
+                    'max_score'    => $detail['item']['max_score'] ?? null,
+                    'is_critical'  => (bool) ($detail['item']['is_critical'] ?? false),
+                ];
+            }
         }
 
         return response()->json([
             'data' => $data,
             'plan' => $plan,
-            'checklist_items' => $plan->batch->checklist->items ?? [],
+            'checklist_items' => $checklistItems,
         ]);
     }
 

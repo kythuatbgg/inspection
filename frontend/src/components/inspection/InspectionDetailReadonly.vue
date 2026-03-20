@@ -37,7 +37,19 @@
           <ListTodo class="w-5 h-5 text-slate-500" />
           Chi tiết từng hạng mục
         </span>
-        <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">Tổng: {{ inspection.details?.length || 0 }}</span>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">Tổng: {{ inspection.details?.length || 0 }}</span>
+          <select
+            :value="currentLang"
+            @change="currentLang = $event.target.value"
+            class="h-9 pl-3 pr-8 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white cursor-pointer appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 8px center;"
+          >
+            <option v-for="opt in LANG_OPTIONS" :key="opt.value" :value="opt.value">
+              {{ opt.flag }} {{ opt.label }}
+            </option>
+          </select>
+        </div>
       </div>
       
       <div v-for="(group, category) in groupedDetails" :key="category" class="mb-4 last:mb-0">
@@ -60,7 +72,7 @@
                  <XCircle v-else class="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
                  
                  <div class="min-w-0">
-                    <h4 class="font-semibold text-slate-900 text-sm leading-snug">{{ detail.item?.content_vn || 'Hạng mục không xác định' }}</h4>
+                    <h4 class="font-semibold text-slate-900 text-sm leading-snug">{{ getContent(detail.item || {}) || 'Hạng mục không xác định' }}</h4>
                     <p v-if="detail.note" class="text-xs text-warning bg-warning/10 px-2 py-1.5 rounded-lg font-medium mt-2 inline-block">📝 Ghi chú: {{ detail.note }}</p>
                  </div>
                </div>
@@ -92,6 +104,9 @@ import { CheckCircle2, XCircle, ListTodo, Camera, AlertTriangle, ChevronDown } f
 import { ref, computed } from 'vue'
 import api from '@/services/api.js'
 import ImageViewerModal from '@/components/common/ImageViewerModal.vue'
+import { useInspectionLang } from '@/composables/useInspectionLang.js'
+
+const { currentLang, LANG_OPTIONS, getContent, getCategory } = useInspectionLang()
 
 const props = defineProps({
   inspection: {
@@ -108,7 +123,7 @@ const groupedDetails = computed(() => {
   const groups = {}
   const details = props.inspection.details || []
   details.forEach(detail => {
-    const cat = detail.item?.category || 'Chung'
+    const cat = getCategory(detail.item || {}) || 'Chung'
     if (!groups[cat]) groups[cat] = []
     groups[cat].push(detail)
   })

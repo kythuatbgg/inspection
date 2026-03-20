@@ -15,6 +15,9 @@ class ChecklistItem extends Model
     protected $fillable = [
         'checklist_id',
         'category',
+        'category_vn',
+        'category_en',
+        'category_kh',
         'content_vn',
         'content_en',
         'content_kh',
