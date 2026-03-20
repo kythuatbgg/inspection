@@ -1,19 +1,19 @@
-<template>
+﻿<template>
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">Cài đặt hệ thống</h1>
+      <h1 class="text-2xl font-bold text-gray-100">Cài đặt hệ thống</h1>
     </div>
 
     <!-- Storage Stats -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <div class="bg-dark-surface rounded-2xl border border-gray-700/50 shadow-lg shadow-black/10 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-700/30 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="p-2 bg-blue-50 rounded-lg">
-            <Server class="w-5 h-5 text-blue-600" />
+          <div class="p-2 bg-blue-500/10 rounded-lg">
+            <Server class="w-5 h-5 text-blue-400" />
           </div>
-          <h2 class="text-lg font-bold text-gray-900">Quản lý lưu trữ</h2>
+          <h2 class="text-lg font-bold text-gray-100">Quản lý lưu trữ</h2>
         </div>
-        <button @click="fetchStats" class="text-sm text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1">
+        <button @click="fetchStats" class="text-sm text-primary-400 font-medium hover:text-primary-700 flex items-center gap-1">
           <RefreshCw class="w-4 h-4" />
           Làm mới
         </button>
@@ -28,9 +28,9 @@
         <!-- Stat Cards Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           <!-- Orphan Files -->
-          <div class="rounded-xl bg-amber-50 border border-amber-100 p-4">
+          <div class="rounded-xl bg-amber-500/10 border border-amber-100 p-4">
             <p class="text-xs font-bold text-amber-600 uppercase tracking-wide mb-1">File mồ côi</p>
-            <p class="text-2xl font-bold text-amber-800">{{ stats.orphan_files_count }}</p>
+            <p class="text-2xl font-bold text-amber-300">{{ stats.orphan_files_count }}</p>
             <p class="text-sm text-amber-600 mt-1">{{ stats.orphan_files_size_mb }} MB</p>
           </div>
 
@@ -42,32 +42,32 @@
           </div>
 
           <!-- Spatie Media -->
-          <div class="rounded-xl bg-green-50 border border-green-100 p-4">
+          <div class="rounded-xl bg-green-500/10 border border-green-100 p-4">
             <p class="text-xs font-bold text-green-600 uppercase tracking-wide mb-1">Ảnh Spatie (Đã lưu)</p>
-            <p class="text-2xl font-bold text-green-800">{{ stats.media_count }}</p>
+            <p class="text-2xl font-bold text-green-300">{{ stats.media_count }}</p>
             <p class="text-sm text-green-600 mt-1">{{ stats.media_size_mb }} MB</p>
           </div>
 
           <!-- Total -->
-          <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <p class="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1">Tổng dung lượng</p>
-            <p class="text-2xl font-bold text-blue-800">{{ stats.total_size_mb }} MB</p>
-            <p class="text-sm text-blue-600 mt-1">Upload + Media</p>
+          <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4">
+            <p class="text-xs font-bold text-blue-400 uppercase tracking-wide mb-1">Tổng dung lượng</p>
+            <p class="text-2xl font-bold text-blue-300">{{ stats.total_size_mb }} MB</p>
+            <p class="text-sm text-blue-400 mt-1">Upload + Media</p>
           </div>
         </div>
 
-        <div class="mb-6 rounded-xl bg-gray-50 border border-gray-200 p-4 text-sm text-gray-600 space-y-1">
+        <div class="mb-6 rounded-xl bg-dark-bg border border-gray-700/50 p-4 text-sm text-gray-500 space-y-1">
           <p><span class="font-semibold text-gray-800">Tổng file upload:</span> {{ stats.upload_files_count }} file · {{ stats.upload_files_size_mb }} MB</p>
           <p>File mồ côi là ảnh đã upload nhưng chưa còn được tham chiếu trong báo cáo kiểm tra.</p>
         </div>
 
         <!-- Cleanup Controls -->
-        <div class="rounded-xl bg-gray-50 border border-gray-200 p-5">
-          <h3 class="text-sm font-bold text-gray-700 mb-3">Dọn dẹp file tạm</h3>
+        <div class="rounded-xl bg-dark-bg border border-gray-700/50 p-5">
+          <h3 class="text-sm font-bold text-gray-300 mb-3">Dọn dẹp file tạm</h3>
           <p class="text-xs text-gray-500 mb-4">Xóa các file mồ côi đã upload nhưng không còn được gắn vào báo cáo kiểm tra. Tự động chạy hàng ngày lúc 3:00 AM nếu scheduler đang hoạt động.</p>
 
           <div class="flex items-center gap-3">
-            <select v-model="cleanupHours" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white">
+            <select v-model="cleanupHours" class="text-sm border border-gray-600 rounded-lg px-3 py-2 bg-dark-surface">
               <option :value="0">⚠ Tất cả file tạm</option>
               <option :value="1">Cũ hơn 1 giờ</option>
               <option :value="6">Cũ hơn 6 giờ</option>
@@ -88,7 +88,7 @@
           </div>
 
           <!-- Cleanup Result -->
-          <div v-if="cleanupMessage" class="mt-3 px-3 py-2 rounded-lg text-sm font-medium" :class="cleanupMessage.includes('error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">
+          <div v-if="cleanupMessage" class="mt-3 px-3 py-2 rounded-lg text-sm font-medium" :class="cleanupMessage.includes('error') ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'">
             ✓ {{ cleanupMessage }}
           </div>
         </div>

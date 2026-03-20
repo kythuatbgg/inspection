@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <h2 class="text-2xl font-bold tracking-tight text-gray-900">Lô kiểm tra</h2>
+      <h2 class="text-2xl font-bold tracking-tight text-gray-100">Lô kiểm tra</h2>
       <!-- Desktop action hidden on mobile -->
       <button class="hidden md:flex btn-primary" @click="showFormModal = true">
         <Plus class="w-5 h-5 mr-2" />
@@ -11,18 +11,18 @@
     </div>
 
     <!-- Filters container -->
-    <div class="bg-white rounded-[20px] md:rounded-xl shadow-sm border border-gray-100 md:border-gray-200 p-3 md:p-4">
+    <div class="bg-dark-surface rounded-[20px] md:rounded-xl shadow-lg shadow-black/10 border border-gray-700/30 md:border-gray-700/50 p-3 md:p-4">
       <div class="flex flex-col md:flex-row gap-4">
         <!-- Search -->
         <div class="relative w-full md:max-w-xs">
           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search class="w-5 h-5 text-gray-400" />
+            <Search class="w-5 h-5 text-gray-500" />
           </div>
           <input
             v-model="filters.search"
             type="text"
             placeholder="Tìm kiếm mã lô, tên lô..."
-            class="w-full pl-11 pr-4 py-3 min-h-[52px] md:min-h-[40px] bg-gray-50/80 md:bg-white border md:border-gray-300 md:focus:bg-white focus:bg-white focus:border-primary-500 rounded-[16px] md:rounded-xl text-gray-900 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder:text-gray-400 font-medium"
+            class="w-full pl-11 pr-4 py-3 min-h-[52px] md:min-h-[40px] bg-dark-elevated/80 md:bg-dark-surface border md:border-gray-600 md:focus:bg-dark-surface focus:bg-dark-surface focus:border-primary-500 rounded-[16px] md:rounded-xl text-gray-100 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder:text-gray-500 font-medium"
             @input="handleSearch"
           />
         </div>
@@ -34,7 +34,7 @@
           label="Chọn trạng thái"
           placeholder="Tất cả trạng thái"
           container-class="w-full md:max-w-xs"
-          trigger-class="!min-h-[52px] md:!min-h-[40px] !bg-gray-50/80 md:!bg-white md:!rounded-xl !rounded-[16px]"
+          trigger-class="!min-h-[52px] md:!min-h-[40px] !bg-dark-elevated/80 md:!bg-dark-surface md:!rounded-xl !rounded-[16px]"
           @update:model-value="handleSearch"
         />
       </div>
@@ -49,27 +49,27 @@
         {{ error }}
       </div>
       <table v-else class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
+        <thead class="bg-dark-bg border-b border-gray-700/50">
           <tr>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Mã lô</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tên lô</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Số tủ</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Ngày tạo</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Trạng thái</th>
-            <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">Thao tác</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Mã lô</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Tên lô</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Số tủ</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Ngày tạo</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Trạng thái</th>
+            <th class="px-4 py-3 text-right text-sm font-semibold text-gray-300">Thao tác</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-for="batch in batches" :key="batch.id" class="hover:bg-gray-50">
-            <td class="px-4 py-3 font-medium text-gray-900">#{{ batch.id }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ batch.name || batch.title }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ batch.plans_count || 0 }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ formatDate(batch.created_at) }}</td>
+          <tr v-for="batch in batches" :key="batch.id" class="hover:bg-dark-bg">
+            <td class="px-4 py-3 font-medium text-gray-100">#{{ batch.id }}</td>
+            <td class="px-4 py-3 text-sm text-gray-500">{{ batch.name || batch.title }}</td>
+            <td class="px-4 py-3 text-sm text-gray-500">{{ batch.plans_count || 0 }}</td>
+            <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(batch.created_at) }}</td>
             <td class="px-4 py-3">
               <span :class="getStatusClass(batch.status)">{{ getStatusLabel(batch.status) }}</span>
             </td>
             <td class="px-4 py-3 text-right">
-              <button @click="$router.push({ name: 'admin-batch-detail', params: { id: batch.id } })" class="inline-flex items-center justify-center p-2 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 text-sm font-bold transition-colors">
+              <button @click="$router.push({ name: 'admin-batch-detail', params: { id: batch.id } })" class="inline-flex items-center justify-center p-2 rounded-lg bg-primary-500/10 text-primary-400 hover:bg-primary-100 text-sm font-bold transition-colors">
                 Chi tiết
               </button>
             </td>
@@ -90,51 +90,51 @@
       
       <template v-else>
         <!-- Card -->
-        <div v-for="batch in batches" :key="batch.id" class="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 relative overflow-hidden active:scale-[0.98] transition-all duration-200">
+        <div v-for="batch in batches" :key="batch.id" class="bg-dark-surface rounded-[24px] p-5 shadow-lg shadow-black/10 border border-gray-700/30 relative overflow-hidden active:scale-[0.98] transition-all duration-200">
           
           <!-- Card Header -->
           <div class="flex items-start gap-4 mb-4">
-            <div class="flex-shrink-0 w-12 h-12 rounded-[16px] bg-primary-50 flex items-center justify-center">
-              <Package class="w-6 h-6 text-primary-600" />
+            <div class="flex-shrink-0 w-12 h-12 rounded-[16px] bg-primary-500/10 flex items-center justify-center">
+              <Package class="w-6 h-6 text-primary-400" />
             </div>
             <div class="flex-1 pt-1">
-              <h3 class="text-lg font-bold text-gray-900 tracking-tight leading-tight">{{ batch.name || batch.title }}</h3>
+              <h3 class="text-lg font-bold text-gray-100 tracking-tight leading-tight">{{ batch.name || batch.title }}</h3>
               <p class="text-sm font-medium text-gray-500 mt-0.5">Mã lô: #{{ batch.id }}</p>
             </div>
           </div>
           
           <!-- Grouped Metadata block -->
-          <div class="bg-gray-50/80 rounded-[16px] p-3.5 mb-4 space-y-2.5">
+          <div class="bg-dark-elevated/80 rounded-[16px] p-3.5 mb-4 space-y-2.5">
             <div class="flex items-center text-sm">
                 <div class="flex items-center text-gray-500 font-medium w-24">
                   <Server class="w-4 h-4 mr-1.5" />
                   Số tủ:
                 </div>
-                <span class="text-gray-900 font-semibold">{{ batch.plans_count || 0 }}</span>
+                <span class="text-gray-100 font-semibold">{{ batch.plans_count || 0 }}</span>
             </div>
             <div class="flex items-center text-sm">
                 <div class="flex items-center text-gray-500 font-medium w-24">
                   <Calendar class="w-4 h-4 mr-1.5" />
                   Ngày tạo:
                 </div>
-                <span class="text-gray-900 font-semibold">{{ formatDate(batch.created_at) }}</span>
+                <span class="text-gray-100 font-semibold">{{ formatDate(batch.created_at) }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm pt-1 mt-1 border-t border-gray-200/50">
+            <div class="flex items-center justify-between text-sm pt-1 mt-1 border-t border-gray-700/50/50">
               <span class="text-gray-500 font-medium">Trạng thái:</span>
               <span :class="getStatusClass(batch.status)" class="shrink-0">{{ getStatusLabel(batch.status) }}</span>
             </div>
           </div>
           
           <!-- Action row -->
-          <button @click="$router.push({ name: 'admin-batch-detail', params: { id: batch.id } })" class="w-full flex items-center justify-center min-h-[48px] rounded-[14px] bg-primary-50 border border-primary-100 text-primary-700 font-bold hover:bg-primary-100 active:bg-primary-200 transition-colors">
+          <button @click="$router.push({ name: 'admin-batch-detail', params: { id: batch.id } })" class="w-full flex items-center justify-center min-h-[48px] rounded-[14px] bg-primary-500/10 border border-primary-100 text-primary-700 font-bold hover:bg-primary-100 active:bg-primary-200 transition-colors">
               Chi tiết lô
           </button>
         </div>
 
         <!-- Empty State Mobile -->
-        <div v-if="batches.length === 0" class="flex flex-col items-center justify-center py-12 px-4 bg-white rounded-[24px] border border-gray-100 shadow-sm mt-4">
+        <div v-if="batches.length === 0" class="flex flex-col items-center justify-center py-12 px-4 bg-dark-surface rounded-[24px] border border-gray-700/30 shadow-lg shadow-black/10 mt-4">
             <FileStack class="w-16 h-16 text-gray-300 mb-4" />
-            <p class="text-gray-500 font-medium text-center">Chưa có lô nào<br/><span class="text-sm text-gray-400 font-normal">Tạo lô mới để kiểm tra</span></p>
+            <p class="text-gray-500 font-medium text-center">Chưa có lô nào<br/><span class="text-sm text-gray-500 font-normal">Tạo lô mới để kiểm tra</span></p>
         </div>
       </template>
     </div>
@@ -142,44 +142,44 @@
     <!-- Pagination -->
     <template v-if="!loading && !error && batches.length > 0">
       <!-- Desktop Pagination -->
-      <div v-if="pagination.last_page > 1" class="hidden md:flex bg-white rounded-xl shadow-sm border border-gray-200 p-6 items-center justify-between">
-        <p class="text-sm text-gray-600 font-medium">
-          Hiển thị <span class="font-semibold text-gray-900">{{ pagination.from }}</span> - 
-          <span class="font-semibold text-gray-900">{{ pagination.to }}</span> trong 
-          <span class="font-semibold text-gray-900">{{ pagination.total }}</span> lô
+      <div v-if="pagination.last_page > 1" class="hidden md:flex bg-dark-surface rounded-xl shadow-lg shadow-black/10 border border-gray-700/50 p-6 items-center justify-between">
+        <p class="text-sm text-gray-500 font-medium">
+          Hiển thị <span class="font-semibold text-gray-100">{{ pagination.from }}</span> - 
+          <span class="font-semibold text-gray-100">{{ pagination.to }}</span> trong 
+          <span class="font-semibold text-gray-100">{{ pagination.total }}</span> lô
         </p>
         
         <div class="flex items-center gap-1.5">
           <button
             @click="changePage(1)"
             :disabled="pagination.current_page === 1"
-            class="flex p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-600 transition-colors items-center justify-center"
+            class="flex p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dark-bg text-gray-500 transition-colors items-center justify-center"
           >
             <ChevronsLeft class="w-4 h-4" />
           </button>
           <button
             @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
-            class="p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-600 transition-colors flex items-center justify-center"
+            class="p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dark-bg text-gray-500 transition-colors flex items-center justify-center"
           >
             <ChevronLeft class="w-4 h-4" />
           </button>
 
-          <div class="px-4 font-semibold text-sm text-gray-700">
+          <div class="px-4 font-semibold text-sm text-gray-300">
             {{ pagination.current_page }} / {{ pagination.last_page }}
           </div>
           
           <button
             @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
-            class="p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-600 transition-colors flex items-center justify-center"
+            class="p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dark-bg text-gray-500 transition-colors flex items-center justify-center"
           >
             <ChevronRight class="w-4 h-4" />
           </button>
           <button
             @click="changePage(pagination.last_page)"
             :disabled="pagination.current_page === pagination.last_page"
-            class="flex p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-600 transition-colors items-center justify-center"
+            class="flex p-2 min-h-[40px] min-w-[40px] rounded-lg border border-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dark-bg text-gray-500 transition-colors items-center justify-center"
           >
             <ChevronsRight class="w-4 h-4" />
           </button>
@@ -190,28 +190,28 @@
       <div v-if="pagination.last_page > 1" class="md:hidden mt-8 mb-24">
         <div class="text-center mb-5">
           <div class="text-sm text-gray-500 font-medium">
-            Lô kiểm tra <span class="text-gray-900 font-bold">{{ pagination.from }}</span> - <span class="text-gray-900 font-bold">{{ pagination.to }}</span><br/>
-            <span class="text-xs text-gray-400 mt-1 inline-block">trong tổng số {{ pagination.total }} lô</span>
+            Lô kiểm tra <span class="text-gray-100 font-bold">{{ pagination.from }}</span> - <span class="text-gray-100 font-bold">{{ pagination.to }}</span><br/>
+            <span class="text-xs text-gray-500 mt-1 inline-block">trong tổng số {{ pagination.total }} lô</span>
           </div>
         </div>
-        <div class="flex items-center justify-between bg-white p-2 rounded-[24px] shadow-sm border border-gray-100 mx-auto max-w-[320px]">
+        <div class="flex items-center justify-between bg-dark-surface p-2 rounded-[24px] shadow-lg shadow-black/10 border border-gray-700/30 mx-auto max-w-[320px]">
           <button 
             @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
-            class="group flex items-center justify-center w-14 h-14 rounded-full bg-gray-50/80 text-gray-600 active:bg-gray-100 active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:active:scale-100 disabled:bg-transparent"
+            class="group flex items-center justify-center w-14 h-14 rounded-full bg-dark-elevated/80 text-gray-500 active:bg-dark-elevated active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:active:scale-100 disabled:bg-transparent"
           >
             <ChevronLeft class="w-6 h-6 group-active:-translate-x-1 transition-transform" />
           </button>
           <div class="flex-1 flex flex-col items-center justify-center">
             <div class="flex items-baseline gap-1.5">
-              <span class="text-xl font-bold tracking-tight text-gray-900">{{ pagination.current_page }}</span>
-              <span class="text-sm font-semibold text-gray-400">/ {{ pagination.last_page }}</span>
+              <span class="text-xl font-bold tracking-tight text-gray-100">{{ pagination.current_page }}</span>
+              <span class="text-sm font-semibold text-gray-500">/ {{ pagination.last_page }}</span>
             </div>
           </div>
           <button 
             @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
-            class="group flex items-center justify-center w-14 h-14 rounded-full text-white bg-primary-600 shadow-lg shadow-primary-500/30 active:bg-primary-700 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:active:scale-100 disabled:shadow-none"
+            class="group flex items-center justify-center w-14 h-14 rounded-full text-white bg-primary-500 shadow-lg shadow-primary-500/30 active:bg-primary-700 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:active:scale-100 disabled:shadow-none"
           >
             <ChevronRight class="w-6 h-6 group-active:translate-x-1 transition-transform" />
           </button>
@@ -223,7 +223,7 @@
     <div class="md:hidden fixed bottom-6 right-6 z-40">
       <button 
         @click="showFormModal = true"
-        class="flex items-center justify-center w-[56px] h-[56px] rounded-full bg-primary-600 text-white shadow-lg shadow-primary-500/40 hover:bg-primary-700 active:scale-90 active:bg-primary-800 transition-all"
+        class="flex items-center justify-center w-[56px] h-[56px] rounded-full bg-primary-500 text-white shadow-lg shadow-primary-500/40 hover:bg-primary-400 active:scale-90 active:bg-primary-800 transition-all"
       >
         <Plus class="w-7 h-7" />
       </button>

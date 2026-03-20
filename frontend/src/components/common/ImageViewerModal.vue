@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 z-[100] bg-black/95 flex max-w-[100vw] max-h-[100dvh] overflow-hidden select-none" @click.self="close">
       <!-- Close button -->

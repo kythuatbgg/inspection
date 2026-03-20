@@ -7,6 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        dark: {
+          bg: '#0A0E1A',
+          surface: '#111827',
+          elevated: '#1F2937',
+          border: 'rgba(55, 65, 81, 0.5)',
+        },
         primary: {
           50: '#EFF6FF',
           100: '#DBEAFE',
@@ -19,12 +25,15 @@ export default {
           800: '#1E40AF',
           900: '#1E3A8A',
         },
-        success: '#16A34A',
-        danger: '#DC2626',
+        accent: '#F97316',
+        success: '#22C55E',
+        danger: '#EF4444',
         warning: '#F59E0B',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Fira Sans', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['Fira Code', 'monospace'],
+        heading: ['Fira Code', 'monospace'],
       },
       minHeight: {
         'touch': '56px',

@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700">
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div class="bg-dark-surface rounded-2xl shadow-xl p-8 w-full max-w-md">
       <div class="text-center mb-8">
         <h1 class="text-2xl font-bold text-gray-800">FBB Inspection</h1>
         <p class="text-gray-500 mt-2">Đăng nhập để tiếp tục</p>
@@ -8,28 +8,28 @@
 
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Tên đăng nhập</label>
+          <label class="block text-gray-300 text-sm font-bold mb-2">Tên đăng nhập</label>
           <input
             v-model="username"
             type="text"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Nhập tên đăng nhập"
             required
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Mật khẩu</label>
+          <label class="block text-gray-300 text-sm font-bold mb-2">Mật khẩu</label>
           <input
             v-model="password"
             type="password"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Nhập mật khẩu"
             required
           />
         </div>
 
-        <div v-if="error" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <div v-if="error" class="mb-4 p-3 bg-red-500/15 border border-red-400 text-red-400 rounded-lg">
           {{ error }}
         </div>
 

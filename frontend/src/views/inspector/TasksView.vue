@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="space-y-4">
     <!-- Tabs -->
     <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -8,8 +8,8 @@
         @click="activeTab = tab.value"
         class="px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors active:scale-95"
         :class="activeTab === tab.value
-          ? 'bg-primary-600 text-white shadow-md shadow-primary-600/20'
-          : 'bg-gray-100 text-gray-600'"
+          ? 'bg-primary-500 text-white shadow-md shadow-primary-500/15'
+          : 'bg-dark-elevated text-gray-500'"
       >
         {{ tab.label }}
         <span v-if="tab.count !== undefined" class="ml-1 opacity-80">({{ tab.count }})</span>
@@ -22,24 +22,24 @@
         v-for="task in filteredTasks"
         :key="task.planId"
         @click="goToInspection(task)"
-        class="w-full text-left rounded-2xl bg-white border border-gray-200 p-4 hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
+        class="w-full text-left rounded-2xl bg-dark-surface border border-gray-700/50 p-4 hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
       >
         <div class="flex items-center justify-between">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <h4 class="font-bold text-gray-900">{{ task.cabinetCode }}</h4>
+              <h4 class="font-bold text-gray-100">{{ task.cabinetCode }}</h4>
               <span
                 class="text-xs font-semibold px-2 py-0.5 rounded-full"
                 :class="task.status === 'done'
-                  ? 'bg-green-50 text-green-700'
-                  : 'bg-amber-50 text-amber-700'"
+                  ? 'bg-green-500/10 text-green-400'
+                  : 'bg-amber-500/10 text-amber-400'"
               >
                 {{ task.status === 'done' ? '✓ Đã kiểm tra' : 'Chưa kiểm tra' }}
               </span>
             </div>
             <p class="text-sm text-gray-500 mt-1 truncate">{{ task.batchName }}</p>
           </div>
-          <ChevronRight class="w-5 h-5 text-gray-400 shrink-0" />
+          <ChevronRight class="w-5 h-5 text-gray-500 shrink-0" />
         </div>
 
         <!-- Meta -->
@@ -55,10 +55,10 @@
         </div>
 
         <!-- Result if done -->
-        <div v-if="task.result" class="mt-2 pt-2 border-t border-gray-100">
+        <div v-if="task.result" class="mt-2 pt-2 border-t border-gray-700/30">
           <span
             class="text-xs font-bold px-2 py-0.5 rounded-full"
-            :class="task.result === 'pass' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+            :class="task.result === 'pass' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'"
           >{{ task.result === 'pass' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}</span>
           <span v-if="task.score !== null" class="text-xs text-gray-500 ml-2">Điểm: {{ task.score }}</span>
         </div>
@@ -67,7 +67,7 @@
       <!-- Empty State -->
       <div v-if="filteredTasks.length === 0" class="text-center py-10">
         <ClipboardIcon class="w-16 h-16 mx-auto text-gray-300" />
-        <p class="font-semibold text-gray-700 mt-4">Không có nhiệm vụ nào</p>
+        <p class="font-semibold text-gray-300 mt-4">Không có nhiệm vụ nào</p>
         <p class="text-sm text-gray-500 mt-1">
           {{ activeTab === 'planned' ? 'Tất cả tủ đã được kiểm tra!' : 'Chưa có nhiệm vụ trong mục này' }}
         </p>

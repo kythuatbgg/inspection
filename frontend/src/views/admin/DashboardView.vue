@@ -1,14 +1,14 @@
-<template>
+﻿<template>
   <div class="space-y-6">
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-            <FileStack class="w-5 h-5 text-blue-600" />
+          <div class="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
+            <FileStack class="w-5 h-5 text-blue-400" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.totalBatches }}</p>
+            <p class="text-2xl font-bold text-gray-100">{{ stats.totalBatches }}</p>
             <p class="text-sm text-gray-500">Lô kiểm tra</p>
           </div>
         </div>
@@ -16,11 +16,11 @@
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-lg bg-green-500/15 flex items-center justify-center">
             <ShieldCheck class="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.passed }}</p>
+            <p class="text-2xl font-bold text-gray-100">{{ stats.passed }}</p>
             <p class="text-sm text-gray-500">Đạt</p>
           </div>
         </div>
@@ -28,11 +28,11 @@
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-lg bg-red-500/15 flex items-center justify-center">
             <XCircle class="w-5 h-5 text-red-600" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.failed }}</p>
+            <p class="text-2xl font-bold text-gray-100">{{ stats.failed }}</p>
             <p class="text-sm text-gray-500">Không đạt</p>
           </div>
         </div>
@@ -40,11 +40,11 @@
 
       <div class="card p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
             <Clock class="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.pending }}</p>
+            <p class="text-2xl font-bold text-gray-100">{{ stats.pending }}</p>
             <p class="text-sm text-gray-500">Đang chờ</p>
           </div>
         </div>
@@ -53,8 +53,8 @@
 
     <!-- Recent Batches -->
     <div class="card">
-      <div class="p-4 border-b border-gray-100">
-        <h2 class="text-lg font-semibold text-gray-900">Lô kiểm tra gần đây</h2>
+      <div class="p-4 border-b border-gray-700/30">
+        <h2 class="text-lg font-semibold text-gray-100">Lô kiểm tra gần đây</h2>
       </div>
 
       <!-- Loading -->
@@ -69,9 +69,9 @@
 
       <!-- Data -->
       <div v-else class="divide-y divide-gray-100">
-        <div v-for="batch in recentBatches" :key="batch.id" class="p-4 flex items-center justify-between hover:bg-gray-50">
+        <div v-for="batch in recentBatches" :key="batch.id" class="p-4 flex items-center justify-between hover:bg-dark-bg">
           <div>
-            <p class="font-medium text-gray-900">{{ batch.name || batch.title }}</p>
+            <p class="font-medium text-gray-100">{{ batch.name || batch.title }}</p>
             <p class="text-sm text-gray-500">{{ batch.plans_count || 0 }} tủ cáp • {{ formatDate(batch.created_at) }}</p>
           </div>
           <span :class="getStatusClass(batch.status)">{{ getStatusLabel(batch.status) }}</span>

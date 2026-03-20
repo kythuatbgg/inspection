@@ -1,31 +1,31 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex justify-center">
+  <div class="min-h-screen bg-dark-bg flex justify-center">
     <!-- Mobile Container - Centered on desktop -->
-    <div class="w-full max-w-md bg-white shadow-lg min-h-screen flex flex-col relative">
+    <div class="w-full max-w-md bg-dark-surface shadow-2xl shadow-black/30 min-h-screen flex flex-col relative">
 
       <!-- Top Header -->
-      <header class="bg-primary-600 text-white px-4 pb-6 pt-4 sticky top-0 z-40">
+      <header class="bg-gradient-to-br from-primary-600 to-primary-800 text-white px-4 pb-6 pt-4 sticky top-0 z-40">
         <div class="flex items-center justify-between">
           <!-- Logo & User -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
               <ShieldCheck class="w-6 h-6" />
             </div>
             <div>
-              <h1 class="text-lg font-bold">FBB Inspection</h1>
-              <p class="text-xs text-white/80">{{ userName }}</p>
+              <h1 class="text-lg font-bold font-heading">FBB Inspection</h1>
+              <p class="text-xs text-white/70">{{ userName }}</p>
             </div>
           </div>
 
           <!-- Status Badge -->
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" :class="isOnline ? 'bg-white/20' : 'bg-red-500'">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" :class="isOnline ? 'bg-white/15' : 'bg-red-500'">
             <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-green-400' : 'bg-white'"></span>
             <span>{{ isOnline ? 'Online' : 'Offline' }}</span>
           </div>
         </div>
 
         <!-- Page Title -->
-        <h2 class="text-xl font-bold mt-4">{{ pageTitle }}</h2>
+        <h2 class="text-xl font-bold mt-4 font-heading">{{ pageTitle }}</h2>
       </header>
 
       <!-- Main Content -->
@@ -34,21 +34,21 @@
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 shadow-lg z-50 safe-bottom">
+      <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-dark-surface border-t border-gray-700/50 shadow-2xl shadow-black/30 z-50 safe-bottom">
         <div class="flex items-center justify-around h-16">
           <router-link
             v-for="item in navItems"
             :key="item.path"
             :to="item.path"
             class="flex flex-col items-center justify-center flex-1 h-full min-h-touch transition-colors"
-            :class="isActive(item.path) ? 'text-primary-600' : 'text-gray-400'"
+            :class="isActive(item.path) ? 'text-primary-400' : 'text-gray-500'"
           >
             <component :is="item.icon" class="w-6 h-6" />
             <span class="text-xs font-medium mt-1">{{ item.label }}</span>
           </router-link>
 
           <!-- Logout -->
-          <button @click="handleLogout" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400">
+          <button @click="handleLogout" class="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-gray-300 transition-colors">
             <LogOut class="w-6 h-6" />
             <span class="text-xs font-medium mt-1">Đăng xuất</span>
           </button>
