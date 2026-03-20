@@ -25,8 +25,8 @@ export default {
         accent: '#F97316',
       },
       fontFamily: {
-        sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
-        heading: ['Poppins', '"Open Sans"', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
       },
       minHeight: {
         'touch': '56px',
