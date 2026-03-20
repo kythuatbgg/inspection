@@ -420,8 +420,9 @@ class BatchController extends Controller
     /**
      * Remove cabinet from batch
      * DELETE /api/batches/{batch}/plans/{plan}
+     * Supports ?force=true to cascade-delete inspections
      */
-    public function removeCabinet(int $batchId, int $planId): JsonResponse
+    public function removeCabinet(Request $request, int $batchId, int $planId): JsonResponse
     {
         $batch = InspectionBatch::findOrFail($batchId);
         if ($batch->status === 'completed') {
@@ -430,15 +431,91 @@ class BatchController extends Controller
 
         $plan = $batch->planDetails()->where('id', $planId)->firstOrFail();
 
-        // Cannot delete if it already has inspection data
-        if ($plan->status === 'done' || $plan->inspection()->exists()) {
-            return response()->json(['message' => 'Tủ này đã có kết quả kiểm tra, không thể xóa khỏi lô.'], 422);
+        $hasInspection = $plan->status === 'done' || $plan->inspections()->exists();
+
+        if ($hasInspection && !$request->boolean('force')) {
+            return response()->json([
+                'message' => 'Tủ này đã có kết quả kiểm tra. Thêm ?force=true để xóa.',
+                'has_inspection' => true,
+            ], 422);
+        }
+
+        // Cascade delete: inspection_details → inspections → plan
+        if ($hasInspection) {
+            foreach ($plan->inspections as $inspection) {
+                $inspection->details()->delete();
+                $inspection->delete();
+            }
         }
 
         $plan->delete();
 
         return response()->json([
             'message' => 'Đã xóa tủ khỏi lô thành công.'
+        ]);
+    }
+
+    /**
+     * Swap cabinet in batch (replace old cabinet with new one)
+     * PATCH /api/batches/{batch}/plans/{plan}/swap
+     */
+    public function swapCabinet(Request $request, int $batchId, int $planId): JsonResponse
+    {
+        $batch = InspectionBatch::findOrFail($batchId);
+        if ($batch->status === 'completed') {
+            return response()->json(['message' => 'Không thể thay đổi tủ trong lô đã kết thúc.'], 422);
+        }
+
+        $request->validate([
+            'new_cabinet_code' => 'required|string|exists:cabinets,cabinet_code',
+        ], [
+            'new_cabinet_code.required' => 'Vui lòng chọn tủ mới.',
+            'new_cabinet_code.exists' => 'Mã tủ mới không tồn tại.',
+        ]);
+
+        // Check new cabinet is not already in this batch
+        $alreadyExists = $batch->planDetails()
+            ->where('cabinet_code', $request->new_cabinet_code)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Tủ mới đã tồn tại trong lô này.',
+            ], 422);
+        }
+
+        $plan = $batch->planDetails()->where('id', $planId)->firstOrFail();
+        $oldCode = $plan->cabinet_code;
+        $hasInspection = $plan->status === 'done' || $plan->inspections()->exists();
+
+        if ($hasInspection && !$request->boolean('force')) {
+            return response()->json([
+                'message' => "Tủ [{$oldCode}] đã có kết quả kiểm tra. Thêm ?force=true để thay thế (dữ liệu kiểm tra cũ sẽ bị xóa).",
+                'has_inspection' => true,
+            ], 422);
+        }
+
+        // Cascade delete old inspection data if force
+        if ($hasInspection) {
+            foreach ($plan->inspections as $inspection) {
+                $inspection->details()->delete();
+                $inspection->delete();
+            }
+        }
+
+        // Swap the cabinet code and reset status
+        $plan->update([
+            'cabinet_code' => $request->new_cabinet_code,
+            'status' => 'planned',
+            'review_status' => 'pending',
+            'review_note' => null,
+            'reviewed_at' => null,
+        ]);
+
+        return response()->json([
+            'message' => "Đã thay thế tủ [{$oldCode}] bằng [{$request->new_cabinet_code}] thành công.",
+            'old_cabinet_code' => $oldCode,
+            'new_cabinet_code' => $request->new_cabinet_code,
         ]);
     }
 }

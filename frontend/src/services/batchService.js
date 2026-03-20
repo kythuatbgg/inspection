@@ -93,8 +93,16 @@ export const batchService = {
     return response.data
   },
 
-  async removeCabinetFromBatch(batchId, planId) {
-    const response = await api.delete(`/batches/${batchId}/plans/${planId}`)
+  async removeCabinetFromBatch(batchId, planId, force = false) {
+    const response = await api.delete(`/batches/${batchId}/plans/${planId}`, { params: force ? { force: true } : {} })
+    return response.data
+  },
+
+  async swapCabinet(batchId, planId, newCabinetCode, force = false) {
+    const response = await api.patch(`/batches/${batchId}/plans/${planId}/swap`, {
+      new_cabinet_code: newCabinetCode,
+      force: force || undefined,
+    })
     return response.data
   }
 }

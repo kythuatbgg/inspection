@@ -123,6 +123,7 @@
                 <th class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Chi tiết kiểm tra</th>
                 <th class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-40">Ghi chú duyệt</th>
                 <th class="px-5 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[180px]">Duyệt kết quả</th>
+                <th v-if="batch.status !== 'completed'" class="px-5 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-16"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -184,10 +185,24 @@
                     <button v-if="batch.status !== 'completed' && item.review_status !== 'pending' && item.inspection" @click="reviewPlan(item.plan_id, 'pending')" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg shrink-0 transition-colors" title="Bỏ duyệt (Hoàn tác)">
                       <Undo2 class="w-4 h-4" />
                     </button>
-                    <!-- Remove Cabinet from Batch -->
-                    <button v-if="batch.status !== 'completed' && !item.inspection && item.status !== 'done'" @click="removeCabinet(item)" class="p-1.5 text-red-400 hover:text-red-700 hover:bg-red-50 rounded-lg shrink-0 transition-colors" title="Xóa khỏi lô">
-                      <Trash2 class="w-4 h-4" />
+                  </div>
+                </td>
+                <!-- Dropdown Action Menu (Desktop) -->
+                <td v-if="batch.status !== 'completed'" class="px-5 py-4 text-center">
+                  <div class="relative">
+                    <button @click.stop="toggleDropdown(item.plan_id)" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                      <MoreVertical class="w-4 h-4" />
                     </button>
+                    <div v-if="openDropdownId === item.plan_id" class="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-30">
+                      <button @click="openSwapModal(item)" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">
+                        <ArrowLeftRight class="w-4 h-4 text-gray-500" />
+                        Thay thế tủ
+                      </button>
+                      <button @click="openDeleteConfirm(item)" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-medium">
+                        <Trash2 class="w-4 h-4" />
+                        Xóa khỏi lô
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -278,16 +293,22 @@
                 </button>
               </div>
 
-              <!-- Undo Review & Remove -->
-              <div v-if="batch.status !== 'completed'" class="flex justify-end gap-2 mt-3 border-t border-gray-100 pt-3">
+              <!-- Undo Review & Actions -->
+              <div v-if="batch.status !== 'completed'" class="flex justify-between items-center gap-2 mt-3 border-t border-gray-100 pt-3">
                 <button v-if="item.review_status !== 'pending' && item.inspection" @click="reviewPlan(item.plan_id, 'pending')" class="px-3 py-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
                   <Undo2 class="w-4 h-4" />
                   Hoàn tác
                 </button>
-                <button v-if="!item.inspection && item.status !== 'done'" @click="removeCabinet(item)" class="px-3 py-1.5 border border-red-200 bg-white text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
-                  <Trash2 class="w-4 h-4" />
-                  Xóa
-                </button>
+                <div class="flex gap-2 ml-auto">
+                  <button @click="openSwapModal(item)" class="px-3 py-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
+                    <ArrowLeftRight class="w-4 h-4" />
+                    Thay thế
+                  </button>
+                  <button @click="openDeleteConfirm(item)" class="px-3 py-1.5 border border-red-200 bg-white text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
+                    <Trash2 class="w-4 h-4" />
+                    Xóa
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -467,11 +488,84 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showDeleteConfirm = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" :class="deleteTarget?.hasInspection ? 'bg-red-100' : 'bg-amber-100'">
+            <AlertTriangle class="w-6 h-6" :class="deleteTarget?.hasInspection ? 'text-red-600' : 'text-amber-600'" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Xóa tủ khỏi lô?</h3>
+            <p class="text-sm text-gray-500 mt-1">Tủ: <strong>{{ deleteTarget?.cabinet_code }}</strong></p>
+          </div>
+        </div>
+        <div v-if="deleteTarget?.hasInspection" class="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
+          <p class="text-sm text-red-700 font-medium">⚠️ Tủ này đã có dữ liệu kiểm tra. Xóa sẽ mất toàn bộ kết quả kiểm tra liên quan!</p>
+        </div>
+        <p v-else class="text-sm text-gray-600 mb-4">Tủ này chưa được kiểm tra. Bạn có chắc chắn muốn xóa?</p>
+        <div class="flex gap-3">
+          <button @click="showDeleteConfirm = false" class="flex-1 py-2.5 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-colors">Hủy</button>
+          <button @click="confirmDelete" :disabled="deleting" class="flex-1 py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
+            {{ deleting ? 'Đang xóa...' : 'Xác nhận xóa' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Swap Cabinet Modal -->
+    <div v-if="showSwapModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showSwapModal = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl">
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Thay thế tủ</h3>
+        <p class="text-sm text-gray-500 mb-4">Đổi tủ <strong>{{ swapTarget?.cabinet_code }}</strong> sang tủ khác</p>
+
+        <div v-if="swapTarget?.hasInspection" class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+          <p class="text-sm text-amber-700 font-medium">⚠️ Tủ hiện tại đã có dữ liệu kiểm tra. Thay thế sẽ xóa toàn bộ kết quả cũ!</p>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative mb-4 shrink-0">
+          <input v-model="swapSearchQuery" @input="debouncedSearchSwapCabinets" type="text" placeholder="Nhập mã tủ mới để tìm..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all" />
+          <Search class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        </div>
+
+        <!-- Search Results -->
+        <div class="flex-1 overflow-y-auto mb-5 border border-gray-200 rounded-xl divide-y divide-gray-100 bg-white min-h-[120px]">
+          <div v-if="searchingSwapCabinets" class="p-6 flex flex-col items-center justify-center text-gray-500 gap-3">
+            <Loader2 class="w-6 h-6 animate-spin text-primary-500" />
+            <span class="text-sm font-medium">Đang tìm kiếm...</span>
+          </div>
+          <div v-else-if="swapAvailableCabinets.length === 0" class="p-6 text-center text-sm text-gray-500">
+            {{ swapSearchQuery ? 'Không tìm thấy tủ phù hợp.' : 'Gõ mã tủ vào ô tìm kiếm.' }}
+          </div>
+          <label v-else v-for="cab in swapAvailableCabinets" :key="cab.cabinet_code" class="flex items-center p-3 hover:bg-blue-50/50 cursor-pointer transition-colors" :class="{'bg-blue-50/80 ring-2 ring-primary-500 ring-inset': swapSelectedCode === cab.cabinet_code}">
+            <input type="radio" :value="cab.cabinet_code" v-model="swapSelectedCode" class="w-4.5 h-4.5 text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer" />
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-bold text-gray-900">{{ cab.cabinet_code }}</p>
+              <p v-if="cab.bts_site" class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                <Building2 class="w-3 h-3" />
+                Trạm: {{ cab.bts_site }}
+              </p>
+            </div>
+          </label>
+        </div>
+
+        <div class="flex gap-3 mt-auto shrink-0 border-t border-gray-100 pt-5">
+          <button @click="showSwapModal = false" class="flex-[1] py-2.5 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-colors">Hủy</button>
+          <button @click="confirmSwap" :disabled="swapping || !swapSelectedCode" class="flex-[2] py-2.5 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-2">
+            <Loader2 v-if="swapping" class="w-4 h-4 animate-spin" />
+            {{ swapping ? 'Đang thay thế...' : 'Xác nhận thay thế' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { AlertTriangle, Check, X, Loader2, Building2, Search, Undo2, ShieldCheck, Info, Lock, Trash2, Eye, MapPin, Plus, FileEdit, ChevronLeft } from 'lucide-vue-next'
+import { AlertTriangle, Check, X, Loader2, Building2, Search, Undo2, ShieldCheck, Info, Lock, Trash2, Eye, MapPin, Plus, FileEdit, ChevronLeft, MoreVertical, ArrowLeftRight } from 'lucide-vue-next'
 
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -583,19 +677,117 @@ const submitAddCabinets = async () => {
   }
 }
 
-const removeCabinet = async (item) => {
-  if (item.inspection || item.status === 'done') {
-    alert('⚠️ Không thể xóa tủ đã được kiểm tra khỏi lô!')
-    return
+// Dropdown menu state
+const openDropdownId = ref(null)
+
+const toggleDropdown = (planId) => {
+  openDropdownId.value = openDropdownId.value === planId ? null : planId
+}
+
+// Close dropdown on click outside
+const closeDropdowns = () => { openDropdownId.value = null }
+if (typeof window !== 'undefined') {
+  document.addEventListener('click', closeDropdowns)
+}
+
+// Delete Confirmation state
+const showDeleteConfirm = ref(false)
+const deleteTarget = ref(null)
+const deleting = ref(false)
+
+const openDeleteConfirm = (item) => {
+  openDropdownId.value = null
+  deleteTarget.value = {
+    plan_id: item.plan_id,
+    cabinet_code: item.cabinet_code,
+    hasInspection: !!(item.inspection || item.status === 'done'),
   }
-  if (!confirm(`Bạn có chắc chắn muốn XÓA TỦ [ ${item.cabinet_code} ] khỏi lô ${batch.value.name} không?`)) return
+  showDeleteConfirm.value = true
+}
+
+const confirmDelete = async () => {
+  if (!deleteTarget.value) return
+  deleting.value = true
   try {
-    const res = await batchService.removeCabinetFromBatch(batch.value.id, item.plan_id)
+    const res = await batchService.removeCabinetFromBatch(
+      batch.value.id,
+      deleteTarget.value.plan_id,
+      deleteTarget.value.hasInspection // force = true if has inspection
+    )
     alert(res.message || 'Đã xóa tủ thành công')
+    showDeleteConfirm.value = false
     await fetchBatch()
     await fetchResults()
-  } catch (error) {
-    alert(error.response?.data?.message || 'Có lỗi khi xóa tủ')
+  } catch (err) {
+    alert(err.response?.data?.message || 'Có lỗi khi xóa tủ')
+  } finally {
+    deleting.value = false
+  }
+}
+
+// Swap Cabinet state
+const showSwapModal = ref(false)
+const swapTarget = ref(null)
+const swapSearchQuery = ref('')
+const searchingSwapCabinets = ref(false)
+const swapAvailableCabinets = ref([])
+const swapSelectedCode = ref('')
+const swapping = ref(false)
+let swapSearchTimeout = null
+
+const openSwapModal = (item) => {
+  openDropdownId.value = null
+  swapTarget.value = {
+    plan_id: item.plan_id,
+    cabinet_code: item.cabinet_code,
+    hasInspection: !!(item.inspection || item.status === 'done'),
+  }
+  swapSearchQuery.value = ''
+  swapAvailableCabinets.value = []
+  swapSelectedCode.value = ''
+  showSwapModal.value = true
+}
+
+const debouncedSearchSwapCabinets = () => {
+  if (swapSearchTimeout) clearTimeout(swapSearchTimeout)
+  swapSearchTimeout = setTimeout(searchSwapCabinets, 500)
+}
+
+const searchSwapCabinets = async () => {
+  if (!swapSearchQuery.value.trim()) {
+    swapAvailableCabinets.value = []
+    return
+  }
+  searchingSwapCabinets.value = true
+  try {
+    const res = await cabinetService.getCabinets({ page: 1, per_page: 20, search: swapSearchQuery.value })
+    const existingCodes = results.value.map(r => r.cabinet_code)
+    swapAvailableCabinets.value = res.data.filter(c => !existingCodes.includes(c.cabinet_code))
+  } catch (err) {
+    console.error('Error searching cabinets for swap', err)
+  } finally {
+    searchingSwapCabinets.value = false
+  }
+}
+
+const confirmSwap = async () => {
+  if (!swapTarget.value || !swapSelectedCode.value) return
+  swapping.value = true
+  try {
+    const res = await batchService.swapCabinet(
+      batch.value.id,
+      swapTarget.value.plan_id,
+      swapSelectedCode.value,
+      swapTarget.value.hasInspection // force = true if has inspection
+    )
+    alert(res.message || 'Đã thay thế tủ thành công')
+    showSwapModal.value = false
+    await fetchBatch()
+    await fetchResults()
+  } catch (err) {
+    alert(err.response?.data?.message || 'Có lỗi khi thay thế tủ')
+  } finally {
+    swapping.value = false
   }
 }
 

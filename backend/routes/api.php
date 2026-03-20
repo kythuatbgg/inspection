@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('batches/{batch}/reopen', [BatchController::class, 'reopen']);
         Route::post('batches/{batch}/cabinets', [BatchController::class, 'addCabinets']);
         Route::delete('batches/{batch}/plans/{plan}', [BatchController::class, 'removeCabinet']);
+        Route::patch('batches/{batch}/plans/{plan}/swap', [BatchController::class, 'swapCabinet']);
 
         // Plan review
         Route::patch('plans/{plan}/review', [PlanDetailController::class, 'review']);
