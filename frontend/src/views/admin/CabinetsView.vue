@@ -121,7 +121,7 @@
     </div>
 
     <div v-else class="space-y-4">
-      <!-- LIST VIEW -->
+      <!-- Desktop Table Card -->
       <div v-show="viewMode === 'list'" class="space-y-4">
         <div class="hidden lg:block card overflow-hidden">
         <table class="w-full">
@@ -161,7 +161,7 @@
         <div v-if="cabinets.length === 0" class="text-center text-gray-500 py-8">
           Không có tủ cáp nào
         </div>
-      </div>
+        </div>
 
       <div class="lg:hidden flex flex-col gap-4">
         <div
@@ -214,6 +214,7 @@
           <FileStack class="w-16 h-16 text-gray-300 mb-4" />
           <p class="text-gray-500 font-medium text-center">Không có tủ cáp nào<br/><span class="text-sm text-gray-400 font-normal">Thêm tủ mới hoặc thay đổi bộ lọc</span></p>
         </div>
+      </div>
       </div>
       
       <!-- MAP VIEW -->
