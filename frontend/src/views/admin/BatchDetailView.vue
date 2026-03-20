@@ -114,7 +114,7 @@
         </div>
 
         <!-- Results Desktop Table -->
-        <div class="hidden md:block bg-white rounded-[16px] overflow-hidden border border-gray-200 shadow-sm">
+        <div class="hidden md:block bg-white rounded-[16px] border border-gray-200 shadow-sm overflow-x-auto">
           <table class="w-full">
             <thead class="bg-gray-50/80 border-b border-gray-100">
               <tr>
@@ -193,7 +193,7 @@
                     <button @click.stop="toggleDropdown(item.plan_id)" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
                       <MoreVertical class="w-4 h-4" />
                     </button>
-                    <div v-if="openDropdownId === item.plan_id" class="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-30">
+                    <div v-if="openDropdownId === item.plan_id" class="absolute right-0 bottom-full mb-1 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-30">
                       <button @click="openSwapModal(item)" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">
                         <ArrowLeftRight class="w-4 h-4 text-gray-500" />
                         Thay thế tủ
