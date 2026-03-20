@@ -2,40 +2,41 @@
 
 namespace App\Services;
 
-use App\Models\Checklist;
-use App\Models\ChecklistItem;
 use App\Models\Inspection;
-use App\Models\InspectionDetail;
 
 class ScoringService
 {
     /**
      * Calculate inspection score and determine PASS/FAIL
+     * Logic:
+     *   FAIL = (total_score < 80) OR (critical_errors_count > 1)
+     *   PASS = (total_score >= 80) AND (critical_errors_count <= 1)
      */
     public function calculateScore(Inspection $inspection): array
     {
         $checklist = $inspection->checklist;
-        $details = $inspection->details;
+        $details = $inspection->details()->with('item')->get();
 
-        // Calculate total score
         $totalScore = 0;
         $criticalErrors = 0;
 
         foreach ($details as $detail) {
             if ($detail->is_failed) {
-                // Check if this is a critical item
-                $item = ChecklistItem::find($detail->item_id);
-                if ($item && $item->is_critical) {
+                // FAILED + CRITICAL → đếm lỗi
+                if ($detail->item && $detail->item->is_critical) {
                     $criticalErrors++;
                 }
             } else {
+                // PASS → cộng điểm score_awarded
                 $totalScore += $detail->score_awarded;
             }
         }
 
-        // Determine PASS/FAIL
-        $passesScoreThreshold = $totalScore >= $checklist->min_pass_score;
-        $passesCriticalThreshold = $criticalErrors < $checklist->max_critical_allowed;
+        // Logic PASS/FAIL:
+        // PASS = (total_score >= 80) AND (critical_errors_count <= 1)
+        // FAIL = (total_score < 80) OR (critical_errors_count > 1)
+        $passesScoreThreshold = $totalScore >= 80;
+        $passesCriticalThreshold = $criticalErrors <= 1;
 
         $finalResult = ($passesScoreThreshold && $passesCriticalThreshold) ? 'PASS' : 'FAIL';
 

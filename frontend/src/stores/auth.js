@@ -29,8 +29,9 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       try {
         const response = await axios.post(`${API_URL}/login`, { username, password })
-        this.token = response.data.token
-        this.user = response.data.user
+        const payload = response.data.data || response.data
+        this.token = payload.token
+        this.user = payload.user
         localStorage.setItem('token', this.token)
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
         return true
@@ -59,7 +60,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
         const response = await axios.get(`${API_URL}/me`)
-        this.user = response.data
+        const payload = response.data.data || response.data
+        this.user = payload.user || payload
       } catch (error) {
         this.logout()
       }

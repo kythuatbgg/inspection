@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Inspection extends Model
+class Inspection extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     /**
      * The attributes that are mass assignable.
      *
@@ -18,6 +21,7 @@ class Inspection extends Model
         'checklist_id',
         'plan_detail_id',
         'cabinet_code',
+        'overall_photos',
         'lat',
         'lng',
         'total_score',
@@ -33,9 +37,26 @@ class Inspection extends Model
     protected $casts = [
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
+        'overall_photos' => 'array',
         'total_score' => 'integer',
         'critical_errors_count' => 'integer',
     ];
+
+    /**
+     * Ensure overall photos return the correct host dynamically.
+     */
+    public function getOverallPhotosAttribute($value)
+    {
+        $photos = is_string($value) ? json_decode($value, true) : $value;
+        if (!is_array($photos)) return [];
+        
+        return array_map(function ($photo) {
+            if ($photo && preg_match('/\/storage\/(.+)$/', $photo, $matches)) {
+                return request()->getSchemeAndHttpHost() . '/storage/' . $matches[1];
+            }
+            return $photo;
+        }, $photos);
+    }
 
     /**
      * Get the user who performed this inspection.
@@ -75,5 +96,10 @@ class Inspection extends Model
     public function details(): HasMany
     {
         return $this->hasMany(InspectionDetail::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('overall_photos');
     }
 }

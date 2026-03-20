@@ -18,6 +18,9 @@ class PlanDetail extends Model
         'batch_id',
         'cabinet_code',
         'status',
+        'review_status',
+        'review_note',
+        'reviewed_at',
     ];
 
     /**

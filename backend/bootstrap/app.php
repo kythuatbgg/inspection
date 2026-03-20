@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'manager' => \App\Http\Middleware\EnsureUserIsManager::class,
+        ]);
+
+        // Allow CORS from any origin (dev mode - LAN access)
+        $middleware->append(\App\Http\Middleware\CorsMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

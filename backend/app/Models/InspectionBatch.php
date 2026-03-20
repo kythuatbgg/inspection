@@ -20,6 +20,7 @@ class InspectionBatch extends Model
         'start_date',
         'end_date',
         'status',
+        'closed_at',
     ];
 
     /**
@@ -30,6 +31,7 @@ class InspectionBatch extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'closed_at' => 'datetime',
     ];
 
     /**

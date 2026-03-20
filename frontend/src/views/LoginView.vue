@@ -71,7 +71,7 @@ onMounted(() => {
   window.addEventListener('offline', () => isOnline.value = false)
 
   if (authStore.isAuthenticated) {
-    router.push('/')
+    router.push(authStore.isInspector ? '/inspector' : '/admin')
   }
 })
 
@@ -82,7 +82,7 @@ const handleLogin = async () => {
   try {
     const success = await authStore.login(username.value, password.value)
     if (success) {
-      router.push('/')
+      router.push(authStore.isInspector ? '/inspector' : '/admin')
     } else {
       error.value = 'Tên đăng nhập hoặc mật khẩu không đúng'
     }

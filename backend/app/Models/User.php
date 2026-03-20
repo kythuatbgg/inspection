@@ -9,36 +9,25 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_INSPECTOR = 'inspector';
+
     protected $fillable = [
         'name',
         'username',
+        'email',
         'password',
         'role',
         'lang_pref',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -46,35 +35,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the batches assigned to this user (if inspector).
-     */
-    public function batches()
-    {
-        return $this->hasMany(InspectionBatch::class);
-    }
-
-    /**
-     * Get the inspections performed by this user.
-     */
-    public function inspections()
-    {
-        return $this->hasMany(Inspection::class);
-    }
-
-    /**
-     * Check if user is admin.
-     */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
     }
 
-    /**
-     * Check if user is inspector.
-     */
     public function isInspector(): bool
     {
-        return $this->role === 'inspector';
+        return $this->role === self::ROLE_INSPECTOR;
     }
 }

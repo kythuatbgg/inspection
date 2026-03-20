@@ -2,75 +2,49 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Auth\LoginUserAction;
+use App\Actions\Auth\LogoutUserAction;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Auth\UserResource;
+use App\Support\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    /**
-     * Login user and create token
-     */
-    public function login(Request $request): JsonResponse
+    public function __construct(
+        private readonly LoginUserAction $loginUserAction,
+        private readonly LogoutUserAction $logoutUserAction,
+    ) {
+    }
+
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
-
-        $user = User::where('username', $request->username)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+        try {
+            $session = $this->loginUserAction->execute($request->validated());
+        } catch (AuthenticationException $exception) {
+            return ApiResponse::error($exception->getMessage(), 401);
         }
 
-        // Revoke old tokens
-        $user->tokens()->delete();
-
-        // Create new token
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'role' => $user->role,
-                'lang_pref' => $user->lang_pref,
-            ],
-            'token' => $token,
-        ]);
+        return ApiResponse::success([
+            'user' => UserResource::make($session['user'])->resolve(),
+            'token' => $session['token'],
+        ], 'Đăng nhập thành công.');
     }
 
-    /**
-     * Get current user info
-     */
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user();
-
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'username' => $user->username,
-            'role' => $user->role,
-            'lang_pref' => $user->lang_pref,
+        return ApiResponse::success([
+            'user' => UserResource::make($request->user())->resolve(),
         ]);
     }
 
-    /**
-     * Logout user (revoke token)
-     */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->logoutUserAction->execute($request->user());
 
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        return ApiResponse::success([], 'Đăng xuất thành công.');
     }
 }
