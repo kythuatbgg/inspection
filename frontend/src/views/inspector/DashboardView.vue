@@ -3,59 +3,70 @@
     <!-- Responsive layout chassis: Tight on mobile, wide on desktop -->
     <div class="p-4 md:p-8 space-y-5 md:space-y-8 max-w-5xl mx-auto pb-28 flex flex-col min-w-0">
       
-      <!-- Stats System -->
-      <div v-if="!loading" class="flex flex-col md:flex-row gap-3 md:gap-5">
+      <!-- Sync: Stats Cards like Admin Dashboard -->
+      <div v-if="!loading" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         
-        <!-- Hero Stat (Total Plans) -->
-        <div class="rounded-lg bg-white border border-slate-200 p-5 md:p-6 flex-1 md:min-w-[280px] shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-[11px] md:text-sm text-slate-500 font-bold uppercase tracking-widest mb-1 md:mb-1.5">Tổng nhiệm vụ</p>
-            <p class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.totalPlans }}</p>
-          </div>
-          <div class="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-primary-50 flex items-center justify-center">
-            <ListTodo class="w-6 h-6 md:w-7 md:h-7 text-primary-600" />
+        <!-- Stat 1: Lô đề xuất -->
+        <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+              <FileStack class="w-5 h-5 text-primary-600" />
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.totalBatches }}</p>
+              <p class="text-sm text-slate-500 font-medium">Lô đề xuất</p>
+            </div>
           </div>
         </div>
 
-        <!-- Secondary Stats Grid ("Pro Max" Style) -->
-        <!-- Mobile: 2x2 grid. Desktop: 1x4 grid. -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-[2.5]">
-          <!-- Stat 1 -->
-          <div class="rounded-lg bg-white border border-slate-200 p-4 md:p-5 shadow-sm hover:bg-slate-50 transition-colors">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
-              <Clock class="w-4.5 h-4.5 md:w-5 md:h-5 text-amber-500" />
+        <!-- Stat 2: Tổng số tủ -->
+        <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
+              <ListTodo class="w-5 h-5 text-indigo-600" />
             </div>
-            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.planned }}</p>
-            <p class="text-[11px] md:text-xs text-slate-500 font-medium mt-1 truncate uppercase tracking-widest">Chưa KT</p>
-          </div>
-          
-          <!-- Stat 2 -->
-          <div class="rounded-lg bg-white border border-slate-200 p-4 md:p-5 shadow-sm hover:bg-slate-50 transition-colors">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-emerald-50 flex items-center justify-center mb-3">
-              <Check class="w-4.5 h-4.5 md:w-5 md:h-5 text-emerald-500" />
+            <div>
+              <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.totalPlans }}</p>
+              <p class="text-sm text-slate-500 font-medium">Tổng số tủ</p>
             </div>
-            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.done }}</p>
-            <p class="text-[11px] md:text-xs text-slate-500 font-medium mt-1 truncate uppercase tracking-widest">Hoàn thành</p>
-          </div>
-
-          <!-- Stat 3 -->
-          <div class="rounded-lg bg-white border border-slate-200 p-4 md:p-5 shadow-sm hover:bg-slate-50 transition-colors">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
-              <FileStack class="w-4.5 h-4.5 md:w-5 md:h-5 text-primary-500" />
-            </div>
-            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ stats.totalBatches }}</p>
-            <p class="text-[11px] md:text-xs text-slate-500 font-medium mt-1 truncate uppercase tracking-widest">Lô đề xuất</p>
-          </div>
-
-          <!-- Stat 4 -->
-          <div class="rounded-lg bg-white border border-slate-200 p-4 md:p-5 shadow-sm hover:bg-slate-50 transition-colors">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-emerald-50 flex items-center justify-center mb-3">
-              <ShieldCheck class="w-4.5 h-4.5 md:w-5 md:h-5 text-emerald-600" />
-            </div>
-            <p class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{{ completionPercent }}%</p>
-            <p class="text-[11px] md:text-xs text-slate-500 font-medium mt-1 truncate uppercase tracking-widest">Tổng tiến độ</p>
           </div>
         </div>
+
+        <!-- Stat 3: Đã kiểm tra -->
+        <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+              <Check class="w-5 h-5 text-success" />
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.done }}</p>
+              <p class="text-sm text-slate-500 font-medium">Đã kiểm tra</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat 4: Tiến độ tổng thể -->
+        <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center">
+          <div class="flex items-center gap-3 w-full">
+            <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+              <ShieldCheck class="w-5 h-5 text-warning" />
+            </div>
+            <div class="flex-1 overflow-hidden pr-2">
+              <div class="flex items-end gap-2 mb-1">
+                <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading" :class="completionPercent === 100 ? 'text-success' : ''">{{ completionPercent }}%</p>
+              </div>
+              <!-- Progress mini bar -->
+              <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-700 ease-out flex"
+                  :class="completionPercent === 100 ? 'bg-success' : 'bg-primary-600'"
+                  :style="{ width: completionPercent + '%' }"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Active Batches Section -->

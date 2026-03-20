@@ -131,7 +131,7 @@
 <script setup>
 import { AlertTriangle, ChevronRight, Calendar, ListTodo, ChevronLeft, Server, Loader2 } from 'lucide-vue-next'
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
@@ -163,7 +163,7 @@ const formatDate = (dateStr) => {
 }
 
 const goBack = () => {
-  router.push({ name: 'inspector-dashboard' })
+  router.push({ name: route.name === 'inspector-proposal-detail' ? 'inspector-proposals' : 'inspector-tasks' })
 }
 
 const goToInspection = (plan) => {
@@ -194,4 +194,13 @@ const fetchData = async () => {
 }
 
 onMounted(fetchData)
+
+watch(
+  () => [route.params.id, route.params.planId],
+  ([batchId, planId], [prevBatchId, prevPlanId]) => {
+    if (batchId !== prevBatchId || (prevPlanId && !planId)) {
+      fetchData()
+    }
+  }
+)
 </script>

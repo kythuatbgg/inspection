@@ -40,6 +40,13 @@
 - Thin horizontal dividers (`border-slate-100` or `slate-200`).
 - Hover states on rows: `hover:bg-slate-50` (very subtle).
 
+### Dashboard KPI / Stats Cards
+- **Grid Layout**: Always use a crisp multi-column grid (`grid-cols-2 lg:grid-cols-4 gap-4`).
+- **Card Structure**: Standalone `bg-white border border-slate-200 rounded-lg p-4 shadow-sm` or `.card`.
+- **Interaction**: Subtle depth on hover (`hover:shadow-md transition-shadow`).
+- **Internal Content**: Left-align with Icon container (`w-10 h-10 rounded-lg bg-{color}-100 flex items-center shrink-0`), bold metric right (`text-2xl font-bold text-slate-900 tracking-tight font-heading`), and muted label (`text-sm text-slate-500 font-medium`).
+- **Consistency**: Keep the layout decoupled across sections (Admin and Inspector should use the same card structures rather than completely custom UI constructs like complex divided panels).
+
 ### Forms & Inputs
 - **Inputs:** `bg-white border-slate-300 rounded-lg`. Focus state: `ring-2 ring-primary-500/20 border-primary-500`.
 - **Primary Buttons:** Solid `bg-primary-600`, `rounded-lg`, `font-medium`, `shadow-sm`.

@@ -28,7 +28,11 @@ class BatchController extends Controller
         }
 
         if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
+            if ($request->status === 'ongoing') {
+                $query->where('status', '!=', 'completed');
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         if ($request->has('approval_status') && $request->approval_status) {

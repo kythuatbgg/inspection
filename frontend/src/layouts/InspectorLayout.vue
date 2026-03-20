@@ -122,14 +122,14 @@ const isOnline = ref(navigator.onLine)
 
 const navItems = [
   { path: '/inspector', label: 'Trang chủ', icon: Home },
-  { path: '/inspector/tasks', label: 'Nhiệm vụ', icon: ListTodo },
+  { path: '/inspector/tasks', label: 'Lô của tôi', icon: ListTodo },
   { path: '/inspector/proposals', label: 'Đề xuất', icon: ClipboardEdit }
 ]
 
 const pageTitle = computed(() => {
   if (route.path === '/inspector') return 'Tổng quan'
   if (route.path.startsWith('/inspector/batch/')) return 'Chi tiết lô'
-  if (route.path === '/inspector/tasks') return 'Danh sách nhiệm vụ'
+  if (route.path === '/inspector/tasks') return 'Lô của tôi'
   if (route.path === '/inspector/proposals') return 'Đề xuất của tôi'
   if (route.path.startsWith('/inspector/inspect/')) return 'Kiểm tra'
   return 'FBB Inspection'
