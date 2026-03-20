@@ -142,7 +142,21 @@
                 </router-link>
               </td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ cabinet.bts_site }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ cabinet.lat }}, {{ cabinet.lng }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500">
+                <div class="flex items-center gap-2">
+                  <span>{{ cabinet.lat }}, {{ cabinet.lng }}</span>
+                  <a
+                    v-if="cabinet.lat && cabinet.lng"
+                    :href="`https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}`"
+                    target="_blank"
+                    rel="noopener"
+                    title="Mở Google Maps"
+                    class="inline-flex items-center justify-center p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                  >
+                    <Navigation class="w-4 h-4" />
+                  </a>
+                </div>
+              </td>
               <td class="px-4 py-3 text-sm text-gray-500 truncate max-w-[200px]">{{ cabinet.note || '-' }}</td>
               <td class="px-4 py-3 text-right">
                 <div class="flex justify-end gap-2">
@@ -186,9 +200,21 @@
             
             <!-- Details -->
             <div class="bg-gray-50/80 rounded-[16px] p-3.5 mb-4 space-y-2.5">
-              <div class="flex items-center text-sm">
-                <span class="text-gray-500 font-medium w-20">Tọa độ:</span>
-                <span class="text-gray-900 font-semibold">{{ cabinet.lat }}, {{ cabinet.lng }}</span>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center">
+                  <span class="text-gray-500 font-medium w-20">Tọa độ:</span>
+                  <span class="text-gray-900 font-semibold">{{ cabinet.lat }}, {{ cabinet.lng }}</span>
+                </div>
+                <a
+                  v-if="cabinet.lat && cabinet.lng"
+                  :href="`https://www.google.com/maps/dir/?api=1&destination=${cabinet.lat},${cabinet.lng}`"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center justify-center p-2 rounded-xl bg-blue-50 text-blue-600 active:bg-blue-100 transition-colors"
+                  @click.stop
+                >
+                  <Navigation class="w-4 h-4" />
+                </a>
               </div>
               <div class="flex items-start text-sm" v-if="cabinet.note">
                 <span class="text-gray-500 font-medium w-20 pt-0.5">Ghi chú:</span>
@@ -408,7 +434,7 @@
 </template>
 
 <script setup>
-import { FileDown, ShieldCheck, AlertTriangle, Plus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileStack, Trash2, FileEdit, MapPin, Server, Search, ArrowUpToLine, ArrowDownToLine, Menu } from 'lucide-vue-next'
+import { FileDown, ShieldCheck, AlertTriangle, Plus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileStack, Trash2, FileEdit, MapPin, Server, Search, ArrowUpToLine, ArrowDownToLine, Menu, Navigation } from 'lucide-vue-next'
 
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import cabinetService from '@/services/cabinetService.js'
