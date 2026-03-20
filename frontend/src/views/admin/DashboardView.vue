@@ -1,8 +1,14 @@
 <template>
   <div class="space-y-8">
     <!-- LÔ KIỂM TRA -->
-    <div v-if="!loading && !error">
-      <h2 class="text-lg font-semibold text-slate-900 mb-3 tracking-tight font-heading">Thống kê Lô kiểm tra</h2>
+    <div v-if="!loading && !error" class="space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900 tracking-tight font-heading">Thống kê Lô kiểm tra</h2>
+        <button @click="fetchData" class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+          <RotateCcw class="w-4 h-4" />
+          Làm mới
+        </button>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         <!-- Card 1: Lô hoàn thành & Tổng số lô -->
@@ -164,7 +170,7 @@
 </template>
 
 <script setup>
-import { Clock, XCircle, ShieldCheck, FileStack, ListTodo, Check, Loader2 } from 'lucide-vue-next'
+import { Clock, XCircle, ShieldCheck, FileStack, ListTodo, Check, Loader2, RotateCcw } from 'lucide-vue-next'
 
 import { ref, onMounted } from 'vue'
 import batchService from '@/services/batchService.js'
