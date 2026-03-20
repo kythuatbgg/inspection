@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function stats(Request $request): JsonResponse
+    private function computeStats(Request $request): array
     {
         $batchQuery = InspectionBatch::query();
 
@@ -21,8 +21,7 @@ class DashboardController extends Controller
         $totalBatches = (clone $batchQuery)->count();
         $completedBatches = (clone $batchQuery)->where('status', 'completed')->count();
         $batchCompletedPercent = $totalBatches > 0 ? round(($completedBatches / $totalBatches) * 100) : 0;
-        
-        // "Chờ duyệt": Lô chưa kết thúc (status != completed) nhưng TẤT CẢ các tủ (planDetails) đều đã 'done'.
+
         $waitingApprovalBatches = (clone $batchQuery)
             ->where('status', '!=', 'completed')
             ->whereHas('planDetails')
@@ -33,7 +32,7 @@ class DashboardController extends Controller
 
         $planQuery = PlanDetail::query();
         if ($request->user()->role === 'inspector') {
-            $planQuery->whereHas('batch', function($q) use ($request) {
+            $planQuery->whereHas('batch', function ($q) use ($request) {
                 $q->where('user_id', $request->user()->id);
             });
         }
@@ -43,16 +42,16 @@ class DashboardController extends Controller
         $planCompletedPercent = $totalPlans > 0 ? round(($completedPlans / $totalPlans) * 100) : 0;
 
         $passedPlans = (clone $planQuery)->where('status', 'done')
-            ->whereHas('inspection', function($q) {
+            ->whereHas('inspection', function ($q) {
                 $q->where('final_result', 'PASS');
             })->count();
-            
+
         $failedPlans = (clone $planQuery)->where('status', 'done')
-            ->whereHas('inspection', function($q) {
+            ->whereHas('inspection', function ($q) {
                 $q->where('final_result', 'FAIL');
             })->count();
 
-        return response()->json([
+        return [
             'batches' => [
                 'total' => $totalBatches,
                 'completed' => $completedBatches,
@@ -66,12 +65,40 @@ class DashboardController extends Controller
                 'passed' => $passedPlans,
                 'failed' => $failedPlans,
             ],
-            // Legacy fallbacks
             'total_batches' => $totalBatches,
             'completed' => $completedBatches,
             'pending' => $waitingApprovalBatches,
             'in_progress' => 0,
             'failed' => $failedPlans,
+        ];
+    }
+
+    public function stats(Request $request): JsonResponse
+    {
+        return response()->json($this->computeStats($request));
+    }
+
+    public function overview(Request $request): JsonResponse
+    {
+        $stats = $this->computeStats($request);
+
+        $query = InspectionBatch::with(['user:id,name,username', 'checklist:id,name'])
+            ->withCount('planDetails as plans_count')
+            ->withCount(['planDetails as completed_count' => function ($q) {
+                $q->where('status', 'done');
+            }])
+            ->orderBy('updated_at', 'desc')
+            ->take(5);
+
+        if ($request->user()->role === 'inspector') {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        $recentBatches = $query->get();
+
+        return response()->json([
+            'stats' => $stats,
+            'recent_batches' => $recentBatches,
         ]);
     }
 }

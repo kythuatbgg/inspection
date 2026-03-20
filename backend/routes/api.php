@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
 
     // User Management
     Route::get('/users/stats', [UserController::class, 'stats']);

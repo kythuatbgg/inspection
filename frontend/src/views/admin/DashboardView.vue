@@ -138,9 +138,19 @@
         <div v-for="batch in recentBatches" :key="batch.id" class="p-4 md:px-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
           <div>
             <p class="font-bold text-slate-900 tracking-tight font-heading">{{ batch.name || batch.title }}</p>
-            <p class="text-[13px] text-slate-500 mt-1 font-medium"><Clock class="inline w-3.5 h-3.5 mr-1 align-text-bottom" /> Cập nhật lúc {{ formatDate(batch.created_at) }}</p>
+            <p class="text-[13px] text-slate-500 mt-1 font-medium">
+              <Clock class="inline w-3.5 h-3.5 mr-1 align-text-bottom" />
+              {{ formatDate(batch.updated_at || batch.created_at) }}
+            </p>
           </div>
-          <span class="text-[10px] py-1 px-2.5 uppercase font-bold tracking-widest rounded-md" :class="getStatusClass(batch.status)">{{ getStatusLabel(batch.status) }}</span>
+          <button
+            type="button"
+            @click="router.push({ name: 'admin-batch-detail', params: { id: batch.id } })"
+            class="text-[10px] py-1 px-2.5 uppercase font-bold tracking-widest rounded-md transition-colors hover:bg-slate-100"
+            :class="getStatusClass(batch.status)"
+          >
+            {{ getStatusLabel(batch.status) }}
+          </button>
         </div>
 
         <!-- Empty -->
@@ -211,26 +221,30 @@ const fetchData = async () => {
   error.value = null
 
   try {
-    const [statsRes, batchesRes] = await Promise.all([
-      api.get('/dashboard/stats'),
-      batchService.getBatches({ per_page: 5 })
-    ])
+    const resp = await api.get('/dashboard/overview')
+    const data = resp.data
 
-    const s = statsRes.data
-    
-    if (s.batches && s.plans) {
-      // Use new structured response
-      stats.value.batches = s.batches
-      stats.value.plans = s.plans
-    } else {
-      // Legacy fallback
-      stats.value.batches.total = s.total_batches || 0
-      stats.value.batches.completed = s.completed || 0
-      stats.value.batches.waiting_approval = s.pending || 0
-      stats.value.plans.failed = s.failed || 0
+    if (!data || !data.stats) {
+      throw new Error('Invalid dashboard overview response')
     }
 
-    recentBatches.value = batchesRes.data || batchesRes || []
+    stats.value = {
+      batches: data.stats.batches || {
+        total: 0,
+        completed: 0,
+        completed_percent: 0,
+        waiting_approval: 0
+      },
+      plans: data.stats.plans || {
+        total: 0,
+        completed: 0,
+        completed_percent: 0,
+        passed: 0,
+        failed: 0
+      }
+    }
+
+    recentBatches.value = data.recent_batches || []
   } catch (e) {
     error.value = 'Không thể kết nối máy chủ dữ liệu'
     console.error(e)
