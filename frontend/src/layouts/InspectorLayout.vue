@@ -6,51 +6,44 @@
       <!-- Desktop Sidebar (Hidden on Mobile) -->
       <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-40">
         <!-- Header/Logo area -->
-        <div class="p-5 border-b border-slate-100 flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shrink-0 shadow-inner">
-            <ShieldCheck class="w-5 h-5 text-white" />
-          </div>
-          <div class="min-w-0">
-            <h1 class="text-lg font-black bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight leading-none truncate">Inspector</h1>
-          </div>
+        <div class="h-16 flex items-center px-6 border-b border-slate-200">
+          <ShieldCheck class="w-8 h-8 text-primary-600 shrink-0" />
+          <h1 class="ml-3 text-lg font-bold text-slate-900 font-heading truncate">FBB Inspector</h1>
         </div>
 
         <!-- Nav items -->
-        <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
           <router-link
             v-for="item in navItems"
             :key="item.path"
             :to="item.path"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+            class="flex items-center px-4 py-3 rounded-lg transition-colors"
             :class="isActive(item.path)
-              ? 'bg-primary-50 text-primary-700 font-semibold'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium'"
+              ? 'bg-primary-50 text-primary-700 font-medium'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
           >
-            <component :is="item.icon" class="w-5 h-5 shrink-0" :stroke-width="isActive(item.path) ? 2.5 : 2" />
-            <span class="text-sm truncate">{{ item.label }}</span>
+            <component :is="item.icon" class="w-5 h-5 mr-3" :class="isActive(item.path) ? 'text-primary-600' : 'text-slate-400'" :stroke-width="2" />
+            <span class="text-sm font-medium">{{ item.label }}</span>
           </router-link>
         </nav>
 
         <!-- Status and Logout -->
-        <div class="p-4 border-t border-slate-100 flex flex-col gap-2">
-          <!-- Profile Info -->
-          <div class="flex items-center gap-3 px-3 py-2 mb-1">
-            <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-              <span class="text-sm font-bold text-slate-600">{{ userName.charAt(0) }}</span>
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+              <span class="text-primary-700 font-semibold">{{ userName.charAt(0) }}</span>
             </div>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-bold text-slate-900 truncate tracking-tight">{{ userName }}</p>
-              <div class="flex items-center gap-1.5 mt-1">
-                <span class="w-1.5 h-1.5 rounded-full shadow-sm" :class="isOnline ? 'bg-emerald-500' : 'bg-red-500'"></span>
-                <span class="text-[10px] uppercase font-bold tracking-wider" :class="isOnline ? 'text-emerald-600' : 'text-red-500'">{{ isOnline ? 'Online' : 'Offline' }}</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-slate-900 truncate tracking-tight">{{ userName }}</p>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">{{ isOnline ? 'Online' : 'Offline' }}</span>
               </div>
             </div>
+            <button @click="handleLogout" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+              <LogOut class="w-5 h-5" />
+            </button>
           </div>
-          <!-- Logout Button -->
-          <button @click="handleLogout" class="flex items-center justify-center gap-2 px-3 py-2.5 w-full rounded-xl bg-slate-50 text-red-500 hover:bg-red-50 hover:text-red-600 active:scale-95 transition-all font-semibold">
-            <LogOut class="w-4.5 h-4.5 shrink-0" />
-            <span class="text-sm">Đăng xuất</span>
-          </button>
         </div>
       </aside>
 
@@ -58,23 +51,21 @@
       <div class="flex-1 flex flex-col min-w-0 max-w-md md:max-w-none mx-auto md:mx-0 w-full min-h-screen relative bg-white md:bg-transparent shadow-sm md:shadow-none border-x border-slate-200 md:border-none">
         
         <!-- Mobile Header (Hidden on Desktop) -->
-        <header class="md:hidden bg-white border-b border-slate-100 px-5 pb-4 pt-5 sticky top-0 z-40">
+        <header class="md:hidden bg-white border-b border-slate-200 px-5 pb-4 pt-5 sticky top-0 z-40">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shadow-inner">
-                <ShieldCheck class="w-5 h-5 text-white" />
-              </div>
-              <h1 class="text-[17px] font-black bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight leading-none">Inspector</h1>
+            <div class="flex items-center gap-2">
+              <ShieldCheck class="w-7 h-7 text-primary-600" />
+              <h1 class="text-lg font-bold text-slate-900 font-heading tracking-tight leading-none">FBB Inspector</h1>
             </div>
 
             <!-- Status -->
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border"
               :class="isOnline
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'bg-red-50 text-red-500'"
+                ? 'bg-success/5 border-success/20 text-success'
+                : 'bg-danger/5 border-danger/20 text-danger'"
             >
-              <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-emerald-500' : 'bg-red-500'"></span>
-              {{ isOnline ? 'Online' : 'Offline' }}
+              <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
+              <span class="text-[10px] font-bold uppercase tracking-wider">{{ isOnline ? 'Online' : 'Offline' }}</span>
             </div>
           </div>
 
