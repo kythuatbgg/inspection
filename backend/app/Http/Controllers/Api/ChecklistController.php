@@ -154,7 +154,7 @@ class ChecklistController extends Controller
      * Clone checklist with all items
      * POST /checklists/{id}/clone
      */
-    public function clone(int $checklistId): JsonResponse
+    public function duplicate(int $checklistId): JsonResponse
     {
         $original = Checklist::with('items')->findOrFail($checklistId);
 

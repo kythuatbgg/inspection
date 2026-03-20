@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('checklists', [ChecklistController::class, 'store']);
         Route::put('checklists/{checklist}', [ChecklistController::class, 'update']);
         Route::delete('checklists/{checklist}', [ChecklistController::class, 'destroy']);
-        Route::post('checklists/{checklist}/clone', [ChecklistController::class, 'clone']);
+        Route::post('checklists/{checklist}/clone', [ChecklistController::class, 'duplicate']);
         Route::post('checklists/{checklist}/items', [ChecklistController::class, 'storeItem']);
         Route::put('checklists/{checklist}/items/{item}', [ChecklistController::class, 'updateItem']);
         Route::delete('checklists/{checklist}/items/{item}', [ChecklistController::class, 'destroyItem']);
