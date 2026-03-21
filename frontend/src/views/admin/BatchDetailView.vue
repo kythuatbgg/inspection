@@ -632,6 +632,7 @@ import api from '@/services/api.js'
 import batchService from '@/services/batchService.js'
 import cabinetService from '@/services/cabinetService.js'
 import InspectionDetailReadonly from '@/components/inspection/InspectionDetailReadonly.vue'
+import { getDateLocale } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -868,7 +869,7 @@ const getStatusLabel = (status) => {
 
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('vi-VN')
+  return new Date(dateStr).toLocaleDateString(getDateLocale())
 }
 
 const formatDateInput = (dateStr) => {

@@ -273,6 +273,7 @@ import { useI18n } from 'vue-i18n'
 import api from '@/services/api.js'
 import MobileImageUploader from '@/components/common/MobileImageUploader.vue'
 import { useInspectionLang } from '@/composables/useInspectionLang.js'
+import { getDateLocale } from '@/i18n'
 
 const { currentLang, LANG_OPTIONS, getContent, getCategory } = useInspectionLang()
 const { t } = useI18n()
@@ -498,7 +499,7 @@ const saveDraft = () => {
   try {
     draftStatus.value = 'saving'
     localStorage.setItem(DRAFT_KEY.value, JSON.stringify(getDraftData()))
-    draftTime.value = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    draftTime.value = new Date().toLocaleTimeString(getDateLocale(), { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     draftStatus.value = 'saved'
   } catch (e) {
     console.warn('Draft save failed:', e)
@@ -523,8 +524,8 @@ const restoreDraft = () => {
       return
     }
 
-    const timeStr = savedDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-    const dateStr = savedDate.toLocaleDateString('vi-VN')
+    const timeStr = savedDate.toLocaleTimeString(getDateLocale(), { hour: '2-digit', minute: '2-digit' })
+    const dateStr = savedDate.toLocaleDateString(getDateLocale())
     if (!confirm(t('inspection.draftConfirm', { date: dateStr, time: timeStr }))) {
       localStorage.removeItem(DRAFT_KEY.value)
       return

@@ -175,6 +175,7 @@ import { Clock, XCircle, ShieldCheck, FileStack, ListTodo, Check, Loader2, Rotat
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { getDateLocale } from '@/i18n'
 import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
 
@@ -224,7 +225,7 @@ const getStatusLabel = (status) => {
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
-  return date.toLocaleDateString('vi-VN')
+  return date.toLocaleDateString(getDateLocale())
 }
 
 const fetchData = async () => {

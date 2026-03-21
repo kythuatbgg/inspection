@@ -21,4 +21,8 @@ export function getI18nLocale() {
   return i18n.global.locale.value
 }
 
+export function getDateLocale() {
+  return i18n.global.locale.value === 'vi' ? 'vi-VN' : 'en-US'
+}
+
 export default i18n

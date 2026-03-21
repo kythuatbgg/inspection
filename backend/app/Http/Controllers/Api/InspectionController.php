@@ -34,7 +34,7 @@ class InspectionController extends Controller
         ])->findOrFail($planId);
 
         if ($request->user()->role === 'inspector' && $plan->batch->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         // Transform items to include all 3 language versions
@@ -60,7 +60,7 @@ class InspectionController extends Controller
                 'data' => null,
                 'plan' => $plan,
                 'checklist_items' => $checklistItems,
-                'message' => 'No inspection found for this plan',
+                'message' => __('messages.inspection_not_found'),
             ]);
         }
 
@@ -118,12 +118,12 @@ class InspectionController extends Controller
 
         $plan = PlanDetail::findOrFail($request->plan_detail_id);
         if ($request->user()->role === 'inspector' && $plan->batch->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         if (Inspection::where('plan_detail_id', $request->plan_detail_id)->exists()) {
             return response()->json([
-                'message' => 'Tủ này đã được kiểm tra rồi.',
+                'message' => __('messages.cabinet_already_inspected'),
             ], 422);
         }
 
@@ -177,7 +177,7 @@ class InspectionController extends Controller
 
         return response()->json([
             'data' => $inspection->load('details'),
-            'message' => 'Lưu kết quả kiểm tra thành công.',
+            'message' => __('messages.inspection_save_success'),
         ], 201);
     }
 

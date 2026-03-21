@@ -36,7 +36,7 @@ class UserController extends Controller
         $users = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
-            'message' => 'Lấy danh sách người dùng thành công',
+            'message' => __('messages.user_list_success'),
             'data' => $users
         ]);
     }
@@ -63,7 +63,7 @@ class UserController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Tạo người dùng thành công',
+            'message' => __('messages.user_create_success'),
             'data' => $user
         ], 201);
     }
@@ -74,7 +74,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         return response()->json([
-            'message' => 'Lấy thông tin người dùng thành công',
+            'message' => __('messages.user_show_success'),
             'data' => $user
         ]);
     }
@@ -99,7 +99,7 @@ class UserController extends Controller
         $user->update($validated);
 
         return response()->json([
-            'message' => 'Cập nhật người dùng thành công',
+            'message' => __('messages.user_update_success'),
             'data' => $user
         ]);
     }
@@ -112,14 +112,14 @@ class UserController extends Controller
         // Prevent deleting yourself
         if ($user->id === auth()->id()) {
             return response()->json([
-                'message' => 'Không thể xóa tài khoản của chính bạn'
+                'message' => __('messages.user_cannot_delete_self')
             ], 422);
         }
 
         $user->delete();
 
         return response()->json([
-            'message' => 'Xóa người dùng thành công'
+            'message' => __('messages.user_delete_success')
         ]);
     }
 
@@ -137,7 +137,7 @@ class UserController extends Controller
         ];
 
         return response()->json([
-            'message' => 'Lấy thống kê thành công',
+            'message' => __('messages.user_stats_success'),
             'data' => $stats
         ]);
     }

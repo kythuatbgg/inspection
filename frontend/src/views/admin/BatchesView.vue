@@ -264,6 +264,7 @@ import { Plus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileStack
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { getDateLocale } from '@/i18n'
 import batchService from '@/services/batchService.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 import BatchFormModal from '@/components/admin/BatchFormModal.vue'
@@ -332,7 +333,7 @@ const getStatusLabel = (status) => {
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
-  return date.toLocaleDateString('vi-VN')
+  return date.toLocaleDateString(getDateLocale())
 }
 
 const fetchBatches = async () => {

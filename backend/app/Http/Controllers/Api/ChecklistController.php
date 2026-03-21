@@ -99,7 +99,7 @@ class ChecklistController extends Controller
 
         return response()->json([
             'data' => $checklist,
-            'message' => 'Tạo checklist thành công.',
+            'message' => __('messages.checklist_create_success'),
         ], 201);
     }
 
@@ -112,7 +112,7 @@ class ChecklistController extends Controller
 
         if ($this->hasActiveBatch($checklistId)) {
             return response()->json([
-                'message' => 'Checklist đang được lô kiểm tra sử dụng, không thể sửa. Hãy clone ra bản mới.',
+                'message' => __('messages.checklist_in_use_edit'),
                 'has_active_batch' => true,
             ], 422);
         }
@@ -127,7 +127,7 @@ class ChecklistController extends Controller
 
         return response()->json([
             'data' => $checklist->fresh(),
-            'message' => 'Cập nhật checklist thành công.',
+            'message' => __('messages.checklist_update_success'),
         ]);
     }
 
@@ -140,7 +140,7 @@ class ChecklistController extends Controller
 
         if ($this->hasActiveBatch($checklistId)) {
             return response()->json([
-                'message' => 'Checklist đang được lô kiểm tra sử dụng, không thể xóa.',
+                'message' => __('messages.checklist_in_use_delete'),
                 'has_active_batch' => true,
             ], 422);
         }
@@ -149,7 +149,7 @@ class ChecklistController extends Controller
         $checklist->delete();
 
         return response()->json([
-            'message' => 'Đã xóa checklist thành công.',
+            'message' => __('messages.checklist_delete_success'),
         ]);
     }
 
@@ -184,7 +184,7 @@ class ChecklistController extends Controller
 
         return response()->json([
             'data' => $newChecklist->load('items'),
-            'message' => "Đã clone checklist thành công (" . count($original->items) . " hạng mục).",
+            'message' => __('messages.checklist_clone_success', ['count' => count($original->items)]),
         ], 201);
     }
 
@@ -200,7 +200,7 @@ class ChecklistController extends Controller
 
         if ($this->hasActiveBatch($checklistId)) {
             return response()->json([
-                'message' => 'Checklist đang được sử dụng, không thể thêm hạng mục.',
+                'message' => __('messages.checklist_in_use_add_item'),
                 'has_active_batch' => true,
             ], 422);
         }
@@ -221,7 +221,7 @@ class ChecklistController extends Controller
 
         return response()->json([
             'data' => $item,
-            'message' => 'Đã thêm hạng mục thành công.',
+            'message' => __('messages.item_add_success'),
         ], 201);
     }
 
@@ -235,7 +235,7 @@ class ChecklistController extends Controller
 
         if ($this->hasActiveBatch($checklistId)) {
             return response()->json([
-                'message' => 'Checklist đang được sử dụng, không thể sửa hạng mục.',
+                'message' => __('messages.checklist_in_use_edit_item'),
                 'has_active_batch' => true,
             ], 422);
         }
@@ -258,7 +258,7 @@ class ChecklistController extends Controller
 
         return response()->json([
             'data' => $item->fresh(),
-            'message' => 'Cập nhật hạng mục thành công.',
+            'message' => __('messages.item_update_success'),
         ]);
     }
 
@@ -272,7 +272,7 @@ class ChecklistController extends Controller
 
         if ($this->hasActiveBatch($checklistId)) {
             return response()->json([
-                'message' => 'Checklist đang được sử dụng, không thể xóa hạng mục.',
+                'message' => __('messages.checklist_in_use_delete_item'),
                 'has_active_batch' => true,
             ], 422);
         }
@@ -281,7 +281,7 @@ class ChecklistController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => 'Đã xóa hạng mục thành công.',
+            'message' => __('messages.item_delete_success'),
         ]);
     }
 

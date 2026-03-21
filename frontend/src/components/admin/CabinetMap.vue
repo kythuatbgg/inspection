@@ -1,12 +1,15 @@
-﻿<template>
+<template>
   <div ref="mapContainer" class="h-full w-full rounded-lg"></div>
 </template>
 
 <script setup>
 import { onMounted, ref, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
+const { t } = useI18n()
 
 const props = defineProps({
   cabinets: { type: Array, default: () => [] }
@@ -63,7 +66,7 @@ const updateMarkers = () => {
   const validCabinets = props.cabinets.filter(c => c.lat && c.lng)
   
   validCabinets.forEach(cabinet => {
-    const site = cabinet.bts_site || 'Không xác định'
+    const site = cabinet.bts_site || t('common.unknown')
     if (!groups[site]) {
       groups[site] = { cabinets: [], lat: cabinet.lat, lng: cabinet.lng }
     }
@@ -96,8 +99,8 @@ const updateMarkers = () => {
         <div class="flex items-center justify-between gap-2 py-1.5 border-b border-slate-200 last:border-0">
           <span class="font-medium text-slate-900 text-sm">${cabinet.cabinet_code}</span>
           <div class="flex items-center gap-1 shrink-0">
-            ${hasCoords ? `<a href="${mapsUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md" title="Điều hướng Google Maps">🧭</a>` : ''}
-            <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md">Chi tiết</a>
+            ${hasCoords ? `<a href="${mapsUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md" title="Google Maps">🧭</a>` : ''}
+            <a href="#" data-cabinet="${cabinet.cabinet_code}" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-1 bg-primary-50 rounded-md">${t('common.details')}</a>
           </div>
         </div>
       `
@@ -109,10 +112,10 @@ const updateMarkers = () => {
       <div class="min-w-[220px] max-w-[300px]">
         <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
           <span class="font-bold text-slate-900 text-sm">
-            ${site === 'Không xác định' ? 'Không thuộc trạm' : site}
+            ${site === t('common.unknown') ? t('common.notBelongStation') : site}
           </span>
-          <a href="${siteMapUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-0.5 bg-primary-50 rounded flex items-center gap-1" title="Chỉ đường đến trạm">
-            🧭 Chỉ đường
+          <a href="${siteMapUrl}" target="_blank" rel="noopener" class="text-xs text-primary-600 hover:text-primary-700 font-semibold px-1.5 py-0.5 bg-primary-50 rounded flex items-center gap-1" title="${t('common.directions')}">
+            🧭 ${t('common.directions')}
           </a>
         </div>
         <div class="max-h-[160px] overflow-y-auto overscroll-contain pr-1">

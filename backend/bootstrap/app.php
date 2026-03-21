@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Allow CORS from any origin (dev mode - LAN access)
         $middleware->append(\App\Http\Middleware\CorsMiddleware::class);
+
+        // Set locale from Accept-Language header
+        $middleware->append(\App\Http\Middleware\SetLocale::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

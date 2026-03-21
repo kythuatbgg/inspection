@@ -71,7 +71,7 @@ class CabinetController extends Controller
 
         return response()->json([
             'data' => $cabinet,
-            'message' => 'Cabinet created successfully',
+            'message' => __('messages.cabinet_create_success'),
         ], 201);
     }
 
@@ -93,7 +93,7 @@ class CabinetController extends Controller
 
         return response()->json([
             'data' => $cabinet->fresh(),
-            'message' => 'Cabinet updated successfully',
+            'message' => __('messages.cabinet_update_success'),
         ]);
     }
 
@@ -106,7 +106,7 @@ class CabinetController extends Controller
         $cabinet->delete();
 
         return response()->json([
-            'message' => 'Cabinet deleted successfully',
+            'message' => __('messages.cabinet_delete_success'),
         ]);
     }
 
@@ -274,7 +274,7 @@ class CabinetController extends Controller
 
         if (!$token) {
             return response()->json([
-                'message' => 'Missing export token.',
+                'message' => __('messages.missing_export_token'),
             ], 422);
         }
 
@@ -282,7 +282,7 @@ class CabinetController extends Controller
 
         if (!is_array($results)) {
             return response()->json([
-                'message' => 'Import result not found or has expired.',
+                'message' => __('messages.import_result_expired'),
             ], 404);
         }
 

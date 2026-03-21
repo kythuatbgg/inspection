@@ -205,6 +205,7 @@ import { ArrowLeft, Loader2, AlertCircle, Server, MapPin, FileEdit, Trash2, Info
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import cabinetService from '@/services/cabinetService.js'
+import { getDateLocale } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -227,7 +228,7 @@ const editForm = ref({
 
 const formatDate = (date) => {
   if (!date) return ''
-  return new Date(date).toLocaleDateString('vi-VN')
+  return new Date(date).toLocaleDateString(getDateLocale())
 }
 
 const goBack = () => router.back()

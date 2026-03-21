@@ -414,7 +414,9 @@
 import { Trash2, X, UserPlus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileEdit, Search, Users } from 'lucide-vue-next'
 
 import { computed, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { getDateLocale } from '@/i18n'
 import userService from '@/services/userService.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 
@@ -488,7 +490,7 @@ const getInitials = (name) => {
 
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('vi-VN')
+  return new Date(dateStr).toLocaleDateString(getDateLocale())
 }
 
 const fetchUsers = async () => {

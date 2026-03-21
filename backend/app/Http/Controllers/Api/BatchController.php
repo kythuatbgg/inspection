@@ -157,8 +157,8 @@ class BatchController extends Controller
         $assignedUser = User::find($userId);
         if (!$assignedUser || $assignedUser->role !== 'inspector') {
             return response()->json([
-                'message' => 'Người được giao phải có vai trò Inspector.',
-                'errors' => ['user_id' => ['Người được giao phải có vai trò Inspector.']]
+                'message' => __('messages.inspector_role_required'),
+                'errors' => ['user_id' => [__('messages.inspector_role_required')]]
             ], 422);
         }
 
@@ -182,7 +182,7 @@ class BatchController extends Controller
 
         return response()->json([
             'data' => $batch->load('planDetails'),
-            'message' => 'Tạo lô kiểm tra thành công.',
+            'message' => __('messages.batch_create_success'),
         ], 201);
     }
 
@@ -194,7 +194,7 @@ class BatchController extends Controller
         $batch = InspectionBatch::findOrFail($batchId);
 
         if ($batch->status === 'completed') {
-            return response()->json(['message' => 'Không thể sửa lô đã hoàn thành.'], 422);
+            return response()->json(['message' => __('messages.batch_cannot_edit_completed')], 422);
         }
 
         $request->validate([
@@ -210,7 +210,7 @@ class BatchController extends Controller
             $assignedUser = User::find($request->user_id);
             if ($assignedUser && $assignedUser->role !== 'inspector') {
                 return response()->json([
-                    'message' => 'Người được giao phải có vai trò Inspector.',
+                    'message' => __('messages.inspector_role_required'),
                 ], 422);
             }
         }
@@ -219,7 +219,7 @@ class BatchController extends Controller
 
         return response()->json([
             'data' => $batch->fresh(),
-            'message' => 'Cập nhật lô kiểm tra thành công.',
+            'message' => __('messages.batch_update_success'),
         ]);
     }
 
@@ -236,7 +236,7 @@ class BatchController extends Controller
 
         if ($hasInspections && !$request->boolean('force')) {
             return response()->json([
-                'message' => 'Lô này đã có dữ liệu kiểm tra. Thêm ?force=true để xóa.',
+                'message' => __('messages.batch_has_data_force'),
                 'has_data' => true,
             ], 422);
         }
@@ -252,7 +252,7 @@ class BatchController extends Controller
         $batch->delete();
 
         return response()->json([
-            'message' => 'Đã xóa lô kiểm tra thành công.',
+            'message' => __('messages.batch_delete_success'),
         ]);
     }
 
@@ -369,7 +369,7 @@ class BatchController extends Controller
         $rejected = $batch->planDetails->where('review_status', 'rejected')->count();
 
         return response()->json([
-            'message' => 'Đã kết thúc lô kiểm tra thành công.',
+            'message' => __('messages.batch_closed'),
             'summary' => [
                 'total' => $total,
                 'approved' => $approved,
@@ -398,7 +398,7 @@ class BatchController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Đã mở lại lô thành công.',
+            'message' => __('messages.batch_reopened'),
             'batch' => $batch
         ]);
     }
@@ -556,7 +556,7 @@ class BatchController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Đã phê duyệt đề xuất thành công.',
+            'message' => __('messages.batch_approved'),
             'data' => $batch
         ]);
     }
@@ -580,7 +580,7 @@ class BatchController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Đã từ chối đề xuất.',
+            'message' => __('messages.batch_rejected'),
             'data' => $batch
         ]);
     }

@@ -17,7 +17,7 @@ class PlanDetailController extends Controller
     public function tasks(Request $request): JsonResponse
     {
         if ($request->user()->role !== 'inspector') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         $status = $request->input('status', 'all');
@@ -92,7 +92,7 @@ class PlanDetailController extends Controller
 
         // Check access
         if ($request->user()->role === 'inspector' && $batch->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         try {
@@ -125,7 +125,7 @@ class PlanDetailController extends Controller
 
         // Check access
         if ($request->user()->role === 'inspector' && $plan->batch->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         return response()->json([
@@ -143,7 +143,7 @@ class PlanDetailController extends Controller
         // Verify inspector owns this plan
         $batch = $plan->batch;
         if ($request->user()->role === 'inspector' && $batch->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
         $plan->update(['status' => 'done']);
@@ -153,7 +153,7 @@ class PlanDetailController extends Controller
 
         return response()->json([
             'data' => $plan->load('cabinet'),
-            'message' => 'Plan marked as complete',
+            'message' => __('messages.plan_complete'),
         ]);
     }
 
@@ -166,11 +166,11 @@ class PlanDetailController extends Controller
         $batch = $plan->batch;
 
         if ($batch->status === 'completed') {
-            return response()->json(['message' => 'Không thể duyệt - lô đã kết thúc.'], 422);
+            return response()->json(['message' => __('messages.batch_ended_cannot_review')], 422);
         }
 
         if ($plan->status !== 'done') {
-            return response()->json(['message' => 'Tủ này chưa được kiểm tra.'], 422);
+            return response()->json(['message' => __('messages.cabinet_not_inspected')], 422);
         }
 
         $request->validate([
