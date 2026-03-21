@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { db } from '../db'
+import { setI18nLocale } from '../i18n'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -8,6 +9,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 const storedToken = localStorage.getItem('token')
 if (storedToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+}
+
+function syncLocaleFromUser(user) {
+  if (!user?.lang_pref) return
+  const locale = user.lang_pref === 'en' ? 'en' : 'vi'
+  setI18nLocale(locale)
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -34,6 +41,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = payload.user
         localStorage.setItem('token', this.token)
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+        syncLocaleFromUser(this.user)
         return true
       } catch (error) {
         console.error('Login failed:', error)
@@ -62,8 +70,23 @@ export const useAuthStore = defineStore('auth', {
         const response = await axios.get(`${API_URL}/me`)
         const payload = response.data.data || response.data
         this.user = payload.user || payload
+        syncLocaleFromUser(this.user)
       } catch (error) {
         this.logout()
+      }
+    },
+
+    async setLanguage(lang) {
+      const locale = lang === 'en' ? 'en' : 'vi'
+      setI18nLocale(locale)
+
+      if (this.user) {
+        this.user.lang_pref = locale === 'en' ? 'en' : 'vn'
+        try {
+          await axios.patch(`${API_URL}/me/language`, { lang_pref: this.user.lang_pref })
+        } catch (e) {
+          console.error('Failed to update language preference:', e)
+        }
       }
     }
   }

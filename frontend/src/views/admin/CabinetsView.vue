@@ -2,7 +2,7 @@
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <!-- DESKTOP HEADER -->
     <div class="hidden md:flex items-center justify-between">
-      <h2 class="text-xl font-bold text-slate-900">Danh sách tủ cáp</h2>
+      <h2 class="text-xl font-bold text-slate-900">{{ $t('cabinet.listTitle') }}</h2>
       <div class="flex gap-3">
         <div class="flex rounded-lg overflow-hidden bg-slate-100 p-1">
           <button
@@ -39,7 +39,7 @@
 
         <button @click="openAddModal" class="bg-primary-600 hover:bg-primary-700 text-white rounded-lg min-h-[52px] px-6 flex items-center gap-2 text-sm font-semibold transition-colors shadow-sm shadow-primary-500/20">
           <Plus class="w-5 h-5" />
-          Thêm tủ
+          {{ $t('cabinet.addNew') }}
         </button>
       </div>
     </div>
@@ -47,7 +47,7 @@
     <!-- MOBILE HEADER -->
     <div class="flex flex-col md:hidden gap-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Tủ cáp</h2>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">{{ $t('cabinet.title') }}</h2>
         
         <!-- Toggle View Mode Pill -->
         <div class="flex bg-slate-100/80 backdrop-blur rounded-[16px] p-1 shadow-inner">
@@ -72,11 +72,11 @@
       <div class="flex gap-3">
         <button @click="openImportModal" class="flex-1 min-h-[48px] bg-white border border-slate-200 active:bg-slate-50 rounded-[16px] text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 shadow-sm">
           <ArrowDownToLine class="w-5 h-5 text-blue-500" />
-          Nhập Excel
+          {{ $t('cabinet.importExcel') }}
         </button>
         <button @click="exportCabinets" class="flex-1 min-h-[48px] bg-white border border-slate-200 active:bg-slate-50 rounded-[16px] text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 shadow-sm">
           <ArrowUpToLine class="w-5 h-5 text-green-500" />
-          Xuất dữ liệu
+          {{ $t('common.export') }}
         </button>
       </div>
     </div>
@@ -98,22 +98,22 @@
 
       <!-- Desktop Per Page Selector -->
       <div class="hidden md:flex shrink-0 whitespace-nowrap items-center gap-2 text-sm text-slate-600 font-medium bg-slate-50/50 p-1.5 rounded-lg border border-slate-200/60">
-        <label class="pl-2">Hiển thị:</label>
+        <label class="pl-2">{{ $t('common.displayCount') }}</label>
         <MobileBottomSheet
           :model-value="pagination.per_page"
           :options="perPageOptions"
-          label="Số mục mỗi trang"
+          :label="$t('common.itemsPerPage')"
           placeholder="10"
           container-class="w-20"
           trigger-class="!min-h-[36px] border-none shadow-sm !py-1 !px-3 !rounded-lg text-sm bg-white"
           @update:model-value="(val) => { pagination.per_page = Number(val); changePerPage() }"
         />
-        <span class="pr-2 text-slate-400">/ trang</span>
+        <span class="pr-2 text-slate-400">{{ $t('common.perPage') }}</span>
       </div>
     </div>
 
     <div v-if="loading" class="text-center text-slate-500 py-8">
-      Đang tải...
+      {{ $t('common.loading') }}
     </div>
 
     <div v-else-if="error" class="text-center text-red-500 py-8">
@@ -127,11 +127,11 @@
         <table class="w-full">
           <thead class="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Mã tủ</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">BTS Site</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Tọa độ</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Ghi chú</th>
-              <th class="px-4 py-3 text-right text-sm font-semibold text-slate-700">Thao tác</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">{{ $t('cabinet.cabinetCode') }}</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">{{ $t('cabinet.btsSite') }}</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">{{ $t('cabinet.coordinates') }}</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">{{ $t('common.note') }}</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold text-slate-700">{{ $t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -160,10 +160,10 @@
               <td class="px-4 py-3 text-sm text-slate-500 truncate max-w-[200px]">{{ cabinet.note || '-' }}</td>
               <td class="px-4 py-3 text-right">
                 <div class="flex justify-end gap-2">
-                  <button @click.stop="openEditModal(cabinet)" class="p-2 hover:bg-slate-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center" title="Sửa">
+                  <button @click.stop="openEditModal(cabinet)" class="p-2 hover:bg-slate-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center" :title="$t('common.edit')">
                     <FileEdit class="w-5 h-5 text-slate-600" />
                   </button>
-                  <button @click.stop="deleteCabinet(cabinet)" class="p-2 hover:bg-danger/10 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center" title="Xóa">
+                  <button @click.stop="deleteCabinet(cabinet)" class="p-2 hover:bg-danger/10 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center" :title="$t('common.delete')">
                     <Trash2 class="w-5 h-5 text-danger" />
                   </button>
                 </div>
@@ -173,7 +173,7 @@
         </table>
 
         <div v-if="cabinets.length === 0" class="text-center text-slate-500 py-8">
-          Không có tủ cáp nào
+          {{ $t('cabinet.noCabinets') }}
         </div>
         </div>
 
@@ -202,7 +202,7 @@
             <div class="bg-slate-50/80 rounded-[16px] p-3.5 mb-4 space-y-2.5">
               <div class="flex items-center justify-between text-sm">
                 <div class="flex items-center">
-                  <span class="text-slate-500 font-medium w-20">Tọa độ:</span>
+                  <span class="text-slate-500 font-medium w-20">{{ $t('cabinet.coordinates') }}:</span>
                   <span class="text-slate-900 font-semibold">{{ cabinet.lat }}, {{ cabinet.lng }}</span>
                 </div>
                 <a
@@ -217,7 +217,7 @@
                 </a>
               </div>
               <div class="flex items-start text-sm" v-if="cabinet.note">
-                <span class="text-slate-500 font-medium w-20 pt-0.5">Ghi chú:</span>
+                <span class="text-slate-500 font-medium w-20 pt-0.5">{{ $t('common.note') }}:</span>
                 <span class="text-slate-700 leading-relaxed max-w-[calc(100%-5rem)] line-clamp-2">{{ cabinet.note }}</span>
               </div>
             </div>
@@ -227,18 +227,18 @@
           <div class="flex items-center gap-3 pt-1">
             <button @click.stop="openEditModal(cabinet)" class="flex-1 min-h-[48px] bg-white border border-slate-200 rounded-[14px] text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 active:bg-slate-50 transition-colors">
               <FileEdit class="w-5 h-5 text-slate-400" />
-              Sửa
+              {{ $t('common.edit') }}
             </button>
             <button @click.stop="deleteCabinet(cabinet)" class="flex-1 min-h-[48px] bg-danger/10/50 hover:bg-danger/10 border border-red-100 rounded-[14px] text-danger font-semibold text-sm flex items-center justify-center gap-2 active:bg-red-100 transition-colors">
               <Trash2 class="w-5 h-5" />
-              Xóa
+              {{ $t('common.delete') }}
             </button>
           </div>
         </div>
 
         <div v-if="cabinets.length === 0" class="flex flex-col items-center justify-center py-12 px-4 bg-white rounded-[24px] border border-slate-200 shadow-sm mt-4">
           <FileStack class="w-16 h-16 text-gray-300 mb-4" />
-          <p class="text-slate-500 font-medium text-center">Không có tủ cáp nào<br/><span class="text-sm text-slate-400 font-normal">Thêm tủ mới hoặc thay đổi bộ lọc</span></p>
+          <p class="text-slate-500 font-medium text-center">{{ $t('cabinet.noCabinets') }}<br/><span class="text-sm text-slate-400 font-normal">{{ $t('cabinet.addOrChangeFilter') }}</span></p>
         </div>
       </div>
       </div>
@@ -252,9 +252,9 @@
       <div v-if="pagination.last_page > 1" class="hidden md:flex bg-white rounded-lg shadow-sm border border-slate-200 p-6 mt-6 items-center justify-between">
         <!-- Info -->
         <p class="text-sm text-slate-600 font-medium">
-          Hiển thị <span class="font-semibold text-slate-900">{{ pagination.from }}</span> - 
-          <span class="font-semibold text-slate-900">{{ pagination.to }}</span> trong 
-          <span class="font-semibold text-slate-900">{{ pagination.total }}</span> tủ cáp
+          {{ $t('common.showing') }} <span class="font-semibold text-slate-900">{{ pagination.from }}</span> - 
+          <span class="font-semibold text-slate-900">{{ pagination.to }}</span> {{ $t('common.of') }} 
+          <span class="font-semibold text-slate-900">{{ pagination.total }}</span> {{ $t('cabinet.cabinetItems') }}
         </p>
 
         <!-- Pagination Controls -->
@@ -317,8 +317,8 @@
         <!-- Status text -->
         <div class="text-center mb-5">
           <div class="text-sm text-slate-500 font-medium">
-            Tủ cáp <span class="text-slate-900 font-bold">{{ pagination.from }}</span> - <span class="text-slate-900 font-bold">{{ pagination.to }}</span><br/>
-            <span class="text-xs text-slate-400 mt-1 inline-block">trong tổng số {{ pagination.total }} tủ</span>
+            {{ $t('cabinet.title') }} <span class="text-slate-900 font-bold">{{ pagination.from }}</span> - <span class="text-slate-900 font-bold">{{ pagination.to }}</span><br/>
+            <span class="text-xs text-slate-400 mt-1 inline-block">{{ $t('cabinet.inTotalCabinets', { total: pagination.total }) }}</span>
           </div>
         </div>
         
@@ -361,17 +361,17 @@
     <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/50" @click="closeImportModal"></div>
       <div class="relative bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
-        <h3 class="text-lg font-semibold text-slate-900 mb-4">Import tủ cáp</h3>
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ $t('cabinet.importTitle') }}</h3>
 
         <div class="mb-4">
           <button @click="downloadTemplate" class="text-primary-600 hover:text-primary-800 text-sm flex items-center gap-2">
             <FileDown class="w-4 h-4" />
-            Tải file mẫu Excel
+            {{ $t('cabinet.downloadTemplate') }}
           </button>
         </div>
 
         <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-700 mb-2">Chọn file (CSV/Excel)</label>
+          <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('cabinet.selectFile') }}</label>
           <input
             ref="fileInput"
             type="file"
@@ -383,7 +383,7 @@
 
         <div v-if="importing" class="mb-4">
           <div class="flex justify-between text-sm text-slate-600 mb-1">
-            <span>Đang import...</span>
+            <span>{{ $t('cabinet.importing') }}</span>
             <span>{{ importProgress }}%</span>
           </div>
           <div class="w-full bg-slate-200 rounded-full h-2">
@@ -396,13 +396,13 @@
             <AlertTriangle class="w-5 h-5 text-yellow-600" />
             <ShieldCheck class="w-5 h-5 text-success" />
             <span class="font-medium" :class="importResult.failed > 0 ? 'text-yellow-800' : 'text-green-800'">
-              Import hoàn thành
+              {{ $t('cabinet.importComplete') }}
             </span>
           </div>
           <div class="text-sm space-y-1" :class="importResult.failed > 0 ? 'text-yellow-700' : 'text-success'">
             <p>{{ importResult.message }}</p>
-            <p>Thành công: {{ importResult.imported }}</p>
-            <p v-if="importResult.failed > 0">Thất bại: {{ importResult.failed }}</p>
+            <p>{{ $t('cabinet.importSuccess') }} {{ importResult.imported }}</p>
+            <p v-if="importResult.failed > 0">{{ $t('cabinet.importFailed') }} {{ importResult.failed }}</p>
           </div>
 
           <button
@@ -411,12 +411,12 @@
             class="mt-3 text-primary-600 hover:text-primary-800 text-sm flex items-center gap-2"
           >
             <FileDown class="w-4 h-4" />
-            Tải file kết quả chi tiết
+            {{ $t('cabinet.downloadResult') }}
           </button>
         </div>
 
         <div class="flex gap-3">
-          <button @click="closeImportModal" class="btn-secondary flex-1 min-h-[56px]">Đóng</button>
+          <button @click="closeImportModal" class="btn-secondary flex-1 min-h-[56px]">{{ $t('common.close') }}</button>
           <button @click="importCabinets" :disabled="!selectedFile || importing" class="btn-primary flex-1 min-h-[56px] flex items-center justify-center gap-2">
             <Loader2 v-if="importing" class="w-4 h-4 animate-spin" />
             <span v-else>Import</span>
@@ -438,10 +438,13 @@
 import { FileDown, ShieldCheck, AlertTriangle, Plus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileStack, Trash2, FileEdit, MapPin, Server, Search, ArrowUpToLine, ArrowDownToLine, Menu, Navigation } from 'lucide-vue-next'
 
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import cabinetService from '@/services/cabinetService.js'
 import CabinetFormModal from '@/components/admin/CabinetFormModal.vue'
 import CabinetMap from '@/components/admin/CabinetMap.vue'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
+
+const { t } = useI18n()
 
 const perPageOptions = [
   { value: 10, label: '10' },
@@ -533,13 +536,13 @@ const downloadTemplate = async () => {
     downloadBlob(blob, 'cabinet_template.xlsx')
   } catch (requestError) {
     console.error('Download template failed:', requestError)
-    alert('Không thể tải file mẫu')
+    alert(t('cabinet.downloadTemplateError'))
   }
 }
 
 const downloadImportResult = async () => {
   if (!importResult.value?.exportToken) {
-    alert('Không tìm thấy mã tải kết quả import')
+    alert(t('cabinet.downloadResultError'))
     return
   }
 
@@ -548,7 +551,7 @@ const downloadImportResult = async () => {
     downloadBlob(blob, 'import_results.csv')
   } catch (requestError) {
     console.error('Download result failed:', requestError)
-    alert('Không thể tải file kết quả import')
+    alert(t('cabinet.downloadResultError'))
   }
 }
 
@@ -576,7 +579,7 @@ const fetchCabinets = async () => {
       to: response.to
     }
   } catch (requestError) {
-    error.value = 'Không thể tải dữ liệu'
+    error.value = t('common.errorLoadData')
     console.error(requestError)
   } finally {
     loading.value = false
@@ -584,7 +587,7 @@ const fetchCabinets = async () => {
 }
 
 const deleteCabinet = async (cabinet) => {
-  if (!confirm(`Bạn có chắc muốn xóa tủ cáp "${cabinet.cabinet_code}"?`)) {
+  if (!confirm(t('cabinet.deleteCabinetConfirm', { code: cabinet.cabinet_code }))) {
     return
   }
 
@@ -593,7 +596,7 @@ const deleteCabinet = async (cabinet) => {
     await fetchCabinets()
   } catch (requestError) {
     console.error(requestError)
-    alert('Có lỗi khi xóa tủ cáp')
+    alert(t('cabinet.deleteError'))
   }
 }
 
@@ -676,7 +679,7 @@ const importCabinets = async () => {
     importResult.value = {
       imported: 0,
       failed: 0,
-      message: requestError.response?.data?.message || 'Import thất bại',
+      message: requestError.response?.data?.message || t('cabinet.importFailedError'),
       exportToken: null
     }
   } finally {
@@ -695,7 +698,7 @@ const exportCabinets = async () => {
     downloadBlob(blob, 'cabinets.csv')
   } catch (requestError) {
     console.error(requestError)
-    alert('Export thất bại')
+    alert(t('cabinet.exportFailed'))
   }
 }
 

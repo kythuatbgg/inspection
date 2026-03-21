@@ -14,7 +14,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.totalBatches }}</p>
-              <p class="text-sm text-slate-500 font-medium">Lô đề xuất</p>
+              <p class="text-sm text-slate-500 font-medium">{{ $t('inspector.proposedBatches') }}</p>
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.totalPlans }}</p>
-              <p class="text-sm text-slate-500 font-medium">Tổng số tủ</p>
+              <p class="text-sm text-slate-500 font-medium">{{ $t('inspector.totalCabinets') }}</p>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-slate-900 tracking-tight font-heading">{{ stats.done }}</p>
-              <p class="text-sm text-slate-500 font-medium">Đã kiểm tra</p>
+              <p class="text-sm text-slate-500 font-medium">{{ $t('inspector.inspected') }}</p>
             </div>
           </div>
         </div>
@@ -71,12 +71,12 @@
 
       <!-- Active Batches Section -->
       <div>
-        <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-4 tracking-tight font-heading">Lô đang hoạt động</h3>
+        <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-4 tracking-tight font-heading">{{ $t('inspector.activeBatches') }}</h3>
 
         <!-- Loading -->
         <div v-if="loading" class="flex flex-col items-center justify-center py-12 md:py-20">
           <Loader2 class="w-8 h-8 animate-spin text-slate-400 mb-4" />
-          <p class="text-sm font-medium text-slate-500">Đang tải biểu đồ...</p>
+          <p class="text-sm font-medium text-slate-500">{{ $t('inspector.loadingCharts') }}</p>
         </div>
 
         <!-- Empty State -->
@@ -84,8 +84,8 @@
           <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-5">
             <FileStack class="w-8 h-8 text-slate-300" />
           </div>
-          <p class="font-bold text-slate-800 text-lg md:text-xl tracking-tight">Không có lô kiểm tra nào</p>
-          <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Khi quản trị viên tạo và giao lô kiểm tra, chúng sẽ xuất hiện tại đây.</p>
+          <p class="font-bold text-slate-800 text-lg md:text-xl tracking-tight">{{ $t('inspector.noBatches') }}</p>
+          <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">{{ $t('inspector.noBatchesHint') }}</p>
         </div>
 
         <!-- Batches List -->
@@ -100,7 +100,7 @@
             <div class="flex items-start justify-between gap-4 w-full">
               <div class="flex-1 min-w-0 pr-3">
                 <h4 class="font-bold text-[15px] md:text-lg text-slate-900 truncate leading-tight font-heading">{{ batch.name }}</h4>
-                <p class="text-[13px] md:text-sm text-slate-500 font-medium mt-1.5 truncate">{{ batch.checklist?.name || 'Mẫu Checklist tiêu chuẩn' }}</p>
+                <p class="text-[13px] md:text-sm text-slate-500 font-medium mt-1.5 truncate">{{ batch.checklist?.name || $t('inspector.standardChecklist') }}</p>
               </div>
               <span
                 class="shrink-0 text-[10px] md:text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg"
@@ -115,7 +115,7 @@
             <!-- Crisp Progress Bar -->
             <div class="mt-5 md:mt-6 w-full">
               <div class="flex items-center justify-between text-[11px] md:text-xs mb-2">
-                <span class="text-slate-500 font-bold uppercase tracking-widest">Tiến độ</span>
+                <span class="text-slate-500 font-bold uppercase tracking-widest">{{ $t('inspector.progress') }}</span>
                 <span class="font-bold tracking-tight" :class="batchProgress(batch) === 100 ? 'text-success' : 'text-primary-600'">
                   {{ batchProgress(batch) }}%
                 </span>
@@ -137,7 +137,7 @@
               </span>
               <span class="flex items-center gap-1.5">
                 <FileStack class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
-                {{ batch.plan_details?.length || 0 }} TỦ
+                {{ batch.plan_details?.length || 0 }} {{ $t('inspector.cabinet') }}
               </span>
             </div>
           </button>
@@ -152,9 +152,11 @@ import { FileStack, Calendar, ShieldCheck, Check, Clock, ListTodo, Loader2 } fro
 
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import batchService from '@/services/batchService.js'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const loading = ref(true)
 const batches = ref([])
@@ -194,8 +196,8 @@ const batchProgress = (batch) => {
 }
 
 const statusLabel = (status) => {
-  const map = { pending: 'Chờ', active: 'Đang chạy', completed: 'Hoàn thành' }
-  return map[status] || status
+  const map = { pending: 'inspector.waiting', active: 'inspector.running', completed: 'status.completed' }
+  return t(map[status] || 'status.unknown')
 }
 
 const formatDate = (dateStr) => {

@@ -1,6 +1,6 @@
-﻿<template>
+<template>
   <div class="max-w-2xl mx-auto space-y-6">
-    <h2 class="text-lg font-semibold text-slate-900">Hồ sơ cá nhân</h2>
+    <h2 class="text-lg font-semibold text-slate-900">{{ $t('profile.title') }}</h2>
 
     <!-- Profile Info -->
     <div class="card p-6">
@@ -18,7 +18,7 @@
       <!-- Edit Form -->
       <form @submit.prevent="updateProfile" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Họ tên</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.fullName') }}</label>
           <input
             v-model="form.name"
             type="text"
@@ -28,7 +28,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.email') }}</label>
           <input
             v-model="form.email"
             type="email"
@@ -38,14 +38,14 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Tên đăng nhập</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.username') }}</label>
           <input
             :value="authStore.user?.username"
             type="text"
             class="input-field min-h-touch"
             disabled
           />
-          <p class="text-xs text-slate-500 mt-1">Tên đăng nhập không thể thay đổi</p>
+          <p class="text-xs text-slate-500 mt-1">{{ $t('profile.usernameHint') }}</p>
         </div>
 
         <!-- Error -->
@@ -59,18 +59,18 @@
         </div>
 
         <button type="submit" :disabled="saving" class="btn-primary w-full min-h-touch">
-          {{ saving ? 'Đang lưu...' : 'Lưu thông tin' }}
+          {{ saving ? $t('profile.saving') : $t('profile.saveInfo') }}
         </button>
       </form>
     </div>
 
     <!-- Change Password -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-slate-900 mb-4">Đổi mật khẩu</h3>
+      <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ $t('profile.changePassword') }}</h3>
 
       <form @submit.prevent="changePassword" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu hiện tại</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.currentPassword') }}</label>
           <input
             v-model="passwordForm.current_password"
             type="password"
@@ -80,7 +80,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu mới</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.newPassword') }}</label>
           <input
             v-model="passwordForm.password"
             type="password"
@@ -91,7 +91,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Xác nhận mật khẩu</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">{{ $t('profile.confirmPassword') }}</label>
           <input
             v-model="passwordForm.password_confirmation"
             type="password"
@@ -112,7 +112,7 @@
         </div>
 
         <button type="submit" :disabled="changingPassword" class="btn-primary w-full min-h-touch">
-          {{ changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu' }}
+          {{ changingPassword ? $t('profile.changingPassword') : $t('profile.changePasswordBtn') }}
         </button>
       </form>
     </div>
@@ -121,9 +121,11 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api.js'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const form = reactive({
@@ -156,13 +158,7 @@ const getRoleClass = (role) => {
 }
 
 const getRoleLabel = (role) => {
-  const labels = {
-    admin: 'Admin',
-    manager: 'Quản lý',
-    inspector: 'Inspector',
-    staff: 'Staff'
-  }
-  return labels[role] || role
+  return t('roles.' + (role || 'admin'))
 }
 
 const getInitials = (name) => {
@@ -184,10 +180,10 @@ const updateProfile = async () => {
     authStore.user.name = form.name
     authStore.user.email = form.email
 
-    success.value = 'Cập nhật thông tin thành công'
+    success.value = t('profile.updateSuccess')
     setTimeout(() => success.value = '', 3000)
   } catch (e) {
-    error.value = e.response?.data?.message || 'Có lỗi xảy ra'
+    error.value = e.response?.data?.message || t('common.errorOccurred')
   } finally {
     saving.value = false
   }
@@ -198,7 +194,7 @@ const changePassword = async () => {
   passwordSuccess.value = ''
 
   if (passwordForm.password !== passwordForm.password_confirmation) {
-    passwordError.value = 'Mật khẩu xác nhận không khớp'
+    passwordError.value = t('profile.passwordMismatch')
     return
   }
 
@@ -211,13 +207,13 @@ const changePassword = async () => {
       password_confirmation: passwordForm.password_confirmation
     })
 
-    passwordSuccess.value = 'Đổi mật khẩu thành công'
+    passwordSuccess.value = t('profile.passwordSuccess')
     passwordForm.current_password = ''
     passwordForm.password = ''
     passwordForm.password_confirmation = ''
     setTimeout(() => passwordSuccess.value = '', 3000)
   } catch (e) {
-    passwordError.value = e.response?.data?.message || 'Có lỗi xảy ra'
+    passwordError.value = e.response?.data?.message || t('common.errorOccurred')
   } finally {
     changingPassword.value = false
   }

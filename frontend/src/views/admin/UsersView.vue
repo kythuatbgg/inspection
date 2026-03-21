@@ -2,30 +2,30 @@
   <div class="space-y-4 md:space-y-6 pb-24 md:pb-0">
     <div class="hidden md:flex items-center justify-between gap-4">
       <div>
-        <h2 class="text-xl font-bold text-slate-900">Quản lý người dùng</h2>
-        <p class="text-sm text-slate-500 mt-1">Theo dõi tài khoản và phân quyền trong hệ thống.</p>
+        <h2 class="text-xl font-bold text-slate-900">{{ $t('user.manageTitle') }}</h2>
+        <p class="text-sm text-slate-500 mt-1">{{ $t('user.manageSubtitle') }}</p>
       </div>
       <button @click="openModal()" class="btn-primary min-h-[52px] px-5 flex items-center gap-2 text-sm font-semibold">
         <UserPlus class="w-5 h-5" />
-        Thêm người dùng
+        {{ $t('user.addNew') }}
       </button>
     </div>
 
     <div class="md:hidden flex flex-col gap-2">
       <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold tracking-tight text-slate-900">Người dùng</h2>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">{{ $t('user.title') }}</h2>
         <div class="flex shrink-0 flex-col items-center justify-center rounded-[12px] bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm">
-          <span>{{ pagination.total }} tài khoản</span>
+          <span>{{ $t('user.totalAccounts', { count: pagination.total }) }}</span>
         </div>
       </div>
-      <p class="text-sm leading-relaxed text-slate-500">Quản lý tài khoản và phân quyền thao tác.</p>
+      <p class="text-sm leading-relaxed text-slate-500">{{ $t('user.mobileSubtitle') }}</p>
     </div>
 
     <!-- Desktop Stats -->
     <div class="hidden lg:grid w-full grid-cols-5 gap-4">
       <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-5">
         <p class="text-[28px] leading-none font-bold text-slate-900">{{ stats.total }}</p>
-        <p class="text-sm text-slate-500 mt-2">Tổng</p>
+        <p class="text-sm text-slate-500 mt-2">{{ $t('common.total') }}</p>
       </div>
       <div class="bg-white rounded-lg border border-amber-100 shadow-sm p-5">
         <p class="text-[28px] leading-none font-bold text-warning">{{ stats.admin }}</p>
@@ -33,7 +33,7 @@
       </div>
       <div class="bg-white rounded-lg border border-sky-100 shadow-sm p-5">
         <p class="text-[28px] leading-none font-bold text-sky-600">{{ stats.manager }}</p>
-        <p class="text-sm text-slate-500 mt-2">Quản lý</p>
+        <p class="text-sm text-slate-500 mt-2">{{ $t('roles.manager') }}</p>
       </div>
       <div class="bg-white rounded-lg border border-emerald-100 shadow-sm p-5">
         <p class="text-[28px] leading-none font-bold text-emerald-600">{{ stats.inspector }}</p>
@@ -51,7 +51,7 @@
         <div class="absolute right-0 top-0 bottom-0 w-32 bg-primary-50/50 rounded-l-full -mr-16"></div>
         <div class="relative z-10 flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-500">Tổng tài khoản</p>
+            <p class="text-sm font-medium text-slate-500">{{ $t('user.totalAccountsLabel') }}</p>
             <p class="text-3xl font-bold tracking-tight text-slate-900 mt-1">{{ stats.total }}</p>
           </div>
           <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 shadow-inner">
@@ -66,7 +66,7 @@
           <p class="text-[22px] leading-none font-bold text-warning mt-1">{{ stats.admin }}</p>
         </div>
         <div class="bg-sky-50/50 rounded-[16px] border border-sky-100 p-3">
-          <p class="text-xs text-sky-600/70 font-semibold uppercase tracking-wider">Quản lý</p>
+          <p class="text-xs text-sky-600/70 font-semibold uppercase tracking-wider">{{ $t('roles.manager') }}</p>
           <p class="text-[22px] leading-none font-bold text-sky-700 mt-1">{{ stats.manager }}</p>
         </div>
         <div class="bg-emerald-50/50 rounded-[16px] border border-emerald-100 p-3">
@@ -89,7 +89,7 @@
           <input
             v-model="filters.search"
             type="text"
-            placeholder="Tìm tên, email hoặc tên đăng nhập..."
+            :placeholder="$t('user.searchPlaceholder')"
             class="w-full min-w-0 pl-11 pr-4 py-3 min-h-[52px] rounded-[16px] md:rounded-lg border border-transparent md:border-slate-300 bg-slate-50/80 md:bg-white text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
             @input="handleSearch"
           />
@@ -98,8 +98,8 @@
         <MobileBottomSheet
           v-model="filters.role"
           :options="roleFilterOptions"
-          label="Chọn vai trò"
-          placeholder="Tất cả vai trò"
+          :label="$t('user.selectRole')"
+          :placeholder="$t('user.allRoles')"
           container-class="w-full md:w-[220px]"
           select-class="rounded-[16px] md:rounded-lg border-transparent md:border-slate-300 bg-slate-50/80 md:bg-white focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
           trigger-class="bg-slate-50/80"
@@ -109,7 +109,7 @@
     </div>
 
     <div v-if="loading" class="bg-white rounded-[24px] md:rounded-lg border border-slate-200 shadow-sm p-10 text-center text-slate-500">
-      Đang tải danh sách người dùng...
+      {{ $t('user.loadingUsers') }}
     </div>
 
     <div v-else-if="error" class="bg-white rounded-[24px] md:rounded-lg border border-red-100 shadow-sm p-10 text-center">
@@ -121,10 +121,10 @@
         <table class="w-full">
           <thead class="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Người dùng</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Vai trò</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Ngày tạo</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Thao tác</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ $t('user.userColumn') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ $t('user.roleColumn') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ $t('common.createdAt') }}</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ $t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -149,10 +149,10 @@
               <td class="px-4 py-4">
                 <div class="flex items-center justify-end gap-2">
                   <button @click="openModal(user)" class="px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium text-primary-700 hover:bg-primary-50 transition-colors">
-                    Sửa
+                    {{ $t('common.edit') }}
                   </button>
                   <button @click="confirmDelete(user)" class="px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium text-danger hover:bg-danger/10 transition-colors">
-                    Xóa
+                    {{ $t('common.delete') }}
                   </button>
                 </div>
               </td>
@@ -161,7 +161,7 @@
         </table>
 
         <div v-if="users.length === 0" class="px-6 py-10 text-center text-slate-500">
-          Không có người dùng nào
+          {{ $t('user.noUsers') }}
         </div>
       </div>
 
@@ -194,7 +194,7 @@
               <span class="min-w-0 break-all text-right font-semibold text-slate-900">{{ user.email }}</span>
             </div>
             <div class="flex items-center justify-between gap-4 text-sm min-w-0">
-              <span class="text-slate-500 font-medium shrink-0">Ngày tạo</span>
+              <span class="text-slate-500 font-medium shrink-0">{{ $t('common.createdAt') }}</span>
               <span class="min-w-0 text-right font-semibold text-slate-900">{{ formatDate(user.created_at) }}</span>
             </div>
           </div>
@@ -202,27 +202,27 @@
           <div class="flex items-center gap-3 min-w-0">
             <button @click="openModal(user)" class="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[14px] border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 min-h-[48px] active:bg-slate-50 transition-colors">
               <FileEdit class="w-5 h-5 shrink-0 text-slate-400" />
-              <span class="truncate">Sửa</span>
+              <span class="truncate">{{ $t('common.edit') }}</span>
             </button>
             <button @click="confirmDelete(user)" class="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[14px] border border-red-100 bg-danger/10/70 px-3 text-sm font-semibold text-danger min-h-[48px] active:bg-red-100 transition-colors">
               <Trash2 class="w-5 h-5 shrink-0" />
-              <span class="truncate">Xóa</span>
+              <span class="truncate">{{ $t('common.delete') }}</span>
             </button>
           </div>
         </div>
 
         <div v-if="users.length === 0" class="flex flex-col items-center justify-center px-4 py-12 bg-white rounded-[24px] border border-slate-200 shadow-sm text-center">
           <UserPlus class="w-16 h-16 text-gray-300 mb-4" />
-          <p class="text-slate-600 font-medium">Không có người dùng nào</p>
-          <p class="text-sm text-slate-400 mt-1">Thử thay đổi bộ lọc hoặc thêm tài khoản mới.</p>
+          <p class="text-slate-600 font-medium">{{ $t('user.noUsers') }}</p>
+          <p class="text-sm text-slate-400 mt-1">{{ $t('user.noUsersHint') }}</p>
         </div>
       </div>
 
       <div v-if="pagination.last_page > 1" class="hidden md:flex bg-white rounded-lg shadow-sm border border-slate-200 p-6 items-center justify-between">
         <p class="text-sm text-slate-600 font-medium">
-          Hiển thị <span class="font-semibold text-slate-900">{{ pagination.from }}</span> -
-          <span class="font-semibold text-slate-900">{{ pagination.to }}</span> trong
-          <span class="font-semibold text-slate-900">{{ pagination.total }}</span> người dùng
+          {{ $t('common.showing') }} <span class="font-semibold text-slate-900">{{ pagination.from }}</span> -
+          <span class="font-semibold text-slate-900">{{ pagination.to }}</span> {{ $t('common.of') }}
+          <span class="font-semibold text-slate-900">{{ pagination.total }}</span> {{ $t('user.userItems') }}
         </p>
 
         <div class="flex items-center gap-1.5">
@@ -279,8 +279,8 @@
       <div v-if="pagination.last_page > 1" class="block md:hidden mt-8 mb-24">
         <div class="text-center mb-5">
           <div class="text-sm text-slate-500 font-medium">
-            Người dùng <span class="text-slate-900 font-bold">{{ pagination.from }}</span> - <span class="text-slate-900 font-bold">{{ pagination.to }}</span><br>
-            <span class="text-xs text-slate-400 mt-1 inline-block">trong tổng số {{ pagination.total }} tài khoản</span>
+            {{ $t('user.title') }} <span class="text-slate-900 font-bold">{{ pagination.from }}</span> - <span class="text-slate-900 font-bold">{{ pagination.to }}</span><br>
+            <span class="text-xs text-slate-400 mt-1 inline-block">{{ $t('user.inTotalAccounts', { total: pagination.total }) }}</span>
           </div>
         </div>
 
@@ -327,9 +327,9 @@
           <div class="flex items-start justify-between gap-4 mb-5">
             <div>
               <h3 class="text-xl font-bold text-slate-900">
-                {{ editingUser ? 'Sửa người dùng' : 'Thêm người dùng' }}
+                {{ editingUser ? $t('user.editUser') : $t('user.addUser') }}
               </h3>
-              <p class="text-sm text-slate-500 mt-1">Điền đầy đủ thông tin để lưu tài khoản.</p>
+              <p class="text-sm text-slate-500 mt-1">{{ $t('user.formHint') }}</p>
             </div>
             <button @click="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center active:bg-slate-200 transition-colors">
               <X class="w-5 h-5" />
@@ -338,12 +338,12 @@
 
           <form @submit.prevent="saveUser" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-2">Họ tên</label>
+              <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('user.fullName') }}</label>
               <input v-model="form.name" type="text" class="input-field min-h-[52px]" required>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-2">Tên đăng nhập</label>
+              <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('user.usernameField') }}</label>
               <input v-model="form.username" type="text" class="input-field min-h-[52px]" :disabled="editingUser" required>
             </div>
 
@@ -353,17 +353,17 @@
             </div>
 
             <div v-if="!editingUser">
-              <label class="block text-sm font-medium text-slate-700 mb-2">Mật khẩu</label>
+              <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('user.passwordField') }}</label>
               <input v-model="form.password" type="password" class="input-field min-h-[52px]" :required="!editingUser">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-2">Vai trò</label>
+              <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('user.roleField') }}</label>
               <MobileBottomSheet
                 v-model="form.role"
                 :options="roleOptions"
-                label="Chọn vai trò"
-                placeholder="Chọn vai trò"
+                :label="$t('user.selectRole')"
+                :placeholder="$t('user.selectRole')"
                 select-class="input-field"
               />
             </div>
@@ -374,11 +374,11 @@
 
             <div class="flex gap-3 pt-2 sticky bottom-0 bg-white pb-1">
               <button type="button" @click="closeModal()" class="btn-secondary flex-1 min-h-[52px]">
-                Hủy
+                {{ $t('common.cancel') }}
               </button>
               <button type="submit" :disabled="saving" class="btn-primary flex-1 min-h-[52px] flex items-center justify-center gap-2">
                 <Loader2 v-if="saving" class="w-4 h-4 animate-spin" />
-                <span v-else>Lưu</span>
+                <span v-else>{{ $t('common.save') }}</span>
               </button>
             </div>
           </form>
@@ -392,13 +392,13 @@
         <div class="w-12 h-12 rounded-full bg-danger/10 text-danger flex items-center justify-center mb-4">
           <Trash2 class="w-6 h-6" />
         </div>
-        <h3 class="text-lg font-bold text-slate-900 mb-2">Xác nhận xóa</h3>
+        <h3 class="text-lg font-bold text-slate-900 mb-2">{{ $t('common.confirmDeleteTitle') }}</h3>
         <p class="text-slate-600 mb-5">
-          Bạn có chắc muốn xóa người dùng <strong>{{ deletingUser?.name }}</strong>?
+          {{ $t('user.deleteConfirm') }} <strong>{{ deletingUser?.name }}</strong>?
         </p>
         <div class="flex gap-3">
           <button @click="showDeleteConfirm = false" class="btn-secondary flex-1 min-h-[52px]">
-            Hủy
+            {{ $t('common.cancel') }}
           </button>
           <button @click="deleteUser" :disabled="deleting" class="flex-1 min-h-[52px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
             <Loader2 v-if="deleting" class="w-4 h-4 animate-spin" />
@@ -414,23 +414,26 @@
 import { Trash2, X, UserPlus, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, FileEdit, Search, Users } from 'lucide-vue-next'
 
 import { computed, ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import userService from '@/services/userService.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 
-const roleFilterOptions = [
-  { value: '', label: 'Tất cả vai trò' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'manager', label: 'Quản lý' },
-  { value: 'inspector', label: 'Inspector' },
-  { value: 'staff', label: 'Staff' }
-]
+const { t } = useI18n()
 
-const roleOptions = [
-  { value: 'admin', label: 'Admin' },
-  { value: 'manager', label: 'Quản lý' },
-  { value: 'inspector', label: 'Inspector' },
-  { value: 'staff', label: 'Staff' }
-]
+const roleFilterOptions = computed(() => [
+  { value: '', label: t('user.allRoles') },
+  { value: 'admin', label: t('roles.admin') },
+  { value: 'manager', label: t('roles.manager') },
+  { value: 'inspector', label: t('roles.inspector') },
+  { value: 'staff', label: t('roles.staff') }
+])
+
+const roleOptions = computed(() => [
+  { value: 'admin', label: t('roles.admin') },
+  { value: 'manager', label: t('roles.manager') },
+  { value: 'inspector', label: t('roles.inspector') },
+  { value: 'staff', label: t('roles.staff') }
+])
 
 const loading = ref(true)
 const error = ref(null)
@@ -470,10 +473,10 @@ const getRoleClass = (role) => {
 
 const getRoleLabel = (role) => {
   const labels = {
-    admin: 'Admin',
-    manager: 'Quản lý',
-    inspector: 'Inspector',
-    staff: 'Staff'
+    admin: t('roles.admin'),
+    manager: t('roles.manager'),
+    inspector: t('roles.inspector'),
+    staff: t('roles.staff')
   }
   return labels[role] || role
 }
@@ -512,7 +515,7 @@ const fetchUsers = async () => {
       total: response.total || 0
     }
   } catch (e) {
-    error.value = 'Không thể tải dữ liệu'
+    error.value = t('common.errorLoadData')
     console.error(e)
   } finally {
     loading.value = false
@@ -594,7 +597,7 @@ const saveUser = async () => {
     closeModal()
     await Promise.all([fetchUsers(), fetchStats()])
   } catch (e) {
-    formError.value = e.response?.data?.message || 'Có lỗi xảy ra'
+    formError.value = e.response?.data?.message || t('common.errorOccurred')
   } finally {
     saving.value = false
   }
@@ -619,7 +622,7 @@ const deleteUser = async () => {
 
     await Promise.all([fetchUsers(), fetchStats()])
   } catch (e) {
-    alert(e.response?.data?.message || 'Có lỗi xảy ra')
+    alert(e.response?.data?.message || t('common.errorOccurred'))
   } finally {
     deleting.value = false
   }

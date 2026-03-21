@@ -9,7 +9,7 @@
           <div class="rounded-lg bg-white border border-slate-200 p-5 shadow-sm">
             <button @click="goBack" class="flex items-center gap-1.5 text-sm text-primary-600 font-medium mb-3 -ml-1 hover:text-primary-700 transition-colors">
               <ChevronLeft class="w-4 h-4" />
-              Quay lại
+              {{ $t('common.back') }}
             </button>
             <h2 class="text-lg font-bold text-slate-900 leading-tight font-heading">{{ batch.name }}</h2>
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 text-[11px] text-slate-500 uppercase tracking-widest font-medium">
@@ -27,7 +27,7 @@
           <!-- Progress -->
           <div class="rounded-lg bg-white border border-slate-200 p-5 shadow-sm">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs text-slate-500 font-bold uppercase tracking-widest">Tiến độ tổng</span>
+              <span class="text-xs text-slate-500 font-bold uppercase tracking-widest">{{ $t('common.overallProgress') }}</span>
               <span class="text-lg font-bold tracking-tight" :class="progress.pct === 100 ? 'text-success' : 'text-primary-600'">
                 {{ progress.done }}/{{ progress.total }}
               </span>
@@ -39,18 +39,18 @@
                 :style="{ width: progress.pct + '%' }"
               ></div>
             </div>
-            <p class="text-[11px] text-slate-500 mt-2 font-medium uppercase tracking-widest">{{ progress.pct }}% Hoàn thành</p>
+            <p class="text-[11px] text-slate-500 mt-2 font-medium uppercase tracking-widest">{{ $t('common.percentCompleted', { pct: progress.pct }) }}</p>
           </div>
 
           <!-- Cabinet List -->
           <div>
-            <h3 class="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider font-heading">Danh sách tủ cáp ({{ planDetails.length }})</h3>
+            <h3 class="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider font-heading">{{ $t('common.cabinetList', { count: planDetails.length }) }}</h3>
 
             <div v-if="planDetails.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
               <div class="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
                 <Server class="w-7 h-7 text-slate-400" />
               </div>
-              <p class="font-semibold text-slate-800">Chưa có tủ nào</p>
+              <p class="font-semibold text-slate-800">{{ $t('common.noCabinets') }}</p>
             </div>
 
             <div v-else class="space-y-3">
@@ -68,11 +68,11 @@
                       <span
                         v-if="plan.status === 'done'"
                         class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-success/10 text-success uppercase tracking-widest"
-                      >Đã KT</span>
+                      >{{ $t('common.inspected') }}</span>
                       <span
                         v-else
                         class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-warning/10 text-warning uppercase tracking-widest"
-                      >Chưa KT</span>
+                      >{{ $t('common.notInspected') }}</span>
                     </div>
                     <p v-if="plan.cabinet?.bts_site" class="text-xs text-slate-500 mt-1.5 font-medium truncate">{{ plan.cabinet.bts_site }}</p>
                   </div>
@@ -85,12 +85,12 @@
                     class="text-[10px] font-bold px-2.5 py-1.5 rounded-md tracking-widest uppercase"
                     :class="plan.inspection.final_result === 'PASS' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'"
                   >
-                    {{ plan.inspection.final_result === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
+                    {{ plan.inspection.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
                   </span>
-                  <span class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-primary-50 text-primary-700 tracking-widest uppercase">Điểm: {{ plan.inspection.total_score }}</span>
+                  <span class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-primary-50 text-primary-700 tracking-widest uppercase">{{ $t('common.score') }} {{ plan.inspection.total_score }}</span>
                   <span v-if="plan.inspection.critical_errors_count > 0" class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-danger/10 text-danger flex items-center gap-1.5 tracking-widest uppercase">
                     <AlertTriangle class="w-3.5 h-3.5" />
-                    {{ plan.inspection.critical_errors_count }} lỗi
+                    {{ plan.inspection.critical_errors_count }} {{ $t('common.errors') }}
                   </span>
                 </div>
               </button>
@@ -105,8 +105,8 @@
 
         <!-- Error -->
         <div v-else-if="!batch" class="flex flex-col items-center justify-center py-14 text-center">
-          <p class="text-slate-600 font-medium">Không thể tải dữ liệu lô kiểm tra.</p>
-          <button @click="fetchData" class="mt-4 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">Thử lại</button>
+          <p class="text-slate-600 font-medium">{{ $t('common.cannotLoadBatch') }}</p>
+          <button @click="fetchData" class="mt-4 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">{{ $t('inspector.retry') }}</button>
         </div>
       </div>
     </div>
@@ -121,8 +121,8 @@
         <div class="w-16 h-16 rounded-lg bg-slate-200 shadow-sm flex items-center justify-center mb-5 border border-slate-300">
           <Server class="w-8 h-8 text-slate-500" />
         </div>
-        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">Chọn một tủ cáp</h3>
-        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Nhấn vào một tủ cáp trong danh sách để bắt đầu kiểm tra hoặc xem chi tiết lỗi.</p>
+        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">{{ $t('common.selectCabinet') }}</h3>
+        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">{{ $t('common.selectCabinetHint') }}</p>
       </div>
     </div>
   </div>

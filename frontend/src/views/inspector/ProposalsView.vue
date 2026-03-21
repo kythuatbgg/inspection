@@ -11,12 +11,12 @@
         <!-- Header -->
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between py-1">
           <div>
-            <h2 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight font-heading">Đề xuất kiểm tra</h2>
-            <p class="text-xs text-slate-500 mt-1">Quản lý và theo dõi các lô đề xuất</p>
+            <h2 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight font-heading">{{ $t('inspector.proposals') }}</h2>
+            <p class="text-xs text-slate-500 mt-1">{{ $t('inspector.proposalsSubtitle') }}</p>
           </div>
           <!-- Desktop Add Button (Hidden on Mobile) -->
           <button @click="showForm = true" class="hidden md:flex items-center justify-center gap-1.5 bg-primary-600 hover:bg-primary-700 text-white px-4 h-9 rounded-lg text-sm font-medium transition-all shadow-sm">
-            <Plus class="w-4 h-4" /> Tạo đề xuất
+            <Plus class="w-4 h-4" /> {{ $t('inspector.createProposal') }}
           </button>
         </div>
 
@@ -52,8 +52,8 @@
           <div class="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
             <ClipboardList class="w-7 h-7 text-slate-400" />
           </div>
-          <p class="font-semibold text-slate-800">Không có đề xuất nào</p>
-          <p class="text-sm text-slate-500 mt-1">{{ activeTab === 'pending' ? 'Chưa có dữ liệu chờ duyệt' : 'Bộ lọc rỗng' }}</p>
+          <p class="font-semibold text-slate-800">{{ $t('inspector.noProposals') }}</p>
+          <p class="text-sm text-slate-500 mt-1">{{ activeTab === 'pending' ? $t('inspector.noPendingData') : $t('inspector.emptyFilter') }}</p>
         </div>
 
         <!-- Batch List -->
@@ -70,8 +70,8 @@
                 <div class="flex items-center gap-2">
                   <h4 class="font-bold text-slate-900 truncate font-heading tracking-tight">{{ batch.name }}</h4>
                 </div>
-                <p v-if="batch.approval_status === 'rejected'" class="text-xs text-danger font-medium mt-1.5 truncate">Lý do từ chối: {{ batch.approval_note }}</p>
-                <p v-else class="text-xs text-slate-500 mt-1 truncate font-medium">Đề xuất cập nhật lúc {{ formatDate(batch.updated_at || batch.created_at) }}</p>
+                <p v-if="batch.approval_status === 'rejected'" class="text-xs text-danger font-medium mt-1.5 truncate">{{ $t('inspector.rejectionReason') }} {{ batch.approval_note }}</p>
+                <p v-else class="text-xs text-slate-500 mt-1 truncate font-medium">{{ $t('inspector.proposalUpdated') }} {{ formatDate(batch.updated_at || batch.created_at) }}</p>
               </div>
               
               <div class="shrink-0">
@@ -111,8 +111,8 @@
         <div class="w-16 h-16 rounded-lg bg-slate-200 shadow-sm flex items-center justify-center mb-5 border border-slate-300">
           <ClipboardEdit class="w-8 h-8 text-slate-500" />
         </div>
-        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">Quản lý Đề xuất</h3>
-        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Chọn một đề xuất ở hệ thống bên trái hoặc tạo mới để bắt đầu.</p>
+        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">{{ $t('inspector.manageProposals') }}</h3>
+        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">{{ $t('inspector.manageProposalsHint') }}</p>
       </div>
     </div>
 
@@ -133,6 +133,7 @@
 import { Plus, Calendar, ListTodo, ClipboardList, ClipboardEdit, Loader2 } from 'lucide-vue-next'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 import ProposalFormModal from '@/components/inspector/ProposalFormModal.vue'
@@ -140,6 +141,7 @@ import ProposalFormModal from '@/components/inspector/ProposalFormModal.vue'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const loading = ref(true)
 const showForm = ref(false)
@@ -147,11 +149,11 @@ const batches = ref([])
 const activeTab = ref('pending')
 const creatorId = ref(null)
 
-const tabs = [
-  { label: 'Chờ duyệt', value: 'pending' },
-  { label: 'Đã duyệt', value: 'approved' },
-  { label: 'Từ chối', value: 'rejected' }
-]
+const tabs = computed(() => [
+  { label: t('inspector.pendingApproval'), value: 'pending' },
+  { label: t('inspector.approved'), value: 'approved' },
+  { label: t('inspector.rejected'), value: 'rejected' }
+])
 
 const filteredBatches = computed(() => {
   return batches.value.filter(b => b.approval_status === activeTab.value)
@@ -162,8 +164,8 @@ const getCount = (status) => {
 }
 
 const getStatusText = (status) => {
-  const map = { pending: 'Chờ duyệt', approved: 'Đã duyệt', rejected: 'Từ chối' }
-  return map[status] || status
+  const map = { pending: 'inspector.pendingApproval', approved: 'inspector.approved', rejected: 'inspector.rejected' }
+  return t(map[status] || 'status.unknown')
 }
 
 const formatDate = (dateStr) => {

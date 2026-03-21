@@ -3,10 +3,10 @@
     <!-- LÔ KIỂM TRA -->
     <div v-if="!loading && !error" class="space-y-2">
       <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-slate-900 tracking-tight font-heading">Thống kê Lô kiểm tra</h2>
+        <h2 class="text-lg font-semibold text-slate-900 tracking-tight font-heading">{{ $t('dashboard.batchStats') }}</h2>
         <button @click="fetchData" class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
           <RotateCcw class="w-4 h-4" />
-          Làm mới
+          {{ $t('common.refresh') }}
         </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -15,7 +15,7 @@
         <div class="card p-5 hover:shadow-md transition-shadow bg-white border border-slate-200 rounded-lg flex flex-col justify-between">
           <div class="flex items-start justify-between mb-4">
             <div>
-              <p class="text-[11px] md:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1.5">Tiến độ thi công Lô</p>
+              <p class="text-[11px] md:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1.5">{{ $t('dashboard.batchProgress') }}</p>
               <div class="flex items-baseline gap-2">
                 <p class="text-3xl md:text-4xl font-bold text-slate-900 font-heading tracking-tight">{{ stats.batches.completed }}</p>
                 <span class="text-sm md:text-base font-bold text-slate-400 font-heading tracking-tight">/ {{ stats.batches.total }}</span>
@@ -28,7 +28,7 @@
           <!-- Progress -->
           <div class="w-full mt-auto">
             <div class="flex items-center justify-between text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">
-              <span>Tỷ lệ hoàn thành</span>
+              <span>{{ $t('dashboard.completionRate') }}</span>
               <span class="text-success">{{ stats.batches.completed_percent }}%</span>
             </div>
             <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -41,10 +41,10 @@
         <div class="card p-5 hover:shadow-md transition-shadow bg-white border border-slate-200 rounded-lg">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-[11px] md:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1.5">Chờ phê duyệt</p>
+              <p class="text-[11px] md:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1.5">{{ $t('dashboard.waitingApproval') }}</p>
               <p class="text-3xl md:text-4xl font-bold text-slate-900 font-heading tracking-tight">{{ stats.batches.waiting_approval }}</p>
               <div class="mt-3">
-                <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-md">Đã xong tủ</span>
+                <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-md">{{ $t('dashboard.cabinetsDone') }}</span>
               </div>
             </div>
             <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
@@ -57,7 +57,7 @@
 
     <!-- TỦ CÁP (MẪU KIỂM TRA) -->
     <div v-if="!loading && !error">
-      <h2 class="text-lg font-semibold text-slate-900 mb-3 tracking-tight font-heading mt-2">Thống kê Tủ cáp</h2>
+      <h2 class="text-lg font-semibold text-slate-900 mb-3 tracking-tight font-heading mt-2">{{ $t('dashboard.cabinetStats') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Tổng mẫu tủ -->
         <div class="card p-4 hover:shadow-md transition-shadow bg-white border border-slate-200 rounded-lg flex flex-col justify-center">
@@ -67,7 +67,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-slate-900 font-heading tracking-tight">{{ stats.plans.total }}</p>
-              <p class="text-sm font-medium text-slate-500">Mẫu tủ trên tuyến</p>
+              <p class="text-sm font-medium text-slate-500">{{ $t('dashboard.totalCabinetsOnRoute') }}</p>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-success font-heading tracking-tight">{{ stats.plans.passed }}</p>
-              <p class="text-sm font-medium text-slate-500">Kết quả <span class="font-bold text-success uppercase text-[11px] tracking-widest ml-0.5">Đạt</span></p>
+              <p class="text-sm font-medium text-slate-500">{{ $t('dashboard.resultPass') }} <span class="font-bold text-success uppercase text-[11px] tracking-widest ml-0.5">{{ $t('status.pass') }}</span></p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-danger font-heading tracking-tight">{{ stats.plans.failed }}</p>
-              <p class="text-sm font-medium text-slate-500">Kết quả <span class="font-bold text-danger uppercase text-[11px] tracking-widest ml-0.5">Lỗi</span></p>
+              <p class="text-sm font-medium text-slate-500">{{ $t('dashboard.resultFail') }} <span class="font-bold text-danger uppercase text-[11px] tracking-widest ml-0.5">{{ $t('status.failed') }}</span></p>
             </div>
           </div>
         </div>
@@ -122,13 +122,13 @@
     <!-- Recent Batches -->
     <div class="card bg-white border border-slate-200 rounded-lg shadow-sm">
       <div class="p-4 border-b border-slate-200">
-        <h2 class="text-lg font-semibold text-slate-900 font-heading tracking-tight">Lô kiểm tra gần đây</h2>
+        <h2 class="text-lg font-semibold text-slate-900 font-heading tracking-tight">{{ $t('dashboard.recentBatches') }}</h2>
       </div>
 
       <!-- Loading -->
       <div v-if="loading" class="p-8 flex flex-col items-center text-center text-slate-500">
         <Loader2 class="w-8 h-8 text-primary-500 animate-spin mb-3" />
-        <p>Đang tải dữ liệu...</p>
+        <p>{{ $t('common.loadingData') }}</p>
       </div>
 
       <!-- Error -->
@@ -162,7 +162,7 @@
         <!-- Empty -->
         <div v-if="recentBatches.length === 0" class="p-8 text-center text-slate-500">
           <FileStack class="w-10 h-10 mx-auto text-slate-300 mb-3" />
-          <p class="font-medium">Chưa có lô kiểm tra nào</p>
+          <p class="font-medium">{{ $t('dashboard.noBatches') }}</p>
         </div>
       </div>
     </div>
@@ -173,8 +173,13 @@
 import { Clock, XCircle, ShieldCheck, FileStack, ListTodo, Check, Loader2, RotateCcw } from 'lucide-vue-next'
 
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
+
+const router = useRouter()
+const { t } = useI18n()
 
 const loading = ref(true)
 const error = ref(null)
@@ -207,13 +212,13 @@ const getStatusClass = (status) => {
 }
 
 const getStatusLabel = (status) => {
-  const labels = {
-    completed: 'Hoàn thành',
-    active: 'Đang kiểm tra',
-    pending: 'Chờ phân công',
-    in_progress: 'Đang kiểm tra',
+  const map = {
+    completed: 'status.completed',
+    active: 'status.active',
+    pending: 'status.pending',
+    in_progress: 'status.in_progress',
   }
-  return labels[status] || 'Không xác định'
+  return t(map[status] || 'status.unknown')
 }
 
 const formatDate = (dateStr) => {
@@ -252,7 +257,7 @@ const fetchData = async () => {
 
     recentBatches.value = data.recent_batches || []
   } catch (e) {
-    error.value = 'Không thể kết nối máy chủ dữ liệu'
+    error.value = t('common.errorConnect')
     console.error(e)
   } finally {
     loading.value = false

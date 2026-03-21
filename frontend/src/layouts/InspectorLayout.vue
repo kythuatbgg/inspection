@@ -23,12 +23,12 @@
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
           >
             <component :is="item.icon" class="w-5 h-5 mr-3" :class="isActive(item.path) ? 'text-primary-600' : 'text-slate-400'" :stroke-width="2" />
-            <span class="text-sm font-medium">{{ item.label }}</span>
+            <span class="text-sm font-medium">{{ $t(item.labelKey) }}</span>
           </router-link>
         </nav>
 
         <!-- Status and Logout -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50">
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
               <span class="text-primary-700 font-semibold">{{ userName.charAt(0) }}</span>
@@ -37,13 +37,18 @@
               <p class="text-sm font-semibold text-slate-900 truncate tracking-tight">{{ userName }}</p>
               <div class="flex items-center gap-1.5 mt-0.5">
                 <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
-                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">{{ isOnline ? 'Online' : 'Offline' }}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">{{ isOnline ? $t('common.online') : $t('common.offline') }}</span>
               </div>
             </div>
             <button @click="handleLogout" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
               <LogOut class="w-5 h-5" />
             </button>
           </div>
+          <!-- Language Switcher -->
+          <button @click="toggleLanguage" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
+            <Languages class="w-4 h-4 text-slate-400" />
+            <span>{{ currentLocale === 'vi' ? 'Tiếng Việt' : 'English' }}</span>
+          </button>
         </div>
       </aside>
 
@@ -65,7 +70,7 @@
                 : 'bg-danger/5 border-danger/20 text-danger'"
             >
               <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
-              <span class="text-[10px] font-bold uppercase tracking-wider">{{ isOnline ? 'Online' : 'Offline' }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider">{{ isOnline ? $t('common.online') : $t('common.offline') }}</span>
             </div>
           </div>
 
@@ -92,13 +97,13 @@
               <!-- Active indicator line -->
               <span v-if="isActive(item.path)" class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-primary-600"></span>
               <component :is="item.icon" class="w-[22px] h-[22px]" :stroke-width="isActive(item.path) ? 2.5 : 1.8" />
-              <span class="text-[10px] font-semibold tracking-wide">{{ item.label }}</span>
+              <span class="text-[10px] font-semibold tracking-wide">{{ $t(item.labelKey) }}</span>
             </router-link>
 
             <!-- Logout -->
             <button @click="handleLogout" class="flex flex-col items-center justify-center flex-1 gap-0.5 text-slate-400 active:text-slate-600 transition-colors">
               <LogOut class="w-[22px] h-[22px]" :stroke-width="1.8" />
-              <span class="text-[10px] font-semibold tracking-wide">Thoát</span>
+              <span class="text-[10px] font-semibold tracking-wide">{{ $t('nav.logout') }}</span>
             </button>
           </div>
         </nav>
@@ -111,31 +116,37 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit } from 'lucide-vue-next'
+import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { t, locale: currentLocale } = useI18n()
 
 const isOnline = ref(navigator.onLine)
 
 const navItems = [
-  { path: '/inspector', label: 'Trang chủ', icon: Home },
-  { path: '/inspector/tasks', label: 'Lô của tôi', icon: ListTodo },
-  { path: '/inspector/proposals', label: 'Đề xuất', icon: ClipboardEdit }
+  { path: '/inspector', labelKey: 'nav.home', icon: Home },
+  { path: '/inspector/tasks', labelKey: 'nav.myBatches', icon: ListTodo },
+  { path: '/inspector/proposals', labelKey: 'nav.proposals', icon: ClipboardEdit }
 ]
 
 const pageTitle = computed(() => {
-  if (route.path === '/inspector') return 'Tổng quan'
-  if (route.path.startsWith('/inspector/batch/')) return 'Chi tiết lô'
-  if (route.path === '/inspector/tasks') return 'Lô của tôi'
-  if (route.path === '/inspector/proposals') return 'Đề xuất của tôi'
-  if (route.path.startsWith('/inspector/inspect/')) return 'Kiểm tra'
+  if (route.path === '/inspector') return t('inspector.overview')
+  if (route.path.startsWith('/inspector/batch/')) return t('inspector.batchDetail')
+  if (route.path === '/inspector/tasks') return t('inspector.myBatches')
+  if (route.path === '/inspector/proposals') return t('inspector.myProposals')
+  if (route.path.startsWith('/inspector/inspect/')) return t('inspector.inspection')
   return 'FBB Inspection'
 })
 
-const userName = computed(() => authStore.user?.name || 'Nhân viên')
+const userName = computed(() => authStore.user?.name || t('inspector.defaultUser'))
+
+const toggleLanguage = () => {
+  authStore.setLanguage(currentLocale.value === 'vi' ? 'en' : 'vi')
+}
 
 const isActive = (path) => {
   if (path === '/inspector') {

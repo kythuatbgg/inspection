@@ -27,8 +27,9 @@ api.defaults.headers.common['Content-Type'] = 'application/json'
 api.defaults.headers.common['Accept'] = 'application/json'
 
 import { showGlobalLoading, hideGlobalLoading } from '@/composables/useLoading.js'
+import { getI18nLocale } from '@/i18n'
 
-// Request interceptor - Add auth token
+// Request interceptor - Add auth token + language header
 api.interceptors.request.use(
   (config) => {
     // Only show loading for requests that don't silently happen in background
@@ -40,6 +41,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    config.headers['Accept-Language'] = getI18nLocale()
     return config
   },
   (error) => {

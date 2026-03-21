@@ -22,24 +22,29 @@
           @click="sidebarOpen = false"
         >
           <component :is="item.icon" class="w-5 h-5 mr-3" :class="isActive(item.path) ? 'text-primary-600' : 'text-slate-400'" />
-          <span class="text-sm font-medium">{{ item.label }}</span>
+          <span class="text-sm font-medium">{{ $t(item.labelKey) }}</span>
         </router-link>
       </nav>
 
       <!-- User Info -->
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50">
+      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
             <span class="text-primary-700 font-semibold">{{ userInitials }}</span>
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-slate-900 truncate">{{ userName }}</p>
-            <p class="text-xs text-slate-500 font-medium">Quản lý</p>
+            <p class="text-xs text-slate-500 font-medium">{{ $t('roles.' + (authStore.user?.role || 'admin')) }}</p>
           </div>
           <button @click="handleLogout" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-lg transition-colors">
             <LogOut class="w-5 h-5" />
           </button>
         </div>
+        <!-- Language Switcher -->
+        <button @click="toggleLanguage" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
+          <Languages class="w-4 h-4 text-slate-400" />
+          <span>{{ currentLocale === 'vi' ? 'Tiếng Việt' : 'English' }}</span>
+        </button>
       </div>
     </aside>
 
@@ -67,7 +72,7 @@
           <!-- Online Status -->
           <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border" :class="isOnline ? 'bg-success/5 border-success/20 text-success' : 'bg-danger/5 border-danger/20 text-danger'">
             <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
-            <span class="text-sm font-medium">{{ isOnline ? 'Online' : 'Offline' }}</span>
+            <span class="text-sm font-medium">{{ isOnline ? $t('common.online') : $t('common.offline') }}</span>
           </div>
         </div>
       </header>
@@ -83,28 +88,36 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings, ClipboardList } from 'lucide-vue-next'
+import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings, ClipboardList, Languages } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
+const { locale: currentLocale } = useI18n()
+
 const sidebarOpen = ref(false)
 const isOnline = ref(navigator.onLine)
 const navItems = [
-  { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/admin/batches', label: 'Lô kiểm tra', icon: FileStack },
-  { path: '/admin/cabinets', label: 'Tủ cáp', icon: Server },
-  { path: '/admin/checklists', label: 'Checklist', icon: ClipboardList },
-  { path: '/admin/users', label: 'Người dùng', icon: Users },
-  { path: '/admin/settings', label: 'Cài đặt', icon: Settings }
+  { path: '/admin', labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { path: '/admin/batches', labelKey: 'nav.batches', icon: FileStack },
+  { path: '/admin/cabinets', labelKey: 'nav.cabinets', icon: Server },
+  { path: '/admin/checklists', labelKey: 'nav.checklists', icon: ClipboardList },
+  { path: '/admin/users', labelKey: 'nav.users', icon: Users },
+  { path: '/admin/settings', labelKey: 'nav.settings', icon: Settings }
 ]
 
+const { t } = useI18n()
 const pageTitle = computed(() => {
   const currentItem = navItems.find(item => isActive(item.path))
-  return currentItem?.label || 'Dashboard'
+  return currentItem ? t(currentItem.labelKey) : 'Dashboard'
 })
+
+const toggleLanguage = () => {
+  authStore.setLanguage(currentLocale.value === 'vi' ? 'en' : 'vi')
+}
 
 const userName = computed(() => authStore.user?.name || 'Admin')
 const userInitials = computed(() => {

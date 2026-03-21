@@ -7,8 +7,8 @@
 
         <!-- Header -->
         <div>
-          <h2 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight font-heading">Lô của tôi</h2>
-          <p class="text-xs text-slate-500 mt-1">Danh sách lô đã được giao</p>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight font-heading">{{ $t('inspector.myBatches') }}</h2>
+          <p class="text-xs text-slate-500 mt-1">{{ $t('inspector.assignedBatches') }}</p>
         </div>
 
         <!-- Segmented Filter -->
@@ -40,13 +40,13 @@
 
         <!-- Error -->
         <div v-else-if="errorMessage" class="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-          <p class="font-semibold text-red-700">Không thể tải danh sách lô</p>
+          <p class="font-semibold text-red-700">{{ $t('inspector.cannotLoadBatches') }}</p>
           <p class="mt-1 text-sm text-red-600">{{ errorMessage }}</p>
           <button
             @click="fetchData()"
             class="mt-4 inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
           >
-            Thử lại
+            {{ $t('inspector.retry') }}
           </button>
         </div>
 
@@ -64,7 +64,7 @@
                 <div class="flex items-center gap-2">
                   <h4 class="font-bold text-slate-900 font-heading tracking-tight">{{ batch.name }}</h4>
                 </div>
-                <p class="text-xs text-slate-500 mt-1 truncate">{{ batch.checklist?.name || 'Checklist tiêu chuẩn' }}</p>
+                <p class="text-xs text-slate-500 mt-1 truncate">{{ batch.checklist?.name || $t('inspector.standardChecklist') }}</p>
               </div>
               <div class="shrink-0 text-right">
                 <span
@@ -81,7 +81,7 @@
             <!-- Progress -->
             <div class="mt-3">
               <div class="flex items-center justify-between text-[11px] mb-1.5">
-                <span class="text-slate-500 uppercase tracking-widest font-medium">Tiến độ</span>
+                <span class="text-slate-500 uppercase tracking-widest font-medium">{{ $t('inspector.progress') }}</span>
                 <span class="font-bold text-slate-700">{{ batchProgress(batch) }}%</span>
               </div>
               <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
@@ -107,9 +107,9 @@
             <div class="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
               <FileStack class="w-7 h-7 text-slate-400" />
             </div>
-            <p class="font-semibold text-slate-800">Không có lô nào</p>
+            <p class="font-semibold text-slate-800">{{ $t('inspector.noBatchesInTab') }}</p>
             <p class="text-sm text-slate-500 mt-1">
-              {{ activeTab === 'active' ? 'Chưa có lô đang xử lý' : 'Không có lô nào ở trạng thái này' }}
+              {{ activeTab === 'active' ? $t('inspector.noActiveBatches') : $t('inspector.noStatusBatches') }}
             </p>
           </div>
         </div>
@@ -123,10 +123,10 @@
             :class="currentPage === 1 ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
           >
             <ChevronLeft class="w-4 h-4" />
-            <span class="hidden sm:inline">Trước</span>
+            <span class="hidden sm:inline">{{ $t('inspector.prev') }}</span>
           </button>
           <div class="flex items-center gap-1.5 text-sm">
-            <span class="text-slate-500">Trang</span>
+            <span class="text-slate-500">{{ $t('common.page') }}</span>
             <span class="font-bold text-slate-900">{{ currentPage }}</span>
             <span class="text-slate-400">/</span>
             <span class="font-bold text-slate-900">{{ totalPages }}</span>
@@ -137,7 +137,7 @@
             class="flex items-center gap-1.5 min-h-[40px] px-3 md:px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm"
             :class="currentPage >= totalPages ? 'bg-slate-100 text-slate-400' : 'bg-primary-600 text-white hover:bg-primary-700'"
           >
-            <span class="hidden sm:inline">Sau</span>
+            <span class="hidden sm:inline">{{ $t('inspector.next') }}</span>
             <ChevronRight class="w-4 h-4" />
           </button>
         </div>
@@ -154,8 +154,8 @@
         <div class="w-16 h-16 rounded-lg bg-slate-200 shadow-sm flex items-center justify-center mb-5 border border-slate-300">
           <FileStack class="w-8 h-8 text-slate-500" />
         </div>
-        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">Chọn một lô</h3>
-        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">Nhấn vào một lô bên trái để xem danh sách tủ và tiến hành kiểm tra.</p>
+        <h3 class="font-bold text-slate-900 text-xl tracking-tight font-heading">{{ $t('inspector.selectBatch') }}</h3>
+        <p class="text-sm text-slate-500 mt-2 max-w-xs leading-relaxed">{{ $t('inspector.selectBatchHint') }}</p>
       </div>
     </div>
   </div>
@@ -166,10 +166,12 @@ import { Calendar, ChevronLeft, ChevronRight, FileStack, Loader2 } from 'lucide-
 
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import batchService from '@/services/batchService.js'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 const isDetailOpen = computed(() => !!route.params.id)
 const isActiveBatch = (id) => route.params.id == id
@@ -184,10 +186,10 @@ const perPage = 10
 const totalPages = ref(1)
 const totalItems = ref(0)
 
-const tabs = [
-  { label: 'Đang KT', value: 'active' },
-  { label: 'Hoàn thành', value: 'completed' }
-]
+const tabs = computed(() => [
+  { label: t('inspector.inspecting'), value: 'active' },
+  { label: t('status.completed'), value: 'completed' }
+])
 
 watch(activeTab, () => {
   fetchData()
@@ -198,8 +200,8 @@ const getCount = (tab) => {
 }
 
 const statusLabel = (status) => {
-  const map = { pending: 'Chờ', active: 'Đang KT', completed: 'Hoàn thành' }
-  return map[status] || status
+  const map = { pending: 'inspector.waiting', active: 'inspector.inspecting', completed: 'status.completed' }
+  return t(map[status] || 'status.unknown')
 }
 
 const batchProgress = (batch) => {
@@ -257,7 +259,7 @@ const fetchData = async (page = 1) => {
     }
   } catch (e) {
     console.error('Failed to fetch batches:', e)
-    errorMessage.value = e.response?.data?.message || 'Không thể tải danh sách lô.'
+    errorMessage.value = e.response?.data?.message || t('inspector.cannotLoadBatchList')
     batches.value = []
   } finally {
     loading.value = false
