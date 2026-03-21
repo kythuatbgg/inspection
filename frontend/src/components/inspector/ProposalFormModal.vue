@@ -9,7 +9,7 @@
         <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-[28px] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden" @click.stop>
           <!-- Header -->
           <div class="flex items-center justify-between px-5 pt-5 pb-3 md:px-6 md:pt-6 border-b border-slate-200">
-            <h2 class="text-lg font-bold text-slate-900">Tạo đề xuất mới</h2>
+            <h2 class="text-lg font-bold text-slate-900">{{ $t('inspector.createProposal') }}</h2>
             <button @click="close" class="w-10 h-10 rounded-xl flex items-center justify-center active:bg-slate-100 transition-colors">
               <X class="w-5 h-5 text-slate-500" />
             </button>
@@ -19,7 +19,7 @@
           <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto overscroll-contain p-5 md:p-6 space-y-5">
             <!-- Tên lô -->
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5">Tên kế hoạch đề xuất <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ $t('batch.proposalName') }} <span class="text-red-500">*</span></label>
               <input
                 v-model="form.name"
                 type="text"
@@ -31,7 +31,7 @@
 
             <!-- Checklist -->
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5">Checklist áp dụng <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ $t('batch.checklistApplied') }} <span class="text-red-500">*</span></label>
               <MobileBottomSheet
                 v-model="form.checklist_id"
                 :options="checklistOptions"
@@ -44,7 +44,7 @@
             <!-- Date Range -->
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ $t('batch.startDate') }} <span class="text-red-500">*</span></label>
                 <MobileDatePicker
                   v-model="form.start_date"
                   label="Ngày bắt đầu"
@@ -55,7 +55,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ $t('batch.endDate') }} <span class="text-red-500">*</span></label>
                 <MobileDatePicker
                   v-model="form.end_date"
                   label="Ngày kết thúc"
@@ -69,8 +69,8 @@
 
             <!-- Cabinets (Multi-select) -->
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5">Đề xuất các tủ cáp <span class="text-red-500">*</span></label>
-              <p class="text-xs text-slate-500 mb-2">Đã chọn: {{ form.cabinet_codes.length }} tủ</p>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ $t('batch.proposeCabinets') }} <span class="text-red-500">*</span></label>
+              <p class="text-xs text-slate-500 mb-2">{{ $t('batch.selectedCount', { count: form.cabinet_codes.length }) }}</p>
               
               <!-- Search cabinets -->
               <div class="relative mb-3">
@@ -102,7 +102,7 @@
                   </div>
                 </label>
                 <div v-if="filteredCabinets.length === 0" class="px-4 py-3 text-sm text-slate-500 text-center">
-                  Không tìm thấy tủ nào
+                  {{ $t('common.noCabinetsFound') }}
                 </div>
               </div>
             </div>
@@ -121,7 +121,7 @@
           <!-- Footer -->
           <div class="px-5 py-4 md:px-6 border-t border-slate-200 flex gap-3">
             <button type="button" @click="close" class="flex-1 min-h-[48px] rounded-xl border border-slate-200 text-slate-600 font-semibold active:bg-slate-50 transition-colors">
-              Hủy
+              {{ $t('common.cancel') }}
             </button>
             <button
               @click="handleSubmit"
@@ -129,7 +129,7 @@
               class="flex-1 min-h-[48px] rounded-xl bg-primary-600 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <Loader2 v-if="submitting" class="w-5 h-5 animate-spin" />
-              <span v-else>Gửi đề xuất</span>
+              <span v-else>{{ $t('batch.submitProposal') }}</span>
             </button>
           </div>
         </div>

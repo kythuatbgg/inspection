@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="relative w-full aspect-square bg-slate-50 border-2 border-dashed rounded-lg overflow-hidden group flex items-center justify-center transition-all shadow-sm"
        :class="borderClass">
     
@@ -14,8 +14,8 @@
       <!-- Image load error overlay -->
       <div v-if="imageLoadError" class="absolute inset-0 bg-danger/10 flex flex-col items-center justify-center">
         <AlertCircle class="w-6 h-6 text-red-400 mb-1" />
-        <span class="text-[10px] text-red-500 font-medium">Lỗi tải ảnh</span>
-        <button @click.prevent="retryPreview" class="mt-1 text-[10px] text-primary-600 font-bold underline">Tải lại</button>
+        <span class="text-[10px] text-red-500 font-medium">{{ $t('common.imageLoadError') }}</span>
+        <button @click.prevent="retryPreview" class="mt-1 text-[10px] text-primary-600 font-bold underline">{{ $t('common.reload') }}</button>
       </div>
       <!-- Remove button -->
       <button v-if="!imageLoadError" @click.prevent="removeImage" type="button" 
@@ -30,13 +30,13 @@
         <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-slate-200 shadow-sm rounded-[10px] text-primary-600 hover:bg-slate-50 active:scale-95 transition-all">
           <input type="file" accept="image/*" capture="environment" class="hidden" @change="onFileChange" :disabled="disabled" />
           <Camera class="w-5 h-5" />
-          <span class="text-xs font-bold">Chụp ảnh</span>
+          <span class="text-xs font-bold">{{ $t('common.takePhoto') }}</span>
         </label>
 
         <label class="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 bg-slate-100 rounded-[10px] text-slate-700 hover:bg-slate-200 active:scale-95 transition-all">
           <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" @change="onFileChange" :disabled="disabled" />
           <Image class="w-5 h-5 text-slate-500" />
-          <span class="text-xs font-bold">Thư viện</span>
+          <span class="text-xs font-bold">{{ $t('common.gallery') }}</span>
         </label>
       </div>
     </template>
@@ -45,7 +45,7 @@
     <template v-else-if="isUploading">
       <div class="flex flex-col items-center justify-center text-primary-600">
         <Loader2 class="w-6 h-6 animate-spin mb-2" />
-        <span class="text-[10px] font-medium">{{ retryCount > 0 ? `Thử lại (${retryCount}/3)...` : 'Đang tải...' }}</span>
+        <span class="text-[10px] font-medium">{{ retryCount > 0 ? $t('common.retrying', { count: retryCount }) : $t('common.uploading') }}</span>
       </div>
     </template>
 
@@ -55,9 +55,9 @@
         <AlertCircle class="w-6 h-6 text-red-400 mb-1" />
         <span class="text-[10px] text-red-500 font-medium mb-2 leading-tight">{{ uploadError }}</span>
         <div class="flex gap-2">
-          <button @click.prevent="retryUpload" class="text-[10px] px-2.5 py-1 bg-primary-600 text-white rounded-lg font-bold">Thử lại</button>
+          <button @click.prevent="retryUpload" class="text-[10px] px-2.5 py-1 bg-primary-600 text-white rounded-lg font-bold">{{ $t('inspector.retry') }}</button>
           <label class="text-[10px] px-2.5 py-1 bg-slate-200 text-slate-700 rounded-lg font-bold cursor-pointer">
-            Chọn khác
+            {{ $t('common.chooseOther') }}
             <input type="file" accept="image/*" class="hidden" @change="onFileChange" />
           </label>
         </div>
@@ -71,7 +71,10 @@ import { AlertCircle, Loader2, Image, Camera, X } from 'lucide-vue-next'
 import imageCompression from 'browser-image-compression'
 
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import api from '@/services/api'
+
+const { t } = useI18n()
 
 const MAX_RETRIES = 3
 const MAX_FILE_SIZE = 10 * 1024 * 1024  // 10MB
@@ -132,7 +135,7 @@ const onFileChange = async (event) => {
 
   // Validate size
   if (file.size > MAX_FILE_SIZE) {
-    uploadError.value = 'Ảnh quá lớn (>10MB)'
+    uploadError.value = t('common.imageTooLarge')
     return
   }
 
@@ -140,7 +143,7 @@ const onFileChange = async (event) => {
   try {
     const hash = await hashFile(file)
     if (props.existingHashes.includes(hash)) {
-      uploadError.value = 'Ảnh này đã được chọn'
+      uploadError.value = t('common.imageAlreadySelected')
       return
     }
     emit('hash', hash)
@@ -177,7 +180,7 @@ const uploadFile = async (file) => {
       imageLoadError.value = false
       emit('update:modelValue', response.data.url)
     } else {
-      throw new Error('Server không trả về URL')
+      throw new Error(t('common.serverNoUrl'))
     }
   } catch (error) {
     console.error('Upload failed:', error)
@@ -192,15 +195,15 @@ const uploadFile = async (file) => {
     // Final failure
     const status = error.response?.status
     if (status === 413) {
-      uploadError.value = 'File quá lớn cho server'
+      uploadError.value = t('common.fileTooLargeServer')
     } else if (status === 422) {
-      uploadError.value = error.response?.data?.message || 'File không hợp lệ'
+      uploadError.value = error.response?.data?.message || t('common.fileInvalid')
     } else if (status >= 500) {
-      uploadError.value = 'Lỗi server, liên hệ admin'
+      uploadError.value = t('common.serverError')
     } else if (!navigator.onLine || error.code === 'ERR_NETWORK') {
-      uploadError.value = 'Mất kết nối mạng'
+      uploadError.value = t('common.networkError')
     } else {
-      uploadError.value = 'Upload thất bại'
+      uploadError.value = t('common.uploadFailed')
     }
   } finally {
     isUploading.value = false

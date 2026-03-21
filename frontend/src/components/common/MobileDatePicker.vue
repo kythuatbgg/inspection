@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="relative w-full" :class="containerClass" ref="containerRef">
     <!-- Trigger Button -->
     <button
@@ -85,8 +85,8 @@
 
             <!-- Title -->
             <div class="px-5 pb-3 border-b border-slate-200 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-slate-900">{{ label || 'Chọn ngày' }}</h3>
-              <button @click="close" class="p-2 -mr-2 text-primary-600 font-semibold text-sm">Xong</button>
+              <h3 class="text-lg font-bold text-slate-900">{{ label || $t('common.selectDate') }}</h3>
+              <button @click="close" class="p-2 -mr-2 text-primary-600 font-semibold text-sm">{{ $t('common.done') }}</button>
             </div>
 
             <!-- Calendar -->
@@ -134,7 +134,7 @@
                 @click="selectToday" 
                 class="w-full py-3.5 rounded-lg bg-slate-50 text-slate-700 font-semibold active:bg-slate-100 transition-colors"
               >
-                Hôm nay
+                {{ $t('common.today') }}
               </button>
             </div>
           </div>

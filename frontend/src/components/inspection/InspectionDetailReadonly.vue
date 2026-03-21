@@ -1,18 +1,18 @@
-﻿<template>
+<template>
   <div class="space-y-4">
     <!-- Header info -->
     <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
       <div class="flex items-start sm:items-center justify-between gap-4">
         <div>
-           <h3 class="text-lg font-bold">Điểm số: <span :class="inspection.final_result?.toUpperCase() === 'PASS' ? 'text-success' : 'text-danger'">{{ inspection.total_score }}</span></h3>
-           <p class="text-sm text-slate-500 font-medium mt-1">Người kiểm tra: <span class="text-slate-900">{{ inspection.user?.name || '—' }}</span></p>
+           <h3 class="text-lg font-bold">{{ $t('inspection.scoreDisplay') }} <span :class="inspection.final_result?.toUpperCase() === 'PASS' ? 'text-success' : 'text-danger'">{{ inspection.total_score }}</span></h3>
+           <p class="text-sm text-slate-500 font-medium mt-1">{{ $t('user.inspector') }}: <span class="text-slate-900">{{ inspection.user?.name || '—' }}</span></p>
            <div class="flex items-center gap-3 mt-2.5">
-             <span class="text-xs font-bold px-2 py-1 bg-danger/10 text-danger rounded-md border border-red-100 flex items-center gap-1"><AlertTriangle class="w-3.5 h-3.5" /> {{ inspection.failed_items || 0 }} lỗi</span>
-             <span class="text-xs font-bold px-2 py-1 bg-slate-50 text-slate-600 rounded-md border border-slate-200">Tổng: {{ inspection.total_items || 0 }}</span>
+             <span class="text-xs font-bold px-2 py-1 bg-danger/10 text-danger rounded-md border border-red-100 flex items-center gap-1"><AlertTriangle class="w-3.5 h-3.5" /> {{ inspection.failed_items || 0 }} {{ $t('common.errors') }}</span>
+             <span class="text-xs font-bold px-2 py-1 bg-slate-50 text-slate-600 rounded-md border border-slate-200">{{ $t('batch.total') }}: {{ inspection.total_items || 0 }}</span>
            </div>
         </div>
         <span class="px-3 py-1.5 text-sm font-bold rounded-lg shrink-0 mt-1 sm:mt-0" :class="inspection.final_result?.toUpperCase() === 'PASS' ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'">
-          {{ inspection.final_result?.toUpperCase() === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
+          {{ inspection.final_result?.toUpperCase() === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
         </span>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <div class="mb-3">
         <span class="font-bold text-slate-900 flex items-center gap-2">
           <Camera class="w-5 h-5 text-slate-500" /> 
-          Ảnh tổng quan
+          {{ $t('inspection.overallPhotos') }}
         </span>
       </div>
       <div class="flex gap-2 overflow-x-auto pb-2">
@@ -35,10 +35,10 @@
       <div class="flex items-center justify-between mb-4">
         <span class="font-bold text-slate-900 flex items-center gap-2">
           <ListTodo class="w-5 h-5 text-slate-500" />
-          Chi tiết từng hạng mục
+          {{ $t('batch.itemDetails') }}
         </span>
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">Tổng: {{ inspection.details?.length || 0 }}</span>
+          <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">{{ $t('batch.total') }}: {{ inspection.details?.length || 0 }}</span>
           <select
             :value="currentLang"
             @change="currentLang = $event.target.value"
@@ -56,8 +56,8 @@
         <!-- Category Header (Collapsible) -->
         <button @click="toggleCategory(category)" type="button" class="w-full bg-slate-50 px-4 py-3 rounded-lg mb-3 border border-slate-200 flex items-center justify-between hover:bg-slate-100 active:scale-[0.99] transition-all">
           <div class="flex items-center gap-2">
-            <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
-            <span class="text-xs font-medium text-slate-400">{{ getCategoryFailed(group) }} lỗi / {{ group.length }}</span>
+            <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide">{{ category || $t('inspection.general') }}</h4>
+            <span class="text-xs font-medium text-slate-400">{{ getCategoryFailed(group) }} {{ $t('common.errorsOf', { total: group.length }) }}</span>
           </div>
           <ChevronDown class="w-4 h-4 text-slate-400 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
         </button>
@@ -72,14 +72,14 @@
                  <XCircle v-else class="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
                  
                  <div class="min-w-0">
-                    <h4 class="font-semibold text-slate-900 text-sm leading-snug">{{ getContent(detail.item || {}) || 'Hạng mục không xác định' }}</h4>
-                    <p v-if="detail.note" class="text-xs text-warning bg-warning/10 px-2 py-1.5 rounded-lg font-medium mt-2 inline-block">📝 Ghi chú: {{ detail.note }}</p>
+                    <h4 class="font-semibold text-slate-900 text-sm leading-snug">{{ getContent(detail.item || {}) || $t('common.unknownItem') }}</h4>
+                    <p v-if="detail.note" class="text-xs text-warning bg-warning/10 px-2 py-1.5 rounded-lg font-medium mt-2 inline-block">📝 {{ $t('common.notePrefix') }} {{ detail.note }}</p>
                  </div>
                </div>
              </div>
              
              <div class="shrink-0 flex flex-col items-end gap-2 text-right">
-               <span v-if="detail.item?.is_critical" class="px-2 py-1 rounded bg-red-100 text-danger text-[10px] font-bold">Lỗi nghiêm trọng</span>
+               <span v-if="detail.item?.is_critical" class="px-2 py-1 rounded bg-red-100 text-danger text-[10px] font-bold">{{ $t('common.criticalError') }}</span>
                <div v-if="detail.image_url" class="mt-1">
                   <img :src="formatImageUrl(detail.image_url)" @click="openImage(detail.image_url)" class="w-16 h-16 object-cover rounded-lg border border-slate-200 cursor-pointer active:scale-95 transition-all" />
                </div>
@@ -89,7 +89,7 @@
       </div>
 
       <div v-if="!inspection.details?.length" class="text-center py-6 text-slate-500 text-sm">
-        Không có dữ liệu chi tiết
+        {{ $t('common.noDetailData') }}
       </div>
     </div>
     

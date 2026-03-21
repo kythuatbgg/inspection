@@ -5,7 +5,7 @@
       <div class="rounded-2xl bg-white border border-slate-200 p-5">
         <button @click="goBack" class="md:hidden flex items-center gap-1 text-sm text-primary-600 font-medium mb-3 -ml-1 active:opacity-70">
           <ChevronLeft class="w-4 h-4" />
-          Quay lại
+          {{ $t('common.back') }}
         </button>
         <div class="flex items-start justify-between">
           <div>
@@ -17,7 +17,7 @@
             class="text-[10px] font-bold px-3 py-1 rounded-full"
             :class="existingInspection.final_result?.toUpperCase() === 'PASS' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'"
           >
-            {{ existingInspection.final_result?.toUpperCase() === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
+            {{ existingInspection.final_result?.toUpperCase() === 'PASS' ? $t('inspection.resultPass') : $t('inspection.resultFail') }}
           </span>
         </div>
       </div>
@@ -28,8 +28,8 @@
           <Check class="w-4 h-4 text-emerald-600" />
         </div>
         <div>
-          <p class="text-sm font-bold text-emerald-800">Tủ này đã được kiểm tra</p>
-          <p class="text-xs text-emerald-600 mt-0.5">Điểm: {{ existingInspection.total_score }} · Lỗi nghiêm trọng: {{ existingInspection.critical_errors_count }}</p>
+          <p class="text-sm font-bold text-emerald-800">{{ $t('inspection.alreadyInspected') }}</p>
+          <p class="text-xs text-emerald-600 mt-0.5">{{ $t('inspection.scoreLabel', { score: existingInspection.total_score }) }} · {{ $t('inspection.criticalErrors', { count: existingInspection.critical_errors_count }) }}</p>
         </div>
       </div>
 
@@ -46,15 +46,15 @@
           <Save v-if="draftStatus === 'saved'" class="w-3.5 h-3.5" />
           <Loader2 v-else-if="draftStatus === 'saving'" class="w-3.5 h-3.5 animate-spin" />
           <RefreshCw v-else class="w-3.5 h-3.5" />
-          <span v-if="draftStatus === 'saving'">Đang lưu nháp...</span>
-          <span v-else-if="draftStatus === 'saved'">Đã lưu nháp lúc {{ draftTime }}</span>
-          <span v-else-if="draftStatus === 'restored'">Đã khôi phục bản nháp</span>
+          <span v-if="draftStatus === 'saving'">{{ $t('inspection.savingDraft') }}</span>
+          <span v-else-if="draftStatus === 'saved'">{{ $t('inspection.draftSaved', { time: draftTime }) }}</span>
+          <span v-else-if="draftStatus === 'restored'">{{ $t('inspection.draftRestored') }}</span>
         </div>
 
         <!-- Step Indicator -->
         <div class="flex items-center gap-2 mb-5">
-          <button @click="currentStep = 1" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'">1. Ảnh tổng thể</button>
-          <button @click="goToStep2" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'" :disabled="!isValidStep1">2. Chi tiết Checklist</button>
+          <button @click="currentStep = 1" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 1 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'">{{ $t('inspection.step1') }}</button>
+          <button @click="goToStep2" class="flex-1 pb-2.5 border-b-2 transition-colors font-bold text-sm" :class="currentStep === 2 ? 'border-primary-600 text-primary-600' : 'border-slate-200 text-slate-400'" :disabled="!isValidStep1">{{ $t('inspection.step2') }}</button>
         </div>
 
         <!-- STEP 1: Overall Photos -->
@@ -62,7 +62,7 @@
           <div class="bg-primary-50 text-primary-800 p-4 rounded-xl border border-primary-100">
             <div class="flex items-start gap-3">
               <Camera class="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
-              <p class="text-sm font-medium leading-relaxed">Vui lòng chụp ít nhất 4 ảnh tổng thể bề ngoài của tủ trước khi tiến hành kiểm tra chi tiết.</p>
+              <p class="text-sm font-medium leading-relaxed">{{ $t('inspection.photoGuide') }}</p>
             </div>
           </div>
           
@@ -79,7 +79,7 @@
             
             <button @click="addPhotoSlot" type="button" v-if="overallPhotos.length < 8 && overallPhotos.every(p => p)" class="aspect-square rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 active:bg-slate-50 transition-colors">
               <Plus class="w-7 h-7 mb-1" />
-              <span class="text-xs font-medium">Thêm ảnh</span>
+              <span class="text-xs font-medium">{{ $t('inspection.addPhoto') }}</span>
             </button>
           </div>
 
@@ -92,7 +92,7 @@
             >
               <Loader2 v-if="isAnyUploading" class="animate-spin w-5 h-5" />
               <template v-else>
-                <span>Tiếp tục kiểm tra</span>
+                <span>{{ $t('inspection.continueInspection') }}</span>
                 <ArrowRight class="w-4 h-4" />
               </template>
             </button>
@@ -102,9 +102,9 @@
         <!-- STEP 2: Checklist Items -->
         <div v-show="currentStep === 2">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-slate-900">Danh sách kiểm tra ({{ checklistItems.length }})</h3>
+            <h3 class="text-sm font-bold text-slate-900">{{ $t('inspection.checklistTitle', { count: checklistItems.length }) }}</h3>
             <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400">{{ answeredCount }}/{{ checklistItems.length }} đã chấm</span>
+              <span class="text-xs text-slate-400">{{ $t('inspection.answeredCount', { answered: answeredCount, total: checklistItems.length }) }}</span>
               <!-- Language Selector -->
               <select
                 :value="currentLang"
@@ -127,7 +127,7 @@
               class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl active:scale-95 transition-all flex items-center gap-2"
             >
               <ShieldCheck class="w-4 h-4" />
-              Đạt tất cả
+              {{ $t('inspection.passAll') }}
             </button>
           </div>
 
@@ -135,7 +135,7 @@
             <!-- Category Header -->
             <button @click="toggleCategory(category)" type="button" class="w-full bg-slate-50 px-4 py-3 rounded-xl mb-3 border border-slate-200 flex items-center justify-between active:bg-slate-100 transition-colors">
               <div class="flex items-center gap-2">
-                <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide">{{ category || 'Chung' }}</h4>
+                <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide">{{ category || $t('inspection.general') }}</h4>
                 <span class="text-[10px] font-semibold text-slate-400">{{ getCategoryAnswered(group) }}/{{ group.length }}</span>
               </div>
               <ChevronDown class="w-4 h-4 text-slate-400 transition-transform" :class="{ 'rotate-180': !collapsedCategories[category] }" />
@@ -157,9 +157,9 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
                       <p class="text-sm font-semibold text-slate-900 leading-snug">{{ getContent(item) }}</p>
-                      <span v-if="item.is_critical" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 shrink-0 uppercase tracking-wide">Nghiêm trọng</span>
+                      <span v-if="item.is_critical" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 shrink-0 uppercase tracking-wide">{{ $t('inspection.critical') }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-1">Điểm tối đa: {{ item.max_score }}</p>
+                    <p class="text-[11px] text-slate-400 mt-1">{{ $t('inspection.maxScoreLabel', { score: item.max_score }) }}</p>
                   </div>
                 </div>
 
@@ -173,7 +173,7 @@
                       ? 'bg-emerald-600 text-white'
                       : 'bg-slate-100 text-slate-500 active:bg-slate-200'"
                   >
-                    Đạt
+                    {{ $t('inspection.pass') }}
                   </button>
                   <button
                     type="button"
@@ -183,32 +183,32 @@
                       ? 'bg-red-600 text-white'
                       : 'bg-slate-100 text-slate-500 active:bg-slate-200'"
                   >
-                    Không đạt
+                    {{ $t('inspection.fail') }}
                   </button>
                 </div>
 
                 <!-- Missing info warning -->
                 <p v-if="itemDetails[item.id]?.is_failed && (!itemDetails[item.id]?.image_url || !itemDetails[item.id]?.note?.trim())" 
                    class="text-[11px] font-medium text-red-500 mt-2 text-center">
-                  Yêu cầu bắt buộc: ảnh và ghi chú lỗi
+                  {{ $t('inspection.requiredPhotoNote') }}
                 </p>
 
                 <!-- Failure detail box -->
                 <div v-if="itemDetails[item.id]?.is_failed" class="mt-3 p-4 bg-red-50 rounded-xl border border-red-100 flex flex-col gap-4">
                   <div>
-                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">1. Ảnh minh chứng <span class="text-red-500">*</span></label>
+                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">{{ $t('inspection.evidencePhoto') }} <span class="text-red-500">*</span></label>
                     <div class="w-32">
                       <MobileImageUploader v-model="itemDetails[item.id].image_url" />
                     </div>
                   </div>
                   
                   <div>
-                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">2. Ghi chú lỗi <span class="text-red-500">*</span></label>
+                    <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">{{ $t('inspection.errorNote') }} <span class="text-red-500">*</span></label>
                     <textarea 
                       v-model="itemDetails[item.id].note" 
                       rows="3"
                       class="w-full text-sm border border-red-200 rounded-xl p-3 focus:ring-red-500 focus:border-red-500 bg-white" 
-                      placeholder="Mô tả chi tiết vấn đề..."></textarea>
+                      :placeholder="$t('inspection.errorPlaceholder')"></textarea>
                   </div>
                 </div>
 
@@ -225,8 +225,8 @@
     </template>
 
     <div v-else-if="!loading && !plan" class="flex flex-col items-center justify-center py-14 text-center">
-      <p class="text-slate-500">Không thể tải dữ liệu nhiệm vụ.</p>
-      <button @click="fetchData" class="mt-3 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold active:scale-95 transition-all">Thử lại</button>
+      <p class="text-slate-500">{{ $t('inspection.cannotLoadTask') }}</p>
+      <button @click="fetchData" class="mt-3 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold active:scale-95 transition-all">{{ $t('inspector.retry') }}</button>
     </div>
 
     <!-- Bottom Scoring Summary + Submit (Fixed on mobile, sticky on desktop) -->
@@ -235,7 +235,7 @@
         <!-- Score summary -->
         <div class="flex items-center justify-between text-sm mb-3">
           <div class="flex items-center gap-3">
-            <span class="text-slate-500 text-xs">Điểm: <span class="text-base font-bold" :class="scoreSummary.willPass ? 'text-emerald-600' : 'text-red-600'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
+            <span class="text-slate-500 text-xs">{{ $t('inspection.scoreDisplay') }} <span class="text-base font-bold" :class="scoreSummary.willPass ? 'text-emerald-600' : 'text-red-600'">{{ scoreSummary.totalScore }}/{{ scoreSummary.maxScore }}</span></span>
             <span v-if="scoreSummary.criticalCount > 0" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-50 text-red-600 flex items-center gap-1">
               <AlertTriangle class="w-3 h-3" />
               {{ scoreSummary.criticalCount }}
@@ -245,7 +245,7 @@
             class="text-[10px] font-bold px-3 py-1.5 rounded-full"
             :class="scoreSummary.willPass ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'"
           >
-            {{ scoreSummary.willPass ? 'ĐẠT' : 'KHÔNG ĐẠT' }}
+            {{ scoreSummary.willPass ? $t('inspection.resultPass') : $t('inspection.resultFail') }}
           </span>
         </div>
 
@@ -257,7 +257,7 @@
           :class="isValidToSubmit ? 'bg-primary-600 text-white shadow-sm' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
         >
           <Loader2 v-if="submitting" class="animate-spin w-5 h-5" />
-          <span v-else>{{ isValidToSubmit ? 'Lưu kết quả kiểm tra' : `Hoàn tất (${answeredCount}/${checklistItems.length})` }}</span>
+          <span v-else>{{ isValidToSubmit ? $t('inspection.saveResult') : $t('inspection.completeCount', { answered: answeredCount, total: checklistItems.length }) }}</span>
         </button>
       </div>
     </div>
@@ -269,11 +269,13 @@ import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown, AlertTriangle, Ch
 
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '@/services/api.js'
 import MobileImageUploader from '@/components/common/MobileImageUploader.vue'
 import { useInspectionLang } from '@/composables/useInspectionLang.js'
 
 const { currentLang, LANG_OPTIONS, getContent, getCategory } = useInspectionLang()
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -327,7 +329,7 @@ const markAllPass = () => {
 const groupedItems = computed(() => {
   const groups = {}
   checklistItems.value.forEach(item => {
-    const cat = getCategory(item) || 'Chung'
+    const cat = getCategory(item) || t('inspection.general')
     if (!groups[cat]) groups[cat] = []
     groups[cat].push(item)
   })
@@ -438,7 +440,7 @@ const handleSubmit = async () => {
     clearDraft()
   } catch (e) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    submitError.value = e.response?.data?.message || 'Không thể lưu kết quả kiểm tra. Vui lòng thử lại.'
+    submitError.value = e.response?.data?.message || t('inspection.submitError')
     console.error(e)
   } finally {
     submitting.value = false
@@ -523,7 +525,7 @@ const restoreDraft = () => {
 
     const timeStr = savedDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     const dateStr = savedDate.toLocaleDateString('vi-VN')
-    if (!confirm(`Có bản nháp từ ${dateStr} lúc ${timeStr}. Khôi phục?`)) {
+    if (!confirm(t('inspection.draftConfirm', { date: dateStr, time: timeStr }))) {
       localStorage.removeItem(DRAFT_KEY.value)
       return
     }
