@@ -1,17 +1,17 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm-bookworm
 
 # Install system deps
-RUN apk add --no-cache \
-    postgresql-dev \
-    postgresql-client \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
     libzip-dev \
-    oniguruma-dev \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    icu-dev \
+    libjpeg-dev \
+    libfreetype-dev \
+    libicu-dev \
     git \
     curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo \
@@ -21,18 +21,17 @@ RUN apk add --no-cache \
         gd \
         zip \
         intl \
-    && pecl install apcu > /dev/null \
-    && docker-php-ext-enable apcu
+    && pecl install apcu && docker-php-ext-enable apcu
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy source
-COPY backend/ .
+# Copy backend source
+COPY app/backend/ .
 
-# Install deps + optimize
+# Install deps + optimize (skip if not in container yet)
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
     && php artisan config:cache \
     && php artisan route:cache \
