@@ -97,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reports (accessible by both admin and inspector)
     Route::prefix('reports')->group(function () {
+        Route::get('search', [ReportController::class, 'search']);
         Route::get('inspection/{inspection}', [ReportController::class, 'inspectionReport']);
         Route::get('batch/{batch}/summary', [ReportController::class, 'batchSummary']);
         Route::get('batch/{batch}/export', [ReportController::class, 'batchExport']);

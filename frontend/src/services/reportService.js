@@ -1,6 +1,11 @@
 import api from './api'
 
 export default {
+  // Search inspections by batch and/or cabinet
+  searchInspections(params = {}) {
+    return api.get('/reports/search', { params })
+  },
+
   // Reports (PDF/Excel download)
   downloadInspectionReport(inspectionId) {
     return api.get(`/reports/inspection/${inspectionId}`, { responseType: 'blob' })

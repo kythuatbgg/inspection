@@ -580,7 +580,8 @@
     "count": "Số lần",
     "exportAll": "Xuất thống kê tổng hợp",
     "noDataYet": "Chưa có dữ liệu",
-    "selectBatchForReport": "Chọn đợt kiểm tra để xuất biên bản"
+    "selectBatchForReport": "Chọn đợt kiểm tra để xuất biên bản",
+    "searchCabinetPlaceholder": "Tìm theo mã tủ..."
   },
 
   "language": {

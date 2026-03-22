@@ -580,7 +580,8 @@
     "count": "Count",
     "exportAll": "Export All Statistics",
     "noDataYet": "No data yet",
-    "selectBatchForReport": "Select a batch to generate reports"
+    "selectBatchForReport": "Select a batch to generate reports",
+    "searchCabinetPlaceholder": "Search by cabinet code..."
   },
 
   "language": {

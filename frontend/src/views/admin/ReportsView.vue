@@ -24,12 +24,22 @@
       <div class="card">
         <div class="card-header">
           <div class="filters-row">
-            <select v-model="selectedBatchId" class="select-input" @change="loadBatchPlans">
+            <select v-model="selectedBatchId" class="select-input" @change="searchReports">
               <option value="">{{ $t('reports.selectBatchPlaceholder') }}</option>
               <option v-for="b in batches" :key="b.id" :value="b.id">
                 {{ b.name }}
               </option>
             </select>
+            <div class="search-box">
+              <Search :size="14" class="search-icon" />
+              <input
+                v-model="searchCabinet"
+                type="text"
+                class="search-input"
+                :placeholder="$t('reports.searchCabinetPlaceholder')"
+                @input="debouncedSearch"
+              />
+            </div>
           </div>
           <div v-if="selectedBatchId" class="batch-actions">
             <button class="btn btn-primary" :disabled="downloading" @click="downloadBatchSummary">
@@ -47,50 +57,48 @@
           </div>
         </div>
 
-        <div v-if="!selectedBatchId" class="empty-state">
-          <FileSearch :size="48" class="empty-icon" />
-          <p>{{ $t('reports.selectBatchForReport') }}</p>
-        </div>
-
-        <div v-else-if="loadingPlans" class="loading-state">
+        <div v-if="loadingSearch" class="loading-state">
           <Loader2 :size="24" class="spinner" />
           <span>{{ $t('common.loading') }}</span>
         </div>
 
-        <table v-else-if="batchPlans.length" class="data-table">
+        <table v-else-if="searchResults.length" class="data-table">
           <thead>
             <tr>
               <th>#</th>
               <th>{{ $t('reports.cabinetCode') }}</th>
+              <th>{{ $t('reports.btsSite') }}</th>
               <th>{{ $t('reports.result') }}</th>
               <th>{{ $t('reports.score') }}</th>
+              <th>{{ $t('reports.inspectorName') }}</th>
+              <th>{{ $t('reports.selectBatch') }}</th>
               <th>{{ $t('reports.actions') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(plan, i) in batchPlans" :key="plan.id">
+            <tr v-for="(row, i) in searchResults" :key="row.id">
               <td>{{ i + 1 }}</td>
-              <td class="font-mono">{{ plan.cabinet_code }}</td>
+              <td class="font-mono">{{ row.cabinet_code }}</td>
+              <td class="font-mono text-muted">{{ row.bts_site }}</td>
               <td>
                 <span
-                  v-if="plan.inspection"
                   class="badge"
-                  :class="plan.inspection.final_result === 'PASS' ? 'badge-pass' : 'badge-fail'"
+                  :class="row.final_result === 'PASS' ? 'badge-pass' : 'badge-fail'"
                 >
-                  {{ plan.inspection.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
+                  {{ row.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
                 </span>
-                <span v-else class="badge badge-pending">—</span>
               </td>
-              <td>{{ plan.inspection?.total_score ?? '—' }}</td>
+              <td>{{ row.total_score }}</td>
+              <td>{{ row.inspector_name }}</td>
+              <td class="text-muted text-sm">{{ row.batch_name }}</td>
               <td>
                 <button
-                  v-if="plan.inspection"
                   class="btn btn-sm btn-outline"
                   :disabled="downloading"
-                  @click="downloadInspectionReport(plan.inspection.id)"
+                  @click="downloadInspectionReport(row.id, row.cabinet_code)"
                 >
                   <Download :size="12" />
-                  PDF
+                  {{ $t('reports.exportPdf') }}
                 </button>
               </td>
             </tr>
@@ -98,7 +106,8 @@
         </table>
 
         <div v-else class="empty-state">
-          <p>{{ $t('reports.noDataYet') }}</p>
+          <FileSearch :size="48" class="empty-icon" />
+          <p>{{ searchCabinet || selectedBatchId ? $t('reports.noDataYet') : $t('reports.selectBatchForReport') }}</p>
         </div>
       </div>
     </div>
@@ -311,7 +320,7 @@ import { useI18n } from 'vue-i18n'
 import {
   FileText, FileSearch, FileSpreadsheet, Download, Loader2,
   AlertTriangle, AlertCircle, Award, Layers, Box,
-  TrendingUp, BarChart3
+  TrendingUp, BarChart3, Search
 } from 'lucide-vue-next'
 import reportService, { triggerDownload } from '@/services/reportService'
 import api from '@/services/api'
@@ -330,8 +339,10 @@ const downloading = ref(false)
 // Reports tab
 const batches = ref([])
 const selectedBatchId = ref('')
-const batchPlans = ref([])
-const loadingPlans = ref(false)
+const searchCabinet = ref('')
+const searchResults = ref([])
+const loadingSearch = ref(false)
+let searchTimer = null
 
 // Statistics tab
 const stats = ref({})
@@ -365,17 +376,24 @@ async function loadBatches() {
   }
 }
 
-async function loadBatchPlans() {
-  if (!selectedBatchId.value) { batchPlans.value = []; return }
-  loadingPlans.value = true
+async function searchReports() {
+  loadingSearch.value = true
   try {
-    const { data } = await api.get(`/batches/${selectedBatchId.value}/results`)
-    batchPlans.value = data.data?.plan_details || data.plan_details || []
+    const params = {}
+    if (selectedBatchId.value) params.batch_id = selectedBatchId.value
+    if (searchCabinet.value.trim()) params.cabinet_code = searchCabinet.value.trim()
+    const { data } = await reportService.searchInspections(params)
+    searchResults.value = data.data || []
   } catch {
     showToast(t('common.errorLoadData'), 'error')
   } finally {
-    loadingPlans.value = false
+    loadingSearch.value = false
   }
+}
+
+function debouncedSearch() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => searchReports(), 300)
 }
 
 async function loadStats() {
@@ -404,11 +422,12 @@ async function loadStats() {
 }
 
 // Downloads
-async function downloadInspectionReport(inspectionId) {
+async function downloadInspectionReport(inspectionId, cabinetCode = '') {
   downloading.value = true
   try {
     const { data } = await reportService.downloadInspectionReport(inspectionId)
-    triggerDownload(data, `bien-ban-kiem-tra-${inspectionId}.pdf`)
+    const filename = cabinetCode ? `bien-ban-${cabinetCode}.pdf` : `bien-ban-kiem-tra-${inspectionId}.pdf`
+    triggerDownload(data, filename)
     showToast(t('reports.downloadSuccess'))
   } catch {
     showToast(t('reports.downloadError'), 'error')
@@ -578,7 +597,38 @@ onMounted(() => {
 }
 
 /* Filters */
-.filters-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #334155;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+.search-input::placeholder { color: #94a3b8; }
 
 .select-input {
   padding: 8px 12px;
@@ -818,6 +868,8 @@ onMounted(() => {
 /* Utilities */
 .font-mono { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 12px; }
 .font-bold { font-weight: 700; }
+.text-muted { color: #94a3b8; }
+.text-sm { font-size: 12px; }
 .text-pass { color: #16a34a; font-weight: 600; }
 .text-fail { color: #dc2626; font-weight: 600; }
 

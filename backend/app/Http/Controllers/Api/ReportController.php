@@ -17,6 +17,45 @@ class ReportController extends Controller
 {
     public function __construct(private ReportService $reportService) {}
 
+    public function search(Request $request): JsonResponse
+    {
+        $query = Inspection::with([
+            'user:id,name',
+            'cabinet:cabinet_code,bts_site',
+            'planDetail.batch:id,name',
+        ]);
+
+        // Inspector can only see own inspections
+        if ($request->user()->role === 'inspector') {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        if ($request->filled('batch_id')) {
+            $query->whereHas('planDetail', fn($q) => $q->where('batch_id', $request->batch_id));
+        }
+
+        if ($request->filled('cabinet_code')) {
+            $query->where('cabinet_code', 'LIKE', '%' . $request->cabinet_code . '%');
+        }
+
+        $inspections = $query->orderByDesc('created_at')->get();
+
+        $data = $inspections->map(fn(Inspection $ins) => [
+            'id' => $ins->id,
+            'cabinet_code' => $ins->cabinet_code,
+            'bts_site' => $ins->cabinet->bts_site ?? '',
+            'final_result' => $ins->final_result,
+            'total_score' => $ins->total_score,
+            'critical_errors_count' => $ins->critical_errors_count,
+            'batch_name' => $ins->planDetail?->batch?->name ?? '',
+            'batch_id' => $ins->planDetail?->batch_id,
+            'inspector_name' => $ins->user->name ?? '',
+            'inspected_at' => $ins->created_at?->format('d/m/Y H:i'),
+        ]);
+
+        return response()->json(['data' => $data]);
+    }
+
     public function inspectionReport(Request $request, int $inspectionId)
     {
         $inspection = Inspection::with('planDetail.batch')->findOrFail($inspectionId);
