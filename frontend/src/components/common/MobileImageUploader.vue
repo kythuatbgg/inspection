@@ -90,10 +90,12 @@ const COMPRESSION_OPTIONS = {
 const props = defineProps({
   modelValue: { type: String, default: null },
   disabled: { type: Boolean, default: false },
-  existingHashes: { type: Array, default: () => [] }
+  existingHashes: { type: Array, default: () => [] },
+  // When true: if upload fails offline, fall back to base64 instead of error
+  offlineBase64Fallback: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:modelValue', 'uploading', 'hash'])
+const emit = defineEmits(['update:modelValue', 'uploading', 'hash', 'offlineSaved'])
 
 const isUploading = ref(false)
 const uploadError = ref('')
@@ -158,6 +160,8 @@ const onFileChange = async (event) => {
 }
 
 // ---- Upload with auto-retry ----
+let processedFile = null
+
 const uploadFile = async (file) => {
   try {
     isUploading.value = true
@@ -165,7 +169,7 @@ const uploadFile = async (file) => {
     emit('uploading', true)
 
     // Compress
-    const processedFile = await compressImage(file)
+    processedFile = await compressImage(file)
 
     const formData = new FormData()
     formData.append('image', processedFile)
@@ -185,14 +189,22 @@ const uploadFile = async (file) => {
   } catch (error) {
     console.error('Upload failed:', error)
 
-    // Auto-retry
-    if (retryCount.value < MAX_RETRIES) {
+    // Auto-retry only if not offline
+    if (navigator.onLine && retryCount.value < MAX_RETRIES) {
       retryCount.value++
       await new Promise(r => setTimeout(r, 1000 * retryCount.value))
       return uploadFile(file)
     }
 
-    // Final failure
+    // Final failure — offline base64 fallback if enabled
+    if (props.offlineBase64Fallback && !navigator.onLine) {
+      const base64 = await fileToBase64(processedFile || file)
+      imageLoadError.value = false
+      emit('update:modelValue', base64)
+      emit('offlineSaved', true)
+      return
+    }
+
     const status = error.response?.status
     if (status === 413) {
       uploadError.value = t('common.fileTooLargeServer')
@@ -209,6 +221,16 @@ const uploadFile = async (file) => {
     isUploading.value = false
     emit('uploading', false)
   }
+}
+
+// Convert File to base64 for offline storage
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
 
 // ---- Retry handlers ----

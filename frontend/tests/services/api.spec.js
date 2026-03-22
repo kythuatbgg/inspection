@@ -8,7 +8,8 @@ describe('API Service (api.js)', () => {
 
   it('should export API_URL constant', async () => {
     const { API_URL } = await import('@/services/api.js')
-    expect(API_URL).toBe('http://localhost:8000/api')
+    // Falls back to '/api' when VITE_API_URL is undefined (test/dev)
+    expect(API_URL).toBe('/api')
   })
 
   it('should export api instance', async () => {

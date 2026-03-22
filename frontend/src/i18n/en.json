@@ -445,6 +445,8 @@
     "myProposals": "My Proposals",
     "inspection": "Inspection",
     "defaultUser": "Inspector",
+    "syncing": "Syncing...",
+    "pendingSync": "{n} inspections pending sync",
     "proposedBatches": "Proposed Batches",
     "totalCabinets": "Total Cabinets",
     "inspected": "Inspected",
@@ -561,6 +563,7 @@
     "saveResult": "Save inspection result",
     "completeCount": "Complete ({answered}/{total})",
     "submitError": "Cannot save inspection result. Please try again.",
+    "savedOffline": "Saved offline. Will sync when back online.",
     "draftConfirm": "Draft found from {date} at {time}. Restore?"
   },
 

@@ -29,6 +29,15 @@
 
         <!-- Status and Logout -->
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
+          <!-- Sync Status -->
+          <div v-if="isSyncing" class="flex items-center gap-2 px-3 py-2 bg-primary-50 rounded-lg text-primary-600">
+            <Loader2 class="w-4 h-4 animate-spin shrink-0" />
+            <span class="text-xs font-medium">{{ $t('inspector.syncing') }}</span>
+          </div>
+          <div v-else-if="draftCount > 0" class="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-lg text-amber-600">
+            <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+            <span class="text-xs font-medium">{{ $t('inspector.pendingSync', { n: draftCount }) }}</span>
+          </div>
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
               <span class="text-primary-700 font-semibold">{{ userName.charAt(0) }}</span>
@@ -114,18 +123,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart } from 'lucide-vue-next'
+import { useOfflineSync } from '@/composables/useOfflineSync'
+import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart, Loader2 } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { t, locale: currentLocale } = useI18n()
 
-const isOnline = ref(navigator.onLine)
+// Sync state from offline composable
+const { isOnline, isSyncing, draftCount } = useOfflineSync()
 
 const navItems = [
   { path: '/inspector', labelKey: 'nav.home', icon: Home },
@@ -161,18 +172,4 @@ const handleLogout = async () => {
   await authStore.logout()
   router.replace({ name: 'login' })
 }
-
-const updateOnlineStatus = () => {
-  isOnline.value = navigator.onLine
-}
-
-onMounted(() => {
-  window.addEventListener('online', updateOnlineStatus)
-  window.addEventListener('offline', updateOnlineStatus)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('online', updateOnlineStatus)
-  window.removeEventListener('offline', updateOnlineStatus)
-})
 </script>

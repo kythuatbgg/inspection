@@ -1,6 +1,10 @@
 import { vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 
-// Mock localStorage
+// ── IndexedDB polyfill (required for Dexie tests) ─────────────
+import 'fake-indexeddb/auto'
+
+// ── localStorage mock ─────────────────────────────────────────
 const localStorageMock = {
   getItem: vi.fn(() => null),
   setItem: vi.fn(),
@@ -13,12 +17,17 @@ Object.defineProperty(globalThis, 'localStorage', {
   writable: true,
 })
 
-// Mock navigator.onLine
+// ── navigator.onLine mock ──────────────────────────────────
 Object.defineProperty(globalThis.navigator, 'onLine', {
   value: true,
   writable: true,
+  configurable: true,
 })
 
-// Mock window events
+// ── window event listeners mock ────────────────────────────────
 window.addEventListener = vi.fn()
 window.removeEventListener = vi.fn()
+
+// ── Pinia global setup ──────────────────────────────────────
+const pinia = createPinia()
+setActivePinia(pinia)

@@ -20,17 +20,19 @@ describe('Batch Service (batchService.js)', () => {
 
   describe('getBatches', () => {
     it('should call GET /batches with params', async () => {
-      const mockData = [{ id: 1, name: 'Batch 1' }]
-      api.get.mockResolvedValue({ data: { data: mockData } })
+      // axios wraps response in { data: ... }; service returns response.data (unwrapped)
+      const axiosResponse = { data: [{ id: 1, name: 'Batch 1' }] }
+      api.get.mockResolvedValue(axiosResponse)
 
       const result = await batchService.getBatches({ status: 'pending' })
 
       expect(api.get).toHaveBeenCalledWith('/batches', { params: { status: 'pending' } })
-      expect(result).toEqual(mockData)
+      // service returns response.data (unwrapped), so we get the array directly
+      expect(result).toEqual([{ id: 1, name: 'Batch 1' }])
     })
 
     it('should handle empty params', async () => {
-      api.get.mockResolvedValue({ data: { data: [] } })
+      api.get.mockResolvedValue({ data: [] })
 
       await batchService.getBatches()
 
@@ -41,7 +43,7 @@ describe('Batch Service (batchService.js)', () => {
   describe('getBatchById', () => {
     it('should call GET /batches/{id}', async () => {
       const mockData = { id: 1, name: 'Batch 1' }
-      api.get.mockResolvedValue({ data: { data: mockData } })
+      api.get.mockResolvedValue({ data: mockData })
 
       const result = await batchService.getBatchById(1)
 
@@ -80,14 +82,15 @@ describe('Batch Service (batchService.js)', () => {
 
       await batchService.deleteBatch(1)
 
-      expect(api.delete).toHaveBeenCalledWith('/batches/1')
+      // Always called with 2 args: url + optional params object
+      expect(api.delete).toHaveBeenCalledWith('/batches/1', expect.any(Object))
     })
   })
 
   describe('getBatchPlans', () => {
     it('should call GET /batches/{id}/plans', async () => {
       const mockPlans = [{ id: 1, name: 'Plan 1' }]
-      api.get.mockResolvedValue({ data: { data: mockPlans } })
+      api.get.mockResolvedValue({ data: mockPlans })
 
       const result = await batchService.getBatchPlans(1)
 

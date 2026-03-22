@@ -68,9 +68,10 @@
           
           <div class="grid grid-cols-2 gap-3">
             <div v-for="(photo, index) in overallPhotos" :key="index" class="relative">
-              <MobileImageUploader 
-                v-model="overallPhotos[index]" 
+              <MobileImageUploader
+                v-model="overallPhotos[index]"
                 :existingHashes="photoHashes"
+                :offlineBase64Fallback="true"
                 @uploading="(v) => onUploadStateChange(index, v)"
                 @hash="(h) => onPhotoHash(index, h)"
               />
@@ -198,7 +199,7 @@
                   <div>
                     <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">{{ $t('inspection.evidencePhoto') }} <span class="text-red-500">*</span></label>
                     <div class="w-32">
-                      <MobileImageUploader v-model="itemDetails[item.id].image_url" />
+                      <MobileImageUploader v-model="itemDetails[item.id].image_url" :offlineBase64Fallback="true" />
                     </div>
                   </div>
                   
@@ -265,7 +266,7 @@
 </template>
 
 <script setup>
-import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown, AlertTriangle, Check, Camera, ArrowRight, Save, RefreshCw } from 'lucide-vue-next'
+import { Loader2, ShieldCheck, Plus, ChevronLeft, ChevronDown, AlertTriangle, Check, Camera, ArrowRight, Save, RefreshCw, WifiOff } from 'lucide-vue-next'
 
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
@@ -274,6 +275,7 @@ import api from '@/services/api.js'
 import MobileImageUploader from '@/components/common/MobileImageUploader.vue'
 import { useInspectionLang } from '@/composables/useInspectionLang.js'
 import { getDateLocale } from '@/i18n'
+import { saveDraft as saveDraftToDexie } from '@/db/inspectionDraft'
 
 const { currentLang, LANG_OPTIONS, getContent, getCategory } = useInspectionLang()
 const { t } = useI18n()
@@ -414,31 +416,61 @@ const handleSubmit = async () => {
   submitError.value = ''
 
   try {
+    // Build detail payloads — separate URL vs base64
     const payloadDetails = checklistItems.value.map(item => {
       const detail = itemDetails.value[item.id]
+      const isBase64 = detail.image_url?.startsWith('data:')
       return {
         item_id: item.id,
         is_failed: detail.is_failed,
         score_awarded: detail.is_failed ? 0 : item.max_score,
-        image_url: detail.is_failed ? detail.image_url : null,
+        image_url: isBase64 ? null : detail.image_url,
+        image_base64: isBase64 ? detail.image_url : null,
         note: detail.is_failed ? detail.note : null,
       }
     })
-    
-    const validPhotos = overallPhotos.value.filter(url => !!url)
 
-    await api.post('/inspections', {
+    // Online: submit directly via API
+    if (navigator.onLine) {
+      const validPhotos = overallPhotos.value.filter(url => !!url)
+      await api.post('/inspections', {
+        plan_detail_id: plan.value.id,
+        checklist_id: plan.value.batch?.checklist_id,
+        cabinet_code: plan.value.cabinet_code,
+        overall_photos: validPhotos,
+        lat: null,
+        lng: null,
+        details: payloadDetails,
+      })
+      clearDraft()
+      goBack()
+      return
+    }
+
+    // Offline: save to Dexie for later sync
+    const overallPhotosBase64 = overallPhotos.value
+      .filter(p => !!p)
+      .map(p => p.startsWith('data:') ? p : null)
+      .filter(Boolean)
+
+    await saveDraftToDexie({
       plan_detail_id: plan.value.id,
       checklist_id: plan.value.batch?.checklist_id,
       cabinet_code: plan.value.cabinet_code,
-      overall_photos: validPhotos,
+      overall_photos: overallPhotosBase64,
       lat: null,
       lng: null,
-      details: payloadDetails
+      details: payloadDetails,
     })
 
-    goBack()
     clearDraft()
+    submitError.value = t('inspection.savedOffline')
+    setTimeout(() => {
+      if (submitError.value === t('inspection.savedOffline')) {
+        submitError.value = ''
+        goBack()
+      }
+    }, 3000)
   } catch (e) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     submitError.value = e.response?.data?.message || t('inspection.submitError')
