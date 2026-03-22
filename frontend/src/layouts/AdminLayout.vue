@@ -90,7 +90,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings, ClipboardList, Languages } from 'lucide-vue-next'
+import { ShieldCheck, Menu, LogOut, LayoutDashboard, FileStack, Server, Users, Settings, ClipboardList, Languages, FileBarChart } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -105,6 +105,7 @@ const navItems = [
   { path: '/admin/batches', labelKey: 'nav.batches', icon: FileStack },
   { path: '/admin/cabinets', labelKey: 'nav.cabinets', icon: Server },
   { path: '/admin/checklists', labelKey: 'nav.checklists', icon: ClipboardList },
+  { path: '/admin/reports', labelKey: 'reports.title', icon: FileBarChart },
   { path: '/admin/users', labelKey: 'nav.users', icon: Users },
   { path: '/admin/settings', labelKey: 'nav.settings', icon: Settings }
 ]

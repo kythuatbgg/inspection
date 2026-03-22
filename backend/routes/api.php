@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\StorageController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -68,6 +70,15 @@ Route::middleware('auth:sanctum')->group(function () {
         // Storage management
         Route::get('/admin/storage-stats', [StorageController::class, 'stats']);
         Route::post('/admin/storage-cleanup', [StorageController::class, 'cleanup']);
+
+        // Statistics (admin/manager only)
+        Route::prefix('statistics')->group(function () {
+            Route::get('overview', [StatisticsController::class, 'overview']);
+            Route::get('by-bts', [StatisticsController::class, 'byBts']);
+            Route::get('by-inspector', [StatisticsController::class, 'byInspector']);
+            Route::get('by-error-type', [StatisticsController::class, 'byErrorType']);
+            Route::get('export', [StatisticsController::class, 'export']);
+        });
     });
 
     Route::get('batches/{batch}/plans', [PlanDetailController::class, 'index']);
@@ -83,4 +94,13 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // File upload
     Route::post('/upload', [UploadController::class, 'store']);
+
+    // Reports (accessible by both admin and inspector)
+    Route::prefix('reports')->group(function () {
+        Route::get('inspection/{inspection}', [ReportController::class, 'inspectionReport']);
+        Route::get('batch/{batch}/summary', [ReportController::class, 'batchSummary']);
+        Route::get('batch/{batch}/export', [ReportController::class, 'batchExport']);
+        Route::get('critical-errors', [ReportController::class, 'criticalErrors']);
+        Route::get('acceptance/{batch}', [ReportController::class, 'acceptance']);
+    });
 });
