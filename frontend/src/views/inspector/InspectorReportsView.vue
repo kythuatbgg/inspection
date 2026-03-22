@@ -126,6 +126,13 @@
               :placeholder="$t('inspector.filterResult')"
               container-class="md:w-40"
             />
+            <MobileBottomSheet
+              v-model="reportLang"
+              :options="langOptions"
+              :label="$t('inspector.reportLang')"
+              :placeholder="$t('inspector.reportLang')"
+              container-class="md:w-36"
+            />
           </div>
         </div>
 
@@ -231,16 +238,23 @@ const dateTo = ref('')
 const searchQuery = ref('')
 const filterResult = ref('')
 const downloadingId = ref(null)
+const reportLang = ref('en')
 
 const overview = ref({ total: 0, passed: 0, failed: 0, pass_rate: 0, critical_errors: 0, avg_score: 0 })
 const timeline = ref([])
 const topErrors = ref([])
 const inspections = ref([])
 
+const langOptions = computed(() => [
+  { value: 'en', label: '🇬🇧 English' },
+  { value: 'vn', label: '🇻🇳 Tiếng Việt' },
+  { value: 'kh', label: '🇰🇭 ភាសាខ្មែរ' }
+])
+
 const resultOptions = computed(() => [
   { value: '', label: t('common.all') },
-  { value: 'PASS', label: '✅ PASS' },
-  { value: 'FAIL', label: '❌ FAIL' },
+  { value: 'PASS', label: 'PASS' },
+  { value: 'FAIL', label: 'FAIL' },
 ])
 
 const dateParams = computed(() => {
@@ -323,7 +337,7 @@ const downloadReport = async (insp) => {
   if (!insp.id || downloadingId.value) return
   downloadingId.value = insp.id
   try {
-    const { data } = await reportService.downloadInspectionReport(insp.id, 'en')
+    const { data } = await reportService.downloadInspectionReport(insp.id, reportLang.value)
     triggerDownload(data, `bien-ban-${insp.cabinet_code}.pdf`)
   } catch (e) {
     console.error('Download failed:', e)
