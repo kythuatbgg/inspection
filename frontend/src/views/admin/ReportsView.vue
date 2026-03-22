@@ -67,7 +67,8 @@
           <span>{{ $t('common.loading') }}</span>
         </div>
 
-        <table v-else-if="searchResults.length" class="data-table">
+        <!-- Desktop Table -->
+        <table v-else-if="searchResults.length" class="data-table d-md-table">
           <thead>
             <tr>
               <th>#</th>
@@ -93,7 +94,7 @@
                   {{ row.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
                 </span>
               </td>
-              <td>{{ row.total_score }}</td>
+              <td><strong>{{ row.total_score }}</strong></td>
               <td>{{ row.inspector_name }}</td>
               <td class="text-muted text-sm">{{ row.batch_name }}</td>
               <td>
@@ -109,6 +110,48 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Mobile Cards -->
+        <div v-if="searchResults.length && !loadingSearch" class="mobile-list d-md-none">
+          <div v-for="(row, i) in searchResults" :key="row.id" class="mobile-card">
+            <div class="mc-header">
+              <div class="mc-title-group">
+                <div class="mc-title font-mono">{{ row.cabinet_code }}</div>
+                <div class="mc-subtitle font-mono">{{ row.bts_site }}</div>
+              </div>
+              <span
+                class="badge"
+                :class="row.final_result === 'PASS' ? 'badge-pass' : 'badge-fail'"
+              >
+                {{ row.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
+              </span>
+            </div>
+            <div class="mc-body">
+              <div class="mc-row">
+                <span class="mc-label">{{ $t('reports.score') }}</span>
+                <span class="mc-value"><strong>{{ row.total_score }}</strong></span>
+              </div>
+              <div class="mc-row">
+                <span class="mc-label">{{ $t('reports.inspectorName') }}</span>
+                <span class="mc-value">{{ row.inspector_name }}</span>
+              </div>
+              <div class="mc-row">
+                <span class="mc-label">{{ $t('reports.selectBatch') }}</span>
+                <span class="mc-value text-muted">{{ row.batch_name }}</span>
+              </div>
+            </div>
+            <div class="mc-actions">
+              <button
+                class="btn btn-sm btn-outline w-full"
+                :disabled="downloading"
+                @click="downloadInspectionReport(row.id, row.cabinet_code)"
+              >
+                <Download :size="14" />
+                {{ $t('reports.exportPdf') }}
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div v-else class="empty-state">
           <FileSearch :size="48" class="empty-icon" />
@@ -171,7 +214,7 @@
         <div class="card">
           <h3 class="card-title">{{ $t('reports.byBts') }}</h3>
           <div v-if="loadingBts" class="loading-state"><Loader2 :size="18" class="spinner" /></div>
-          <table v-else-if="btsData.length" class="data-table compact">
+          <table v-else-if="btsData.length" class="data-table compact d-md-table">
             <thead>
               <tr>
                 <th>{{ $t('reports.btsSite') }}</th>
@@ -196,6 +239,26 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="btsData.length && !loadingBts" class="mobile-list d-md-none">
+            <div v-for="row in btsData" :key="row.bts_site" class="mobile-card">
+              <div class="mc-header" style="margin-bottom: 8px; padding-bottom: 8px;">
+                <div class="mc-title-group">
+                  <div class="mc-title font-mono">{{ row.bts_site }}</div>
+                </div>
+                <span class="badge" :class="row.pass_rate >= 80 ? 'badge-pass' : (row.pass_rate >= 50 ? 'badge-warning' : 'badge-fail')">{{ row.pass_rate }}% pass</span>
+              </div>
+              <div class="mc-body" style="margin-bottom: 0;">
+                <div class="mc-row">
+                  <span class="mc-label">{{ $t('reports.total') }}</span>
+                  <span class="mc-value">{{ row.total }}</span>
+                </div>
+                <div class="mc-row">
+                  <span class="mc-label">{{ $t('reports.passed') }}/{{ $t('reports.failed') }}</span>
+                  <span class="mc-value"><span class="text-pass">{{ row.passed }}</span> / <span class="text-fail">{{ row.failed }}</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div v-else class="empty-state small"><p>{{ $t('reports.noDataYet') }}</p></div>
         </div>
 
@@ -203,7 +266,7 @@
         <div class="card">
           <h3 class="card-title">{{ $t('reports.byInspector') }}</h3>
           <div v-if="loadingInspector" class="loading-state"><Loader2 :size="18" class="spinner" /></div>
-          <table v-else-if="inspectorData.length" class="data-table compact">
+          <table v-else-if="inspectorData.length" class="data-table compact d-md-table">
             <thead>
               <tr>
                 <th>{{ $t('reports.inspectorName') }}</th>
@@ -226,6 +289,26 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="inspectorData.length && !loadingInspector" class="mobile-list d-md-none">
+            <div v-for="row in inspectorData" :key="row.inspector_id" class="mobile-card">
+              <div class="mc-header" style="margin-bottom: 8px; padding-bottom: 8px;">
+                <div class="mc-title-group">
+                  <div class="mc-title">{{ row.inspector_name }}</div>
+                </div>
+                <span class="badge badge-primary">{{ row.total_inspections }} tủ</span>
+              </div>
+              <div class="mc-body" style="margin-bottom: 0;">
+                <div class="mc-row">
+                  <span class="mc-label">{{ $t('reports.passRate') }}</span>
+                  <span class="mc-value">{{ row.pass_rate }}%</span>
+                </div>
+                <div class="mc-row">
+                  <span class="mc-label">{{ $t('reports.avgScore') }}</span>
+                  <span class="mc-value"><strong>{{ row.avg_score }}</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div v-else class="empty-state small"><p>{{ $t('reports.noDataYet') }}</p></div>
         </div>
       </div>
@@ -234,7 +317,7 @@
       <div class="card" style="margin-top: 16px">
         <h3 class="card-title">{{ $t('reports.byErrorType') }}</h3>
         <div v-if="loadingErrors" class="loading-state"><Loader2 :size="18" class="spinner" /></div>
-        <table v-else-if="errorData.length" class="data-table compact">
+        <table v-else-if="errorData.length" class="data-table compact d-md-table">
           <thead>
             <tr>
               <th>{{ $t('reports.errorContent') }}</th>
@@ -250,6 +333,19 @@
             </tr>
           </tbody>
         </table>
+        <div v-if="errorData.length && !loadingErrors" class="mobile-list d-md-none">
+          <div v-for="row in errorData" :key="row.error_content" class="mobile-card">
+            <div class="mc-body" style="margin-bottom: 0; gap: 4px;">
+              <div class="mc-row" style="align-items: flex-start;">
+                <span class="mc-title" style="flex: 1; text-align: left; font-weight: 500;">{{ row.error_content }}</span>
+                <span class="mc-value text-fail font-bold" style="font-size: 16px; min-width: 30px; text-align: right;">{{ row.count }}</span>
+              </div>
+              <div class="mc-row" style="margin-top: 4px;">
+                <span class="badge badge-category" style="font-size: 10px;">{{ row.category }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div v-else class="empty-state small"><p>{{ $t('reports.noDataYet') }}</p></div>
       </div>
     </div>
@@ -257,7 +353,7 @@
     <!-- Tab: Export Excel -->
     <div v-if="activeTab === 'export'" class="tab-content">
       <div class="card export-card">
-        <div class="export-grid">
+        <div class="export-grid mobile-export-grid">
           <!-- Batch Export -->
           <div class="export-item">
             <div class="export-icon"><FileSpreadsheet :size="32" /></div>
@@ -646,6 +742,92 @@ onMounted(() => {
   min-width: 200px;
 }
 .select-lang { min-width: 140px; max-width: 160px; }
+
+/* Filter & Desktop/Mobile Visibility */
+.d-md-none { display: none !important; }
+.d-md-table { display: table; }
+
+@media (max-width: 768px) {
+  .d-md-none { display: block !important; }
+  .d-md-table { display: none !important; }
+  
+  .filters-row { flex-direction: column; gap: 8px; }
+  .select-input, .search-box, .select-lang { width: 100%; max-width: 100%; }
+  
+  .batch-actions { flex-direction: column; gap: 8px; }
+  .batch-actions .btn { width: 100%; justify-content: center; }
+  
+  .w-full { width: 100%; justify-content: center; }
+}
+
+/* Mobile Cards */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.mobile-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.mc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.mc-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mc-title {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.mc-subtitle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.mc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.mc-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mc-label {
+  color: #64748b;
+}
+
+.mc-value {
+  color: #1e293b;
+  text-align: right;
+}
+
+.mc-actions {
+  display: flex;
+  gap: 8px;
+}
 
 .filter-card { margin-bottom: 16px; }
 .filter-row { display: flex; gap: 16px; flex-wrap: wrap; }
