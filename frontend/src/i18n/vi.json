@@ -567,6 +567,7 @@
     "completeCount": "Hoàn tất ({answered}/{total})",
     "submitError": "Không thể lưu kết quả kiểm tra. Vui lòng thử lại.",
     "savedOffline": "Đã lưu offline. Sẽ đồng bộ khi có mạng.",
+    "submitSuccess": "Đã nộp biên bản thành công!",
     "draftConfirm": "Có bản nháp từ {date} lúc {time}. Khôi phục?"
   },
 
@@ -617,6 +618,14 @@
     "selectBatchForReport": "Chọn đợt kiểm tra để xuất biên bản",
     "searchCabinetPlaceholder": "Tìm theo mã tủ...",
     "reportLang": "Ngôn ngữ biên bản"
+  },
+
+  "sync": {
+    "errorTokenExpired": "Token hết hạn. Vui lòng đăng nhập lại.",
+    "errorSyncFailed": "Không thể đồng bộ dữ liệu.",
+    "failedCount": "{n} biên bản chưa đồng bộ",
+    "retry": "Thử lại",
+    "relogin": "Đăng nhập lại"
   },
 
   "language": {

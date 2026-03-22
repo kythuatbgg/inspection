@@ -34,6 +34,36 @@
             <Loader2 class="w-4 h-4 animate-spin shrink-0" />
             <span class="text-xs font-medium">{{ $t('inspector.syncing') }}</span>
           </div>
+          <div v-else-if="isExhausted" class="space-y-2">
+            <div class="flex items-start gap-2 px-3 py-2 bg-danger/10 border border-danger/20 rounded-lg text-danger">
+              <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold leading-snug">
+                  {{ syncError === 'token_expired' ? $t('sync.errorTokenExpired') : $t('sync.errorSyncFailed') }}
+                </p>
+                <p v-if="failedCount > 0" class="text-[10px] mt-0.5 opacity-75">
+                  {{ $t('sync.failedCount', { n: failedCount }) }}
+                </p>
+              </div>
+            </div>
+            <!-- Retry / Re-login buttons — full-width mobile -->
+            <div class="flex gap-2">
+              <button
+                v-if="syncError === 'token_expired'"
+                @click="handleRelogin"
+                class="flex-1 btn-primary text-xs text-center min-h-[40px]"
+              >
+                {{ $t('sync.relogin') }}
+              </button>
+              <button
+                @click="retryManually"
+                class="flex-1 btn-secondary text-xs text-center min-h-[40px] flex items-center justify-center gap-1"
+              >
+                <RefreshCw class="w-3.5 h-3.5" />
+                {{ $t('sync.retry') }}
+              </button>
+            </div>
+          </div>
           <div v-else-if="draftCount > 0" class="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-lg text-amber-600">
             <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
             <span class="text-xs font-medium">{{ $t('inspector.pendingSync', { n: draftCount }) }}</span>
@@ -138,21 +168,25 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
+import { useSyncStore } from '@/stores/syncStore'
 import { useOfflineSync } from '@/composables/useOfflineSync'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
-import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart, Loader2, Smartphone } from 'lucide-vue-next'
+import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart, Loader2, Smartphone, AlertCircle, RefreshCw } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const syncStore = useSyncStore()
 const { t, locale: currentLocale } = useI18n()
 
 // Sync state from offline composable
-const { isOnline, isSyncing, draftCount } = useOfflineSync()
+const { isOnline, isSyncing, retryManually } = useOfflineSync()
+const { draftCount, failedCount, isExhausted, syncError } = storeToRefs(syncStore)
 
 // PWA install prompt
 const { canInstall, showBanner, install, dismiss } = useInstallPrompt()
@@ -189,6 +223,12 @@ const isActive = (path) => {
 
 const handleLogout = async () => {
   await authStore.logout()
+  router.replace({ name: 'login' })
+}
+
+const handleRelogin = async () => {
+  await authStore.logout()
+  syncStore.resetAll()
   router.replace({ name: 'login' })
 }
 </script>

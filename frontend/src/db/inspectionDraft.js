@@ -12,6 +12,32 @@ db.version(1).stores({
   inspectionDetails: '++id, inspection_id, item_id'
 })
 
+// v2: add sync metadata columns (non-destructive migration)
+db.version(2).stores({
+  cabinets: 'cabinet_code, bts_site, name',
+  checklists: 'id, name',
+  checklistItems: 'id, checklist_id, category',
+  batches: 'id, user_id, status',
+  planDetails: 'id, batch_id, cabinet_code, status',
+  inspections: '++id, plan_detail_id, cabinet_code, sync_status, created_at',
+  inspectionDetails: '++id, inspection_id, item_id'
+}).upgrade(tx => {
+  // Add nullable columns to existing inspections rows
+  return tx.table('inspections').toCollection().modify(row => {
+    if (row.sync_status === undefined) row.sync_status = 'draft'
+    if (row.sync_error === undefined) row.sync_error = null
+    if (row.sync_retry_count === undefined) row.sync_retry_count = 0
+  })
+})
+
+// ── Sync Status Constants ────────────────────────────────────────────────
+export const SYNC_DRAFT = 'draft'     // never synced
+export const SYNC_PENDING = 'pending' // failed, retry scheduled
+export const SYNC_SYNCED = 'synced'   // server confirmed
+export const SYNC_FAILED = 'failed'   // exhausted, requires action
+
+// ── Save / Read ─────────────────────────────────────────────────────────
+
 /**
  * Lưu inspection draft vào IndexedDB (Dexie).
  * Ảnh được lưu dưới dạng base64 string để không phụ thuộc network.
@@ -24,7 +50,9 @@ export async function saveDraft(inspection) {
 
   const localId = await db.inspections.add({
     ...header,
-    sync_status: 'draft',
+    sync_status: SYNC_DRAFT,
+    sync_error: null,
+    sync_retry_count: 0,
     created_at: new Date().toISOString(),
   })
 
@@ -39,13 +67,12 @@ export async function saveDraft(inspection) {
 }
 
 /**
- * Lấy tất cả inspection chưa sync.
- * Chỉ trả về `draft` và `pending` — không trả `synced`.
+ * Lấy tất cả inspection chưa sync (draft + pending).
  */
 export async function getDrafts() {
   const drafts = await db.inspections
     .where('sync_status')
-    .anyOf(['draft', 'pending'])
+    .anyOf([SYNC_DRAFT, SYNC_PENDING])
     .toArray()
 
   const withDetails = await Promise.all(
@@ -67,18 +94,66 @@ export async function getDrafts() {
 export async function getPendingInspections() {
   return db.inspections
     .where('sync_status')
-    .equals('draft')
+    .equals(SYNC_DRAFT)
     .toArray()
 }
+
+/**
+ * Lấy inspection đang ở trạng thái pending (đang retry).
+ */
+export async function getPendingRetryInspections() {
+  return db.inspections
+    .where('sync_status')
+    .equals(SYNC_PENDING)
+    .toArray()
+}
+
+/**
+ * Lấy inspection đang ở trạng thái failed (exhausted).
+ */
+export async function getFailedInspections() {
+  return db.inspections
+    .where('sync_status')
+    .equals(SYNC_FAILED)
+    .toArray()
+}
+
+// ── Status Transitions ──────────────────────────────────────────────────
 
 /**
  * Đánh dấu inspection đã sync thành công.
  */
 export async function markAsSynced(localId) {
-  await db.inspections.update(localId, { sync_status: 'synced' })
+  await db.inspections.update(localId, {
+    sync_status: SYNC_SYNCED,
+    sync_error: null,
+  })
 }
 
-// ── Master Data Sync (Phase 7) ─────────────────────────────────────────
+/**
+ * Đánh dấu inspection đang chờ retry (sau fail đầu tiên).
+ */
+export async function markAsPending(localId) {
+  const row = await db.inspections.get(localId)
+  await db.inspections.update(localId, {
+    sync_status: SYNC_PENDING,
+    sync_retry_count: (row?.sync_retry_count ?? 0) + 1,
+  })
+}
+
+/**
+ * Đánh dấu inspection đã exhausted — không retry nữa, cần action từ user.
+ * @param {number} localId
+ * @param {string|null} errorMsg
+ */
+export async function markAsFailed(localId, errorMsg = null) {
+  await db.inspections.update(localId, {
+    sync_status: SYNC_FAILED,
+    sync_error: errorMsg,
+  })
+}
+
+// ── Master Data Sync (Phase 7) ──────────────────────────────────────────
 
 /**
  * Fetch cabinets from API → bulkPut into Dexie cabinets table.
@@ -104,7 +179,6 @@ export async function syncChecklists() {
 
   await db.checklists.bulkPut(checklists)
 
-  // Fetch items for each checklist concurrently
   await Promise.all(
     checklists.map(async (cl) => {
       try {
@@ -136,7 +210,6 @@ export async function syncBatches(userId) {
 
   await db.batches.bulkPut(batches)
 
-  // Fetch plan_details for each batch concurrently
   await Promise.all(
     batches.map(async (batch) => {
       try {
@@ -154,31 +227,21 @@ export async function syncBatches(userId) {
   )
 }
 
-// ── Lazy imports: only resolved when pushDrafts is called ──
+// ── Push Drafts ─────────────────────────────────────────────────────────
 
 /**
- * Push all pending inspections lên backend /api/sync.
- * Map inspectionDetails rows từ Dexie vào payload shape backend yêu cầu.
- * Sau khi sync thành công → đánh dấu từng draft là synced.
+ * Sync a single inspection to backend.
+ * Returns { status: 'synced'|'failed', reason?: string }
  */
-export async function pushDrafts() {
+async function syncOneInspection(draft) {
   const { default: api } = await import('@/services/api')
 
-  const drafts = await getPendingInspections()
+  const details = await db.inspectionDetails
+    .where('inspection_id')
+    .equals(draft.id)
+    .toArray()
 
-  if (!drafts.length) return { synced: 0 }
-
-  const withDetails = await Promise.all(
-    drafts.map(async (draft) => {
-      const details = await db.inspectionDetails
-        .where('inspection_id')
-        .equals(draft.id)
-        .toArray()
-      return { ...draft, details }
-    })
-  )
-
-  const payload = withDetails.map(({ details, ...draft }) => ({
+  const payload = {
     plan_detail_id: draft.plan_detail_id,
     checklist_id: draft.checklist_id,
     cabinet_code: draft.cabinet_code,
@@ -192,11 +255,99 @@ export async function pushDrafts() {
       image_base64,
       note,
     })),
-  }))
+  }
 
-  const { data } = await api.post('/sync', { inspections: payload })
+  await api.post('/sync', { inspections: [payload] })
+  return { status: 'synced' }
+}
 
-  await Promise.all(drafts.map(d => markAsSynced(d.id)))
+/**
+ * Push all 'draft' inspections (never-synced) to backend.
+ * Handles per-inspection errors — one fail does not block others.
+ *
+ * @returns {{ synced: number, pending: number, failed: number, reason: string|null }}
+ */
+export async function pushDrafts() {
+  const drafts = await getPendingInspections()
+  if (!drafts.length) return { synced: 0, pending: 0, failed: 0, reason: null }
 
-  return data
+  let synced = 0
+  let pending = 0
+  let failed = 0
+  let reason = null
+
+  for (const draft of drafts) {
+    try {
+      const result = await syncOneInspection(draft)
+      if (result.status === 'synced') {
+        await markAsSynced(draft.id)
+        synced++
+      }
+    } catch (err) {
+      const status = err?.response?.status
+
+      if (status === 401) {
+        // Token hết hạn — không retry, báo user
+        await markAsFailed(draft.id, 'token_expired')
+        reason = 'token_expired'
+        failed++
+        break // không sync thêm nữa
+      } else {
+        // Network / 5xx / timeout — đánh dấu pending để retry
+        await markAsPending(draft.id)
+        pending++
+      }
+    }
+  }
+
+  return { synced, pending, failed, reason }
+}
+
+/**
+ * Retry all 'pending' inspections (previously failed, now retrying).
+ * Stops at MAX_RETRIES — marks exhausted as 'failed'.
+ *
+ * @param {number} maxRetries — max retry_count before marking failed
+ * @returns {{ synced: number, pending: number, failed: number }}
+ */
+export async function retryPendingInspections(maxRetries = 5) {
+  const pending = await getPendingRetryInspections()
+  if (!pending.length) return { synced: 0, pending: 0, failed: 0 }
+
+  let synced = 0
+  let stillPending = 0
+  let failed = 0
+
+  for (const draft of pending) {
+    const count = draft.sync_retry_count ?? 0
+
+    if (count >= maxRetries) {
+      // Exhausted — đánh dấu failed, không retry nữa
+      await markAsFailed(draft.id, 'max_retries')
+      failed++
+      continue
+    }
+
+    try {
+      const result = await syncOneInspection(draft)
+      if (result.status === 'synced') {
+        await markAsSynced(draft.id)
+        synced++
+      }
+    } catch (err) {
+      const status = err?.response?.status
+
+      if (status === 401) {
+        await markAsFailed(draft.id, 'token_expired')
+        failed++
+        break
+      } else {
+        // Increment retry count via markAsPending (adds 1)
+        await markAsPending(draft.id)
+        stillPending++
+      }
+    }
+  }
+
+  return { synced, pending: stillPending, failed }
 }

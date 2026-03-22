@@ -224,6 +224,10 @@
       <div v-if="submitError" class="rounded-xl bg-red-50 border border-red-200 p-4 mt-4">
         <p class="text-sm text-red-600 font-medium">{{ submitError }}</p>
       </div>
+      <!-- Success -->
+      <div v-if="submitSuccess" class="rounded-xl bg-emerald-50 border border-emerald-200 p-4 mt-4">
+        <p class="text-sm text-emerald-600 font-medium">{{ submitSuccess }}</p>
+      </div>
     </template>
 
     <div v-else-if="!loading && !plan" class="flex flex-col items-center justify-center py-14 text-center">
@@ -287,6 +291,7 @@ const router = useRouter()
 const loading = ref(true)
 const submitting = ref(false)
 const submitError = ref('')
+const submitSuccess = ref('')
 const plan = ref(null)
 const checklistItems = ref([])
 const existingInspection = ref(null)
@@ -422,6 +427,7 @@ const handleSubmit = async () => {
 
   submitting.value = true
   submitError.value = ''
+  submitSuccess.value = ''
 
   try {
     // Build detail payloads — separate URL vs base64
@@ -451,7 +457,11 @@ const handleSubmit = async () => {
         details: payloadDetails,
       })
       clearDraft()
-      goBack()
+      submitSuccess.value = t('inspection.submitSuccess')
+      setTimeout(() => {
+        submitSuccess.value = ''
+        goBack()
+      }, 2000)
       return
     }
 
@@ -472,12 +482,10 @@ const handleSubmit = async () => {
     })
 
     clearDraft()
-    submitError.value = t('inspection.savedOffline')
+    submitSuccess.value = t('inspection.savedOffline')
     setTimeout(() => {
-      if (submitError.value === t('inspection.savedOffline')) {
-        submitError.value = ''
-        goBack()
-      }
+      submitSuccess.value = ''
+      goBack()
     }, 3000)
   } catch (e) {
     window.scrollTo({ top: 0, behavior: 'smooth' })

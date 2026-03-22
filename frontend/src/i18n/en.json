@@ -567,6 +567,7 @@
     "completeCount": "Complete ({answered}/{total})",
     "submitError": "Cannot save inspection result. Please try again.",
     "savedOffline": "Saved offline. Will sync when back online.",
+    "submitSuccess": "Inspection submitted successfully!",
     "draftConfirm": "Draft found from {date} at {time}. Restore?"
   },
 
@@ -617,6 +618,14 @@
     "selectBatchForReport": "Select a batch to generate reports",
     "searchCabinetPlaceholder": "Search by cabinet code...",
     "reportLang": "Report language"
+  },
+
+  "sync": {
+    "errorTokenExpired": "Session expired. Please log in again.",
+    "errorSyncFailed": "Unable to sync data.",
+    "failedCount": "{n} inspection(s) not synced",
+    "retry": "Retry",
+    "relogin": "Log in again"
   },
 
   "language": {
