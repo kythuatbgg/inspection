@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\StorageController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\StatisticsController;
+use App\Http\Controllers\Api\InspectorStatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -94,6 +95,14 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // File upload
     Route::post('/upload', [UploadController::class, 'store']);
+
+    // Inspector personal stats
+    Route::prefix('inspector/stats')->group(function () {
+        Route::get('overview', [InspectorStatsController::class, 'overview']);
+        Route::get('timeline', [InspectorStatsController::class, 'timeline']);
+        Route::get('top-errors', [InspectorStatsController::class, 'topErrors']);
+        Route::get('inspections', [InspectorStatsController::class, 'inspections']);
+    });
 
     // Reports (accessible by both admin and inspector)
     Route::prefix('reports')->group(function () {

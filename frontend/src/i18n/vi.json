@@ -104,6 +104,7 @@
     "home": "Trang chủ",
     "myBatches": "Lô của tôi",
     "proposals": "Đề xuất",
+    "reports": "Báo cáo",
     "logout": "Thoát"
   },
 
@@ -478,7 +479,20 @@
     "reportLang": "Ngôn ngữ biên bản",
     "downloading": "Đang tải...",
     "downloadSuccess": "Tải biên bản thành công",
-    "downloadError": "Lỗi khi tải biên bản"
+    "downloadError": "Lỗi khi tải biên bản",
+    "myReports": "Báo cáo của tôi",
+    "myReportsDesc": "Thống kê cá nhân và danh sách biên bản",
+    "totalInspected": "Tổng đã kiểm tra",
+    "passRate": "Tỷ lệ đạt",
+    "criticalErrors": "Lỗi nghiêm trọng",
+    "avgScore": "Điểm trung bình",
+    "timeline": "Theo thời gian",
+    "topErrors": "Lỗi thường gặp",
+    "noErrors": "Chưa có lỗi nào",
+    "allInspections": "Tất cả biên bản",
+    "searchCabinet": "Tìm mã tủ...",
+    "filterResult": "Kết quả",
+    "noInspections": "Chưa có biên bản nào"
   },
 
   "profile": {

@@ -118,7 +118,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
-import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages } from 'lucide-vue-next'
+import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -130,11 +130,13 @@ const isOnline = ref(navigator.onLine)
 const navItems = [
   { path: '/inspector', labelKey: 'nav.home', icon: Home },
   { path: '/inspector/tasks', labelKey: 'nav.myBatches', icon: ListTodo },
-  { path: '/inspector/proposals', labelKey: 'nav.proposals', icon: ClipboardEdit }
+  { path: '/inspector/proposals', labelKey: 'nav.proposals', icon: ClipboardEdit },
+  { path: '/inspector/reports', labelKey: 'nav.reports', icon: FileBarChart }
 ]
 
 const pageTitle = computed(() => {
   if (route.path === '/inspector') return t('inspector.overview')
+  if (route.path === '/inspector/reports') return t('inspector.myReports')
   if (route.path.startsWith('/inspector/batch/')) return t('inspector.batchDetail')
   if (route.path === '/inspector/tasks') return t('inspector.myBatches')
   if (route.path === '/inspector/proposals') return t('inspector.myProposals')

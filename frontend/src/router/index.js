@@ -135,6 +135,11 @@ const routes = [
         component: () => import('../views/inspector/ProposalsView.vue')
       },
       {
+        path: 'reports',
+        name: 'inspector-reports',
+        component: () => import('../views/inspector/InspectorReportsView.vue')
+      },
+      {
         path: 'proposals/:id',
         name: 'inspector-proposal-detail',
         component: () => import('../views/inspector/BatchDetailView.vue')

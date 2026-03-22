@@ -104,6 +104,7 @@
     "home": "Home",
     "myBatches": "My Batches",
     "proposals": "Proposals",
+    "reports": "Reports",
     "logout": "Logout"
   },
 
@@ -478,7 +479,20 @@
     "reportLang": "Report Language",
     "downloading": "Downloading...",
     "downloadSuccess": "Report downloaded",
-    "downloadError": "Download failed"
+    "downloadError": "Download failed",
+    "myReports": "My Reports",
+    "myReportsDesc": "Personal stats and inspection history",
+    "totalInspected": "Total Inspected",
+    "passRate": "Pass Rate",
+    "criticalErrors": "Critical Errors",
+    "avgScore": "Avg. Score",
+    "timeline": "Timeline",
+    "topErrors": "Common Errors",
+    "noErrors": "No errors found",
+    "allInspections": "All Inspections",
+    "searchCabinet": "Search cabinet...",
+    "filterResult": "Result",
+    "noInspections": "No inspections yet"
   },
 
   "profile": {
