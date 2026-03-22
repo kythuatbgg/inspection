@@ -1,15 +1,9 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '../services/api'
 import { db } from '../db'
 import { setI18nLocale } from '../i18n'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
-// Set axios default header if token exists
 const storedToken = localStorage.getItem('token')
-if (storedToken) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-}
 
 function syncLocaleFromUser(user) {
   if (!user?.lang_pref) return
@@ -35,12 +29,11 @@ export const useAuthStore = defineStore('auth', {
     async login(username, password) {
       this.loading = true
       try {
-        const response = await axios.post(`${API_URL}/login`, { username, password })
+        const response = await api.post('/login', { username, password })
         const payload = response.data.data || response.data
         this.token = payload.token
         this.user = payload.user
         localStorage.setItem('token', this.token)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
         syncLocaleFromUser(this.user)
         return true
       } catch (error) {
@@ -53,21 +46,19 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        await axios.post(`${API_URL}/logout`)
+        await api.post('/logout')
       } catch (e) {
         // Ignore
       }
       this.token = null
       this.user = null
       localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
     },
 
     async fetchUser() {
       if (!this.token) return
       try {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-        const response = await axios.get(`${API_URL}/me`)
+        const response = await api.get('/me')
         const payload = response.data.data || response.data
         this.user = payload.user || payload
         syncLocaleFromUser(this.user)
@@ -83,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
       if (this.user) {
         this.user.lang_pref = locale === 'en' ? 'en' : 'vn'
         try {
-          await axios.patch(`${API_URL}/me/language`, { lang_pref: this.user.lang_pref })
+          await api.patch('/me/language', { lang_pref: this.user.lang_pref })
         } catch (e) {
           console.error('Failed to update language preference:', e)
         }

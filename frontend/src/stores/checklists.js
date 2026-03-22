@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+import api from '../services/api'
 
 export const useChecklistsStore = defineStore('checklists', {
   state: () => ({
@@ -18,7 +16,7 @@ export const useChecklistsStore = defineStore('checklists', {
     async fetchChecklists() {
       this.loading = true
       try {
-        const response = await axios.get(`${API_URL}/checklists`)
+        const response = await api.get('/checklists')
         this.checklists = response.data.data
       } finally {
         this.loading = false
@@ -28,7 +26,7 @@ export const useChecklistsStore = defineStore('checklists', {
     async fetchChecklist(id) {
       this.loading = true
       try {
-        const response = await axios.get(`${API_URL}/checklists/${id}`)
+        const response = await api.get(`/checklists/${id}`)
         this.currentChecklist = response.data.data
         return this.currentChecklist
       } finally {
@@ -38,7 +36,7 @@ export const useChecklistsStore = defineStore('checklists', {
 
     async fetchChecklistItems(checklistId) {
       try {
-        const response = await axios.get(`${API_URL}/checklists/${checklistId}/items`)
+        const response = await api.get(`/checklists/${checklistId}/items`)
         return response.data.data
       } catch (error) {
         console.error('Failed to fetch checklist items:', error)

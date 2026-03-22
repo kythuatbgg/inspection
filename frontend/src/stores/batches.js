@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+import api from '../services/api'
 
 export const useBatchesStore = defineStore('batches', {
   state: () => ({
@@ -19,7 +17,7 @@ export const useBatchesStore = defineStore('batches', {
     async fetchBatches() {
       this.loading = true
       try {
-        const response = await axios.get(`${API_URL}/batches`)
+        const response = await api.get('/batches')
         this.batches = response.data.data
       } finally {
         this.loading = false
@@ -29,7 +27,7 @@ export const useBatchesStore = defineStore('batches', {
     async fetchBatch(id) {
       this.loading = true
       try {
-        const response = await axios.get(`${API_URL}/batches/${id}`)
+        const response = await api.get(`/batches/${id}`)
         this.currentBatch = response.data.data
       } finally {
         this.loading = false
@@ -37,13 +35,13 @@ export const useBatchesStore = defineStore('batches', {
     },
 
     async createBatch(data) {
-      const response = await axios.post(`${API_URL}/batches`, data)
+      const response = await api.post('/batches', data)
       this.batches.push(response.data.data)
       return response.data.data
     },
 
     async updateBatchStatus(id, status) {
-      const response = await axios.patch(`${API_URL}/batches/${id}`, { status })
+      const response = await api.patch(`/batches/${id}`, { status })
       const index = this.batches.findIndex(b => b.id === id)
       if (index !== -1) this.batches[index] = response.data.data
       return response.data.data
@@ -53,7 +51,7 @@ export const useBatchesStore = defineStore('batches', {
       this.loading = true
       try {
         // Get batch that contains this plan
-        const batchesResponse = await axios.get(`${API_URL}/batches`)
+        const batchesResponse = await api.get('/batches')
         for (const batch of batchesResponse.data.data) {
           if (batch.plan_details) {
             const plan = batch.plan_details.find(p => p.id === parseInt(planId))
