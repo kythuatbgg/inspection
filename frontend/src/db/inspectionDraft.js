@@ -78,6 +78,82 @@ export async function markAsSynced(localId) {
   await db.inspections.update(localId, { sync_status: 'synced' })
 }
 
+// ── Master Data Sync (Phase 7) ─────────────────────────────────────────
+
+/**
+ * Fetch cabinets from API → bulkPut into Dexie cabinets table.
+ */
+export async function syncCabinets() {
+  const { default: api } = await import('@/services/api')
+  const response = await api.get('/cabinets')
+  const items = response.data?.data ?? response.data ?? []
+  if (items.length) {
+    await db.cabinets.bulkPut(items)
+  }
+}
+
+/**
+ * Fetch checklists from API → bulkPut into Dexie checklists table.
+ * Also fetches and stores checklist items into checklistItems table.
+ */
+export async function syncChecklists() {
+  const { default: api } = await import('@/services/api')
+  const response = await api.get('/checklists')
+  const checklists = response.data?.data ?? response.data ?? []
+  if (!checklists.length) return
+
+  await db.checklists.bulkPut(checklists)
+
+  // Fetch items for each checklist concurrently
+  await Promise.all(
+    checklists.map(async (cl) => {
+      try {
+        const res = await api.get(`/checklists/${cl.id}/items`)
+        const items = res.data?.data ?? res.data ?? []
+        if (items.length) {
+          await db.checklistItems.bulkPut(
+            items.map(item => ({ ...item, checklist_id: cl.id }))
+          )
+        }
+      } catch {
+        // Skip items if fetch fails
+      }
+    })
+  )
+}
+
+/**
+ * Fetch batches for a given userId → bulkPut into Dexie batches table.
+ * Also fetches and stores planDetails for each batch.
+ */
+export async function syncBatches(userId) {
+  const { default: api } = await import('@/services/api')
+  const response = await api.get('/batches', {
+    params: userId ? { user_id: userId } : {}
+  })
+  const batches = response.data?.data ?? response.data ?? []
+  if (!batches.length) return
+
+  await db.batches.bulkPut(batches)
+
+  // Fetch plan_details for each batch concurrently
+  await Promise.all(
+    batches.map(async (batch) => {
+      try {
+        const res = await api.get(`/batches/${batch.id}/plans`)
+        const plans = res.data?.data ?? res.data ?? []
+        if (plans.length) {
+          await db.planDetails.bulkPut(
+            plans.map(p => ({ ...p, batch_id: batch.id }))
+          )
+        }
+      } catch {
+        // Skip plans if fetch fails
+      }
+    })
+  )
+}
+
 // ── Lazy imports: only resolved when pushDrafts is called ──
 
 /**

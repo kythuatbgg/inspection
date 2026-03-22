@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import api from '../services/api'
 import { db } from '../db'
 import { setI18nLocale } from '../i18n'
+import { syncCabinets, syncChecklists, syncBatches } from '../db/inspectionDraft'
 
 const storedToken = localStorage.getItem('token')
 
@@ -35,6 +36,8 @@ export const useAuthStore = defineStore('auth', {
         this.user = payload.user
         localStorage.setItem('token', this.token)
         syncLocaleFromUser(this.user)
+        // Cache master data in background — non-blocking
+        this.cacheMasterData()
         return true
       } catch (error) {
         console.error('Login failed:', error)
@@ -78,6 +81,20 @@ export const useAuthStore = defineStore('auth', {
         } catch (e) {
           console.error('Failed to update language preference:', e)
         }
+      }
+    },
+
+    /** Cache master data into Dexie for offline access — fires silently in background. */
+    async cacheMasterData() {
+      if (!this.isAuthenticated) return
+      try {
+        await Promise.allSettled([
+          syncCabinets(),
+          syncChecklists(),
+          syncBatches(this.user?.id),
+        ])
+      } catch {
+        // Silent — offline access should not break the session
       }
     }
   }

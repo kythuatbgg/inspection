@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '../services/api'
+import { db } from '../db'
 
 export const useBatchesStore = defineStore('batches', {
   state: () => ({
@@ -19,6 +20,11 @@ export const useBatchesStore = defineStore('batches', {
       try {
         const response = await api.get('/batches')
         this.batches = response.data.data
+      } catch {
+        // Offline: fallback to Dexie cache
+        if (!navigator.onLine) {
+          this.batches = await db.batches.toArray()
+        }
       } finally {
         this.loading = false
       }
@@ -29,6 +35,15 @@ export const useBatchesStore = defineStore('batches', {
       try {
         const response = await api.get(`/batches/${id}`)
         this.currentBatch = response.data.data
+      } catch {
+        // Offline: fallback to Dexie — try planDetails first, then batch
+        if (!navigator.onLine) {
+          const plans = await db.planDetails.where('batch_id').equals(Number(id)).toArray()
+          if (plans.length) {
+            const batch = await db.batches.get(Number(id))
+            this.currentBatch = batch ? { ...batch, plan_details: plans } : null
+          }
+        }
       } finally {
         this.loading = false
       }
