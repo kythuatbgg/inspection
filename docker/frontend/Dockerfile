@@ -4,13 +4,13 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Copy package files
-COPY frontend/package*.json ./
+COPY app/frontend/package*.json ./
 
 RUN npm ci --frozen-lockfile
 
 # Copy source and build
-COPY frontend/ ./
-RUN npm run build
+COPY app/frontend/ ./
+RUN node node_modules/vite/bin/vite.js build
 
 # ── Stage 2: Serve ──────────────────────────────────────────────────────────
 FROM nginx:alpine

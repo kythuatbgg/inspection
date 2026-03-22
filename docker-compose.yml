@@ -17,6 +17,8 @@ services:
       retries: 5
 
   backend:
+    ports:
+      - "127.0.0.1:8000:80"
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
@@ -38,12 +40,7 @@ services:
       LOG_CHANNEL: stack
       LOG_LEVEL: info
     volumes:
-      - ./backend/storage:/var/www/html/storage:ro
-    healthcheck:
-      test: ["CMD-SHELL", "php artisan --version"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - ./backend/storage:/var/www/html/storage
 
   frontend:
     build:
@@ -52,8 +49,6 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-    volumes:
-      - ./frontend.dist:/var/www/html:ro
 
 volumes:
   postgres_data:
