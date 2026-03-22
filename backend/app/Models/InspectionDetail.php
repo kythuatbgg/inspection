@@ -42,7 +42,7 @@ class InspectionDetail extends Model implements HasMedia
         if (!$value) return null;
         
         if (preg_match('/\/storage\/(.+)$/', $value, $matches)) {
-            return request()->getSchemeAndHttpHost() . '/storage/' . $matches[1];
+            return '/storage/' . $matches[1];
         }
         
         return $value;

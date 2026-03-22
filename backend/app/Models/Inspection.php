@@ -52,7 +52,7 @@ class Inspection extends Model implements HasMedia
         
         return array_map(function ($photo) {
             if ($photo && preg_match('/\/storage\/(.+)$/', $photo, $matches)) {
-                return request()->getSchemeAndHttpHost() . '/storage/' . $matches[1];
+                return '/storage/' . $matches[1];
             }
             return $photo;
         }, $photos);

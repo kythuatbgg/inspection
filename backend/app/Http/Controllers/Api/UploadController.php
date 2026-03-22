@@ -22,8 +22,8 @@ class UploadController extends Controller
             $file = $request->file('image');
             $path = $file->store('images/inspections', 'public');
             
-            // Build URL using the request's host so it works from LAN devices
-            $url = $request->getSchemeAndHttpHost() . Storage::url($path);
+            // Return a relative path so the frontend (via Vite proxy or Nginx) can resolve it relative to its own host
+            $url = '/storage/' . $path;
 
             return response()->json([
                 'url' => $url,
