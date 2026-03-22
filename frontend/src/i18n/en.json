@@ -44,6 +44,7 @@
     "name": "Name",
     "confirmDeleteTitle": "Confirm deletion",
     "errorOccurred": "An error occurred. Please try again.",
+    "retry": "Retry",
     "overallProgress": "Overall Progress",
     "percentCompleted": "{pct}% Completed",
     "cabinetList": "Cabinet List ({count})",
@@ -498,7 +499,9 @@
     "allInspections": "All Inspections",
     "searchCabinet": "Search cabinet...",
     "filterResult": "Result",
-    "noInspections": "No inspections yet"
+    "noInspections": "No inspections yet",
+    "noFilteredResults": "No matching results",
+    "clearFilters": "Clear filters"
   },
 
   "profile": {

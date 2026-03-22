@@ -1,9 +1,9 @@
 import api from './api'
 
 export default {
-  // Search inspections by batch and/or cabinet
-  searchInspections(params = {}) {
-    return api.get('/reports/search', { params })
+  // Search inspections by batch and/or cabinet — accepts signal for cancellation
+  searchInspections(params = {}, config = {}) {
+    return api.get('/reports/search', { params, ...config })
   },
 
   // Reports (PDF/Excel download)

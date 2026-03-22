@@ -44,6 +44,7 @@
     "name": "Tên",
     "confirmDeleteTitle": "Xác nhận xóa",
     "errorOccurred": "Có lỗi xảy ra. Vui lòng thử lại.",
+    "retry": "Thử lại",
     "overallProgress": "Tiến độ tổng",
     "percentCompleted": "{pct}% Hoàn thành",
     "cabinetList": "Danh sách tủ cáp ({count})",
@@ -498,7 +499,9 @@
     "allInspections": "Tất cả biên bản",
     "searchCabinet": "Tìm mã tủ...",
     "filterResult": "Kết quả",
-    "noInspections": "Chưa có biên bản nào"
+    "noInspections": "Chưa có biên bản nào",
+    "noFilteredResults": "Không có kết quả phù hợp",
+    "clearFilters": "Xóa bộ lọc"
   },
 
   "profile": {
