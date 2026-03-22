@@ -125,6 +125,7 @@
               :label="$t('inspector.filterResult')"
               :placeholder="$t('inspector.filterResult')"
               container-class="md:w-40"
+              trigger-class="!min-h-[48px] md:!min-h-[40px]"
             />
             <MobileBottomSheet
               v-model="reportLang"
@@ -132,6 +133,7 @@
               :label="$t('inspector.reportLang')"
               :placeholder="$t('inspector.reportLang')"
               container-class="md:w-36"
+              trigger-class="!min-h-[48px] md:!min-h-[40px]"
             />
           </div>
         </div>
