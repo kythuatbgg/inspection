@@ -72,6 +72,7 @@
                 v-model="overallPhotos[index]"
                 :existingHashes="photoHashes"
                 :offlineBase64Fallback="true"
+                :watermarkOptions="watermarkOptions"
                 @uploading="(v) => onUploadStateChange(index, v)"
                 @hash="(h) => onPhotoHash(index, h)"
               />
@@ -199,7 +200,7 @@
                   <div>
                     <label class="block text-[10px] font-bold text-red-700 mb-2 uppercase tracking-wide">{{ $t('inspection.evidencePhoto') }} <span class="text-red-500">*</span></label>
                     <div class="w-32">
-                      <MobileImageUploader v-model="itemDetails[item.id].image_url" :offlineBase64Fallback="true" />
+                      <MobileImageUploader v-model="itemDetails[item.id].image_url" :offlineBase64Fallback="true" :watermarkOptions="watermarkOptions" />
                     </div>
                   </div>
                   
@@ -318,6 +319,13 @@ const goToStep2 = () => {
 const isValidStep1 = computed(() => {
   return overallPhotos.value.length >= 4 && overallPhotos.value.slice(0, 4).every(url => !!url)
 })
+
+// Watermark options: GPS + cabinet code for offline photo watermarking
+const watermarkOptions = computed(() => ({
+  lat: null,
+  lng: null,
+  cabinetCode: plan.value?.cabinet_code ?? 'N/A',
+}))
 
 const itemDetails = ref({})
 

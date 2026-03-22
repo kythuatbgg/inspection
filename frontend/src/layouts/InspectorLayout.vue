@@ -86,6 +86,21 @@
           <h2 class="text-xl font-bold mt-5 text-slate-900 tracking-tight leading-tight">{{ pageTitle }}</h2>
         </header>
 
+        <!-- PWA Install Banner -->
+        <div v-if="canInstall && showBanner" class="fixed bottom-20 md:bottom-4 left-4 right-4 max-w-md md:left-auto md:right-6 md:max-w-sm mx-auto bg-primary-600 text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3 z-50">
+          <Smartphone class="w-6 h-6 shrink-0 mt-0.5" />
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm leading-snug">{{ $t('pwa.installTitle') }}</p>
+            <p class="text-xs text-white/80 mt-0.5 leading-snug">{{ $t('pwa.installHint') }}</p>
+          </div>
+          <button @click="install" class="shrink-0 bg-white text-primary-600 font-bold text-xs px-3 py-1.5 rounded-xl">
+            {{ $t('pwa.installCta') }}
+          </button>
+          <button @click="dismiss" class="shrink-0 text-white/60 hover:text-white p-1">
+            <span class="text-sm leading-none">✕</span>
+          </button>
+        </div>
+
         <!-- Main Router View -->
         <main class="flex-1 h-full relative overflow-y-auto w-full md:pb-0 pb-24 z-10 md:bg-transparent">
           <router-view />
@@ -128,7 +143,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useOfflineSync } from '@/composables/useOfflineSync'
-import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart, Loader2 } from 'lucide-vue-next'
+import { useInstallPrompt } from '@/composables/useInstallPrompt'
+import { ShieldCheck, LogOut, Home, ListTodo, ClipboardEdit, Languages, FileBarChart, Loader2, Smartphone } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -137,6 +153,9 @@ const { t, locale: currentLocale } = useI18n()
 
 // Sync state from offline composable
 const { isOnline, isSyncing, draftCount } = useOfflineSync()
+
+// PWA install prompt
+const { canInstall, showBanner, install, dismiss } = useInstallPrompt()
 
 const navItems = [
   { path: '/inspector', labelKey: 'nav.home', icon: Home },

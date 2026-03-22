@@ -93,6 +93,8 @@ const props = defineProps({
   existingHashes: { type: Array, default: () => [] },
   // When true: if upload fails offline, fall back to base64 instead of error
   offlineBase64Fallback: { type: Boolean, default: false },
+  // GPS + cabinet code for watermark (used when offlineBase64Fallback is true)
+  watermarkOptions: { type: Object, default: null },
 })
 
 const emit = defineEmits(['update:modelValue', 'uploading', 'hash', 'offlineSaved'])
@@ -198,9 +200,20 @@ const uploadFile = async (file) => {
 
     // Final failure — offline base64 fallback if enabled
     if (props.offlineBase64Fallback && !navigator.onLine) {
-      const base64 = await fileToBase64(processedFile || file)
+      try {
+        // Try watermark capture if options are provided (GPS + cabinet code)
+        if (props.watermarkOptions) {
+          const { captureWithWatermark } = await import('@/composables/useWatermark')
+          const watermarked = await captureWithWatermark(processedFile || file, props.watermarkOptions)
+          emit('update:modelValue', watermarked)
+        } else {
+          emit('update:modelValue', await fileToBase64(processedFile || file))
+        }
+      } catch {
+        // Watermark failed — store raw base64
+        emit('update:modelValue', await fileToBase64(processedFile || file))
+      }
       imageLoadError.value = false
-      emit('update:modelValue', base64)
       emit('offlineSaved', true)
       return
     }
