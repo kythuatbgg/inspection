@@ -1,0 +1,59 @@
+name: fbb-inspection
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fsm_inspection
+      POSTGRES_USER: fbb_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fbb_user -d fsm_inspection"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: https://inspector.quandh.online
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: fsm_inspection
+      DB_USERNAME: fbb_user
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      SESSION_DRIVER: database
+      LOG_CHANNEL: stack
+      LOG_LEVEL: info
+    volumes:
+      - ./backend/storage:/var/www/html/storage:ro
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan --version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend.dist:/var/www/html:ro
+
+volumes:
+  postgres_data:
