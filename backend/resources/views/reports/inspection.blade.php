@@ -31,6 +31,16 @@
         .sig-col .title { font-weight: bold; font-size: 11px; margin-bottom: 60px; }
         .sig-col .name { font-size: 10px; color: #64748b; }
         .footer { margin-top: 20px; text-align: right; font-size: 9px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+        .note-text { font-size: 9px; color: #dc2626; font-style: italic; margin-top: 2px; }
+        .error-photo { margin-top: 4px; }
+        .error-photo img { max-width: 200px; max-height: 150px; border: 1px solid #e2e8f0; border-radius: 3px; }
+        .overall-section { margin-bottom: 16px; }
+        .overall-section h3 { font-size: 12px; font-weight: bold; margin-bottom: 8px; color: #475569; }
+        .overall-photos { display: block; text-align: center; }
+        .overall-photos img { max-width: 160px; max-height: 120px; margin: 4px; border: 1px solid #e2e8f0; border-radius: 3px; }
+        .photo-grid { margin-top: 8px; page-break-inside: avoid; }
+        .photo-pair { display: block; margin-bottom: 8px; text-align: center; }
+        .photo-pair img { width: 48%; max-height: 140px; margin: 0 1%; border: 1px solid #e2e8f0; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -47,6 +57,28 @@
         <div class="info-row"><span class="info-label">Checklist:</span><span class="info-value">{{ $checklist->name ?? 'N/A' }}</span></div>
         <div class="info-row"><span class="info-label">Ngày kiểm tra:</span><span class="info-value">{{ $inspection->created_at?->format('d/m/Y H:i') }}</span></div>
     </div>
+
+    {{-- Overall photos --}}
+    @if(!empty($inspection->overall_photos) && count($inspection->overall_photos) > 0)
+    <div class="overall-section">
+        <h3>Ảnh tổng quan tủ</h3>
+        <div class="photo-grid">
+            @foreach(array_chunk($inspection->overall_photos, 2) as $pair)
+            <div class="photo-pair">
+                @foreach($pair as $photoUrl)
+                    @php
+                        $absPath = public_path(str_replace(request()->getSchemeAndHttpHost(), '', $photoUrl));
+                        $exists = file_exists($absPath);
+                    @endphp
+                    @if($exists)
+                        <img src="{{ $absPath }}" />
+                    @endif
+                @endforeach
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
 
     @foreach($grouped as $category => $items)
         <div class="category-header">{{ $category }}</div>
@@ -80,6 +112,28 @@
                         @endif
                     </td>
                 </tr>
+                {{-- Error details: note + photo --}}
+                @if($item['is_failed'] && (!empty($item['note']) || !empty($item['image_url'])))
+                <tr>
+                    <td></td>
+                    <td colspan="4">
+                        @if(!empty($item['note']))
+                            <div class="note-text">📝 {{ $item['note'] }}</div>
+                        @endif
+                        @if(!empty($item['image_url']))
+                            @php
+                                $imgPath = public_path(str_replace(request()->getSchemeAndHttpHost(), '', $item['image_url']));
+                                $imgExists = file_exists($imgPath);
+                            @endphp
+                            @if($imgExists)
+                            <div class="error-photo">
+                                <img src="{{ $imgPath }}" />
+                            </div>
+                            @endif
+                        @endif
+                    </td>
+                </tr>
+                @endif
                 @endforeach
             </tbody>
         </table>
