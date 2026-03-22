@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: {{ ($lang ?? 'en') === 'kh' ? "'noto-khmer', " : '' }}DejaVu Sans, sans-serif; font-size: 11px; color: #1e293b; line-height: 1.5; }
+        body { font-family: {!! ($lang ?? 'en') === 'kh' ? 'noto-khmer, ' : '' !!}DejaVu Sans, sans-serif; font-size: 11px; color: #1e293b; line-height: 1.5; }
         .header { text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
         .header h1 { font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .header p { font-size: 10px; color: #64748b; margin-top: 4px; }
