@@ -44,24 +44,101 @@
     </style>
 </head>
 <body>
+    @php
+        $labels = match($lang ?? 'en') {
+            'vn', 'vi' => [
+                'title' => 'Biên bản kiểm tra tủ cáp GPON',
+                'subtitle' => 'CNN Telecom — Hệ thống FBB Inspection',
+                'cabinet_code' => 'Mã tủ',
+                'bts_site' => 'Trạm BTS',
+                'coordinates' => 'Tọa độ',
+                'inspector' => 'Nhân viên kiểm tra',
+                'checklist' => 'Checklist',
+                'date' => 'Ngày kiểm tra',
+                'overall_photos' => 'Ảnh tổng quan tủ',
+                'content' => 'Nội dung',
+                'max_score' => 'Điểm tối đa',
+                'score' => 'Điểm đạt',
+                'result' => 'Kết quả',
+                'pass' => 'ĐẠT',
+                'fail' => 'KHÔNG ĐẠT',
+                'result_label' => 'Kết quả kiểm tra',
+                'total_score' => 'Tổng điểm',
+                'critical_errors' => 'Lỗi Critical',
+                'inspector_sig' => 'Nhân viên kiểm tra',
+                'supervisor_sig' => 'Giám sát',
+                'sign' => '(Ký tên)',
+                'generated' => 'Xuất lúc',
+            ],
+            'kh' => [
+                'title' => 'របាយការណ៍ត្រួតពិនិត្យទូ GPON',
+                'subtitle' => 'CNN Telecom — FBB Inspection System',
+                'cabinet_code' => 'Cabinet Code',
+                'bts_site' => 'BTS Site',
+                'coordinates' => 'Coordinates',
+                'inspector' => 'Inspector',
+                'checklist' => 'Checklist',
+                'date' => 'Inspection Date',
+                'overall_photos' => 'Cabinet Overview Photos',
+                'content' => 'Content',
+                'max_score' => 'Max Score',
+                'score' => 'Score',
+                'result' => 'Result',
+                'pass' => 'PASS',
+                'fail' => 'FAIL',
+                'result_label' => 'Inspection Result',
+                'total_score' => 'Total Score',
+                'critical_errors' => 'Critical Errors',
+                'inspector_sig' => 'Inspector',
+                'supervisor_sig' => 'Supervisor',
+                'sign' => '(Signature)',
+                'generated' => 'Generated at',
+            ],
+            default => [
+                'title' => 'GPON Cabinet Inspection Report',
+                'subtitle' => 'CNN Telecom — FBB Inspection System',
+                'cabinet_code' => 'Cabinet Code',
+                'bts_site' => 'BTS Site',
+                'coordinates' => 'Coordinates',
+                'inspector' => 'Inspector',
+                'checklist' => 'Checklist',
+                'date' => 'Inspection Date',
+                'overall_photos' => 'Cabinet Overview Photos',
+                'content' => 'Content',
+                'max_score' => 'Max Score',
+                'score' => 'Score',
+                'result' => 'Result',
+                'pass' => 'PASS',
+                'fail' => 'FAIL',
+                'result_label' => 'Inspection Result',
+                'total_score' => 'Total Score',
+                'critical_errors' => 'Critical Errors',
+                'inspector_sig' => 'Inspector',
+                'supervisor_sig' => 'Supervisor',
+                'sign' => '(Signature)',
+                'generated' => 'Generated at',
+            ],
+        };
+    @endphp
+
     <div class="header">
-        <h1>Biên bản kiểm tra tủ cáp GPON</h1>
-        <p>CNN Telecom — Hệ thống FBB Inspection</p>
+        <h1>{{ $labels['title'] }}</h1>
+        <p>{{ $labels['subtitle'] }}</p>
     </div>
 
     <div class="info-grid">
-        <div class="info-row"><span class="info-label">Mã tủ:</span><span class="info-value">{{ $cabinet->cabinet_code ?? 'N/A' }}</span></div>
-        <div class="info-row"><span class="info-label">Trạm BTS:</span><span class="info-value">{{ $cabinet->bts_site ?? 'N/A' }}</span></div>
-        <div class="info-row"><span class="info-label">Tọa độ:</span><span class="info-value">{{ $inspection->lat }}, {{ $inspection->lng }}</span></div>
-        <div class="info-row"><span class="info-label">Nhân viên kiểm tra:</span><span class="info-value">{{ $user->name ?? 'N/A' }}</span></div>
-        <div class="info-row"><span class="info-label">Checklist:</span><span class="info-value">{{ $checklist->name ?? 'N/A' }}</span></div>
-        <div class="info-row"><span class="info-label">Ngày kiểm tra:</span><span class="info-value">{{ $inspection->created_at?->format('d/m/Y H:i') }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['cabinet_code'] }}:</span><span class="info-value">{{ $cabinet->cabinet_code ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['bts_site'] }}:</span><span class="info-value">{{ $cabinet->bts_site ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['coordinates'] }}:</span><span class="info-value">{{ $inspection->lat }}, {{ $inspection->lng }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['inspector'] }}:</span><span class="info-value">{{ $user->name ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['checklist'] }}:</span><span class="info-value">{{ $checklist->name ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="info-label">{{ $labels['date'] }}:</span><span class="info-value">{{ $inspection->created_at?->format('d/m/Y H:i') }}</span></div>
     </div>
 
     {{-- Overall photos --}}
     @if(!empty($inspection->overall_photos) && count($inspection->overall_photos) > 0)
     <div class="overall-section">
-        <h3>Ảnh tổng quan tủ</h3>
+        <h3>{{ $labels['overall_photos'] }}</h3>
         <div class="photo-grid">
             @foreach(array_chunk($inspection->overall_photos, 2) as $pair)
             <div class="photo-pair">
@@ -86,10 +163,10 @@
             <thead>
                 <tr>
                     <th style="width: 40px">#</th>
-                    <th>Nội dung</th>
-                    <th style="width: 70px">Điểm tối đa</th>
-                    <th style="width: 70px">Điểm đạt</th>
-                    <th style="width: 70px">Kết quả</th>
+                    <th>{{ $labels['content'] }}</th>
+                    <th style="width: 70px">{{ $labels['max_score'] }}</th>
+                    <th style="width: 70px">{{ $labels['score'] }}</th>
+                    <th style="width: 70px">{{ $labels['result'] }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -108,7 +185,7 @@
                         @if($item['is_failed'])
                             <span class="badge badge-fail">FAIL</span>
                         @else
-                            <span class="badge badge-pass">ĐẠT</span>
+                            <span class="badge badge-pass">{{ $labels['pass'] }}</span>
                         @endif
                     </td>
                 </tr>
@@ -140,22 +217,22 @@
     @endforeach
 
     <div class="result-box {{ $inspection->final_result === 'PASS' ? 'result-pass' : 'result-fail' }}">
-        <div class="label">Kết quả kiểm tra</div>
-        <div class="value">{{ $inspection->final_result === 'PASS' ? 'ĐẠT' : 'KHÔNG ĐẠT' }}</div>
-        <div class="label">Tổng điểm: {{ $inspection->total_score }} | Lỗi Critical: {{ $inspection->critical_errors_count }}</div>
+        <div class="label">{{ $labels['result_label'] }}</div>
+        <div class="value">{{ $inspection->final_result === 'PASS' ? $labels['pass'] : $labels['fail'] }}</div>
+        <div class="label">{{ $labels['total_score'] }}: {{ $inspection->total_score }} | {{ $labels['critical_errors'] }}: {{ $inspection->critical_errors_count }}</div>
     </div>
 
     <div class="signatures">
         <div class="sig-col">
-            <div class="title">Nhân viên kiểm tra</div>
-            <div class="name">(Ký tên)</div>
+            <div class="title">{{ $labels['inspector_sig'] }}</div>
+            <div class="name">{{ $labels['sign'] }}</div>
         </div>
         <div class="sig-col">
-            <div class="title">Giám sát</div>
-            <div class="name">(Ký tên)</div>
+            <div class="title">{{ $labels['supervisor_sig'] }}</div>
+            <div class="name">{{ $labels['sign'] }}</div>
         </div>
     </div>
 
-    <div class="footer">Xuất lúc: {{ $generated_at }}</div>
+    <div class="footer">{{ $labels['generated'] }}: {{ $generated_at }}</div>
 </body>
 </html>

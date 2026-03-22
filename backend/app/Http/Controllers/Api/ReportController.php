@@ -64,10 +64,11 @@ class ReportController extends Controller
             return response()->json(['message' => 'Không có quyền xem báo cáo này.'], 403);
         }
 
-        $data = $this->reportService->getInspectionReportData($inspection);
+        $lang = $request->query('lang', 'en');
+        $data = $this->reportService->getInspectionReportData($inspection, $lang);
         $pdf = Pdf::loadView('reports.inspection', $data)->setPaper('a4');
 
-        return $pdf->download("bien-ban-kiem-tra-{$inspection->cabinet_code}.pdf");
+        return $pdf->download("inspection-report-{$inspection->cabinet_code}.pdf");
     }
 
     public function batchSummary(Request $request, int $batchId)

@@ -10,7 +10,25 @@ use Illuminate\Support\Collection;
 
 class ReportService
 {
-    public function getInspectionReportData(Inspection $inspection): array
+    private function contentField(string $lang): string
+    {
+        return match ($lang) {
+            'vn', 'vi' => 'content_vn',
+            'kh' => 'content_kh',
+            default => 'content_en',
+        };
+    }
+
+    private function categoryField(string $lang): string
+    {
+        return match ($lang) {
+            'vn', 'vi' => 'category_vn',
+            'kh' => 'category_kh',
+            default => 'category_en',
+        };
+    }
+
+    public function getInspectionReportData(Inspection $inspection, string $lang = 'en'): array
     {
         $inspection->load([
             'user:id,name,username',
@@ -19,9 +37,12 @@ class ReportService
             'cabinet',
         ]);
 
+        $contentKey = $this->contentField($lang);
+        $categoryKey = $this->categoryField($lang);
+
         $details = $inspection->details->map(fn(InspectionDetail $d) => [
-            'category' => $d->item->category ?? $d->item->category_vn ?? '',
-            'content' => $d->item->content_vn ?? '',
+            'category' => $d->item->{$categoryKey} ?? $d->item->category ?? '',
+            'content' => $d->item->{$contentKey} ?? $d->item->content_en ?? '',
             'max_score' => $d->item->max_score,
             'score_awarded' => $d->score_awarded,
             'is_failed' => $d->is_failed,
@@ -39,6 +60,7 @@ class ReportService
             'checklist' => $inspection->checklist,
             'details' => $details,
             'grouped' => $groupedByCategory,
+            'lang' => $lang,
             'generated_at' => now()->format('d/m/Y H:i'),
         ];
     }
@@ -155,8 +177,8 @@ class ReportService
             'cabinet_code' => $d->inspection->cabinet_code ?? '',
             'bts_site' => $d->inspection->cabinet->bts_site ?? '',
             'batch_name' => $d->inspection->planDetail?->batch?->name ?? '',
-            'item_content' => $d->item->content_vn ?? '',
-            'item_category' => $d->item->category ?? $d->item->category_vn ?? '',
+            'item_content' => $d->item->content_en ?? '',
+            'item_category' => $d->item->category_en ?? $d->item->category ?? '',
             'inspector' => $d->inspection->user->name ?? '',
             'inspected_at' => $d->inspection->created_at?->format('d/m/Y'),
             'note' => $d->note,

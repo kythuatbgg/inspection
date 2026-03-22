@@ -581,7 +581,8 @@
     "exportAll": "Export All Statistics",
     "noDataYet": "No data yet",
     "selectBatchForReport": "Select a batch to generate reports",
-    "searchCabinetPlaceholder": "Search by cabinet code..."
+    "searchCabinetPlaceholder": "Search by cabinet code...",
+    "reportLang": "Report language"
   },
 
   "language": {

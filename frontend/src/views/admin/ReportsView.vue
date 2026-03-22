@@ -40,6 +40,11 @@
                 @input="debouncedSearch"
               />
             </div>
+            <select v-model="reportLang" class="select-input select-lang" :title="$t('reports.reportLang')">
+              <option value="en">🇬🇧 English</option>
+              <option value="vn">🇻🇳 Tiếng Việt</option>
+              <option value="kh">🇰🇭 ភាសាខ្មែរ</option>
+            </select>
           </div>
           <div v-if="selectedBatchId" class="batch-actions">
             <button class="btn btn-primary" :disabled="downloading" @click="downloadBatchSummary">
@@ -342,6 +347,7 @@ const selectedBatchId = ref('')
 const searchCabinet = ref('')
 const searchResults = ref([])
 const loadingSearch = ref(false)
+const reportLang = ref('en')
 let searchTimer = null
 
 // Statistics tab
@@ -425,8 +431,8 @@ async function loadStats() {
 async function downloadInspectionReport(inspectionId, cabinetCode = '') {
   downloading.value = true
   try {
-    const { data } = await reportService.downloadInspectionReport(inspectionId)
-    const filename = cabinetCode ? `bien-ban-${cabinetCode}.pdf` : `bien-ban-kiem-tra-${inspectionId}.pdf`
+    const { data } = await reportService.downloadInspectionReport(inspectionId, reportLang.value)
+    const filename = cabinetCode ? `inspection-${cabinetCode}.pdf` : `inspection-report-${inspectionId}.pdf`
     triggerDownload(data, filename)
     showToast(t('reports.downloadSuccess'))
   } catch {
@@ -639,6 +645,7 @@ onMounted(() => {
   color: #334155;
   min-width: 200px;
 }
+.select-lang { min-width: 140px; max-width: 160px; }
 
 .filter-card { margin-bottom: 16px; }
 .filter-row { display: flex; gap: 16px; flex-wrap: wrap; }

@@ -7,8 +7,8 @@ export default {
   },
 
   // Reports (PDF/Excel download)
-  downloadInspectionReport(inspectionId) {
-    return api.get(`/reports/inspection/${inspectionId}`, { responseType: 'blob' })
+  downloadInspectionReport(inspectionId, lang = 'en') {
+    return api.get(`/reports/inspection/${inspectionId}`, { params: { lang }, responseType: 'blob' })
   },
 
   downloadBatchSummary(batchId) {

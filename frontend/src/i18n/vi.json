@@ -581,7 +581,8 @@
     "exportAll": "Xuất thống kê tổng hợp",
     "noDataYet": "Chưa có dữ liệu",
     "selectBatchForReport": "Chọn đợt kiểm tra để xuất biên bản",
-    "searchCabinetPlaceholder": "Tìm theo mã tủ..."
+    "searchCabinetPlaceholder": "Tìm theo mã tủ...",
+    "reportLang": "Ngôn ngữ biên bản"
   },
 
   "language": {
