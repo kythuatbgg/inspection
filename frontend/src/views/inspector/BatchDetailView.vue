@@ -91,25 +91,27 @@
                 </div>
 
                 <!-- Inspection result -->
-                <div v-if="plan.inspection" class="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 flex-wrap" :class="{ 'border-primary-100': isActiveTask(plan.id) }">
-                  <span
-                    class="text-[10px] font-bold px-2.5 py-1.5 rounded-md tracking-widest uppercase"
-                    :class="plan.inspection.final_result === 'PASS' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'"
-                  >
-                    {{ plan.inspection.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
-                  </span>
-                  <span class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-primary-50 text-primary-700 tracking-widest uppercase">{{ $t('common.score') }} {{ plan.inspection.total_score }}</span>
-                  <span v-if="plan.inspection.critical_errors_count > 0" class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-danger/10 text-danger flex items-center gap-1.5 tracking-widest uppercase">
-                    <AlertTriangle class="w-3.5 h-3.5" />
-                    {{ plan.inspection.critical_errors_count }} {{ $t('common.errors') }}
-                  </span>
+                <div v-if="plan.inspection" class="mt-3 pt-3 border-t border-slate-100" :class="{ 'border-primary-100': isActiveTask(plan.id) }">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                      class="text-[10px] font-bold px-2.5 py-1.5 rounded-md tracking-widest uppercase"
+                      :class="plan.inspection.final_result === 'PASS' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'"
+                    >
+                      {{ plan.inspection.final_result === 'PASS' ? $t('common.resultPass') : $t('common.resultFail') }}
+                    </span>
+                    <span class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-primary-50 text-primary-700 tracking-widest uppercase">{{ $t('common.score') }} {{ plan.inspection.total_score }}</span>
+                    <span v-if="plan.inspection.critical_errors_count > 0" class="text-[10px] font-bold px-2.5 py-1.5 rounded-md bg-danger/10 text-danger flex items-center gap-1.5 tracking-widest uppercase">
+                      <AlertTriangle class="w-3.5 h-3.5" />
+                      {{ plan.inspection.critical_errors_count }} {{ $t('common.errors') }}
+                    </span>
+                  </div>
                   <button
                     @click.stop="downloadReport(plan)"
                     :disabled="downloadingId === plan.id"
-                    class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95"
+                    class="mt-2.5 w-full inline-flex items-center justify-center gap-1.5 min-h-[36px] md:min-h-[32px] px-3 rounded-lg text-xs font-bold transition-all active:scale-[0.98]"
                     :class="downloadingId === plan.id
                       ? 'bg-slate-100 text-slate-400 cursor-wait'
-                      : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm'"
+                      : 'bg-primary-50 text-primary-700 hover:bg-primary-100'"
                   >
                     <Loader2 v-if="downloadingId === plan.id" class="w-3.5 h-3.5 animate-spin" />
                     <Download v-else class="w-3.5 h-3.5" />
