@@ -24,12 +24,14 @@
       <div class="card">
         <div class="card-header">
           <div class="filters-row">
-            <select v-model="selectedBatchId" class="select-input" @change="searchReports">
-              <option value="">{{ $t('reports.selectBatchPlaceholder') }}</option>
-              <option v-for="b in batches" :key="b.id" :value="b.id">
-                {{ b.name }}
-              </option>
-            </select>
+            <MobileBottomSheet
+              v-model="selectedBatchId"
+              :options="batches"
+              :placeholder="$t('reports.selectBatchPlaceholder')"
+              :label="$t('reports.title')"
+              container-class="batch-select-container"
+              @update:modelValue="searchReports"
+            />
             <div class="search-box">
               <Search :size="14" class="search-icon" />
               <input
@@ -40,11 +42,13 @@
                 @input="debouncedSearch"
               />
             </div>
-            <select v-model="reportLang" class="select-input select-lang" :title="$t('reports.reportLang')">
-              <option value="en">🇬🇧 English</option>
-              <option value="vn">🇻🇳 Tiếng Việt</option>
-              <option value="kh">🇰🇭 ភាសាខ្មែរ</option>
-            </select>
+            <MobileBottomSheet
+              v-model="reportLang"
+              :options="langOptions"
+              :placeholder="$t('reports.reportLang')"
+              :label="$t('reports.reportLang')"
+              container-class="lang-select-container"
+            />
           </div>
           <div v-if="selectedBatchId" class="batch-actions">
             <button class="btn btn-primary" :disabled="downloading" @click="downloadBatchSummary">
@@ -197,13 +201,23 @@
       <!-- Filters -->
       <div class="card filter-card">
         <div class="filter-row">
-          <div class="filter-group">
+          <div class="filter-group flex-1">
             <label>{{ $t('reports.fromDate') }}</label>
-            <input v-model="filterFrom" type="date" class="input-date" @change="loadStats" />
+            <MobileDatePicker
+              v-model="filterFrom"
+              :placeholder="$t('reports.fromDate')"
+              :label="$t('reports.fromDate')"
+              @update:modelValue="loadStats"
+            />
           </div>
-          <div class="filter-group">
+          <div class="filter-group flex-1">
             <label>{{ $t('reports.toDate') }}</label>
-            <input v-model="filterTo" type="date" class="input-date" @change="loadStats" />
+            <MobileDatePicker
+              v-model="filterTo"
+              :placeholder="$t('reports.toDate')"
+              :label="$t('reports.toDate')"
+              @update:modelValue="loadStats"
+            />
           </div>
         </div>
       </div>
@@ -357,12 +371,15 @@
           <!-- Batch Export -->
           <div class="export-item">
             <div class="export-icon"><FileSpreadsheet :size="32" /></div>
-            <div class="export-info">
+            <div class="export-info" style="width: 100%;">
               <h4>{{ $t('reports.batchExport') }}</h4>
-              <select v-model="exportBatchId" class="select-input">
-                <option value="">{{ $t('reports.selectBatchPlaceholder') }}</option>
-                <option v-for="b in batches" :key="b.id" :value="b.id">{{ b.name }}</option>
-              </select>
+              <MobileBottomSheet
+                v-model="exportBatchId"
+                :options="batches"
+                :placeholder="$t('reports.selectBatchPlaceholder')"
+                :label="$t('reports.batchExport')"
+                container-class="w-full mt-2"
+              />
             </div>
             <button
               class="btn btn-primary"
@@ -390,12 +407,15 @@
           <!-- Critical Errors Export -->
           <div class="export-item">
             <div class="export-icon export-icon-red"><AlertTriangle :size="32" /></div>
-            <div class="export-info">
+            <div class="export-info" style="width: 100%;">
               <h4>{{ $t('reports.criticalErrors') }}</h4>
-              <select v-model="exportErrorBatchId" class="select-input">
-                <option value="">{{ $t('common.all') }}</option>
-                <option v-for="b in batches" :key="b.id" :value="b.id">{{ b.name }}</option>
-              </select>
+              <MobileBottomSheet
+                v-model="exportErrorBatchId"
+                :options="[{value: '', label: $t('common.all')}, ...batches.map(b => ({value: b.id, label: b.name}))]"
+                :placeholder="$t('common.all')"
+                :label="$t('reports.criticalErrors')"
+                container-class="w-full mt-2"
+              />
             </div>
             <button class="btn btn-warning" :disabled="downloading" @click="downloadCriticalErrorsExcel">
               <Download :size="14" />
@@ -416,7 +436,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   FileText, FileSearch, FileSpreadsheet, Download, Loader2,
@@ -424,6 +444,8 @@ import {
   TrendingUp, BarChart3, Search
 } from 'lucide-vue-next'
 import reportService, { triggerDownload } from '@/services/reportService'
+import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
+import MobileDatePicker from '@/components/common/MobileDatePicker.vue'
 import api from '@/services/api'
 
 const { t } = useI18n()
@@ -434,16 +456,22 @@ const tabs = [
   { key: 'export', label: 'reports.tabExport', icon: FileSpreadsheet },
 ]
 
+// State
 const activeTab = ref('reports')
-const downloading = ref(false)
-
-// Reports tab
 const batches = ref([])
 const selectedBatchId = ref('')
 const searchCabinet = ref('')
-const searchResults = ref([])
-const loadingSearch = ref(false)
 const reportLang = ref('en')
+const downloading = ref(false) // Moved here from original position
+const searchResults = ref([]) // Moved here from original position
+
+// Computed
+const langOptions = computed(() => [
+  { value: 'en', label: '🇬🇧 English' },
+  { value: 'vn', label: '🇻🇳 Tiếng Việt' },
+  { value: 'kh', label: '🇰🇭 ភាសាខ្មែរ' }
+])
+const loadingSearch = ref(false)
 let searchTimer = null
 
 // Statistics tab
@@ -719,11 +747,19 @@ onMounted(() => {
   width: 100%;
   padding: 8px 12px 8px 32px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 8px;
+  font-size: 14px;
   color: #334155;
   background: #fff;
   transition: border-color 0.15s;
+}
+@media (max-width: 768px) {
+  .search-input {
+    min-height: 52px;
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.8);
+    border-color: transparent;
+  }
 }
 .search-input:focus {
   outline: none;
@@ -732,16 +768,8 @@ onMounted(() => {
 }
 .search-input::placeholder { color: #94a3b8; }
 
-.select-input {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 13px;
-  background: #fff;
-  color: #334155;
-  min-width: 200px;
-}
-.select-lang { min-width: 140px; max-width: 160px; }
+.batch-select-container { min-width: 200px; }
+.lang-select-container { min-width: 160px; max-width: 180px; }
 
 /* Filter & Desktop/Mobile Visibility */
 .d-md-none { display: none !important; }
@@ -752,7 +780,7 @@ onMounted(() => {
   .d-md-table { display: none !important; }
   
   .filters-row { flex-direction: column; gap: 8px; }
-  .select-input, .search-box, .select-lang { width: 100%; max-width: 100%; }
+  .batch-select-container, .search-box, .lang-select-container { width: 100%; max-width: 100%; }
   
   .batch-actions { flex-direction: column; gap: 8px; }
   .batch-actions .btn { width: 100%; justify-content: center; }
