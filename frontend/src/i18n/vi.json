@@ -473,7 +473,12 @@
     "rejected": "Từ chối",
     "waiting": "Chờ",
     "running": "Đang chạy",
-    "cannotLoadBatchList": "Không thể tải danh sách lô."
+    "cannotLoadBatchList": "Không thể tải danh sách lô.",
+    "exportPdf": "Xuất biên bản",
+    "reportLang": "Ngôn ngữ biên bản",
+    "downloading": "Đang tải...",
+    "downloadSuccess": "Tải biên bản thành công",
+    "downloadError": "Lỗi khi tải biên bản"
   },
 
   "profile": {

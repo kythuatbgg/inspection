@@ -24,6 +24,17 @@
             </div>
           </div>
 
+          <!-- Report Language -->
+          <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm">
+            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">{{ $t('inspector.reportLang') }}</label>
+            <MobileBottomSheet
+              v-model="reportLang"
+              :options="langOptions"
+              :placeholder="$t('inspector.reportLang')"
+              :label="$t('inspector.reportLang')"
+            />
+          </div>
+
           <!-- Progress -->
           <div class="rounded-lg bg-white border border-slate-200 p-5 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -92,6 +103,18 @@
                     <AlertTriangle class="w-3.5 h-3.5" />
                     {{ plan.inspection.critical_errors_count }} {{ $t('common.errors') }}
                   </span>
+                  <button
+                    @click.stop="downloadReport(plan)"
+                    :disabled="downloadingId === plan.id"
+                    class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95"
+                    :class="downloadingId === plan.id
+                      ? 'bg-slate-100 text-slate-400 cursor-wait'
+                      : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm'"
+                  >
+                    <Loader2 v-if="downloadingId === plan.id" class="w-3.5 h-3.5 animate-spin" />
+                    <Download v-else class="w-3.5 h-3.5" />
+                    {{ downloadingId === plan.id ? $t('inspector.downloading') : $t('inspector.exportPdf') }}
+                  </button>
                 </div>
               </button>
             </div>
@@ -129,13 +152,17 @@
 </template>
 
 <script setup>
-import { AlertTriangle, ChevronRight, Calendar, ListTodo, ChevronLeft, Server, Loader2 } from 'lucide-vue-next'
+import { AlertTriangle, ChevronRight, Calendar, ListTodo, ChevronLeft, Server, Loader2, Download } from 'lucide-vue-next'
 
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
+import reportService, { triggerDownload } from '@/services/reportService'
+import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -145,6 +172,14 @@ const isActiveTask = (id) => route.params.planId == id
 const loading = ref(true)
 const batch = ref(null)
 const planDetails = ref([])
+const reportLang = ref('en')
+const downloadingId = ref(null)
+
+const langOptions = computed(() => [
+  { value: 'en', label: '🇬🇧 English' },
+  { value: 'vn', label: '🇻🇳 Tiếng Việt' },
+  { value: 'kh', label: '🇰🇭 ភាសាខ្មែរ' }
+])
 
 const progress = computed(() => {
   const total = planDetails.value.length
@@ -190,6 +225,19 @@ const fetchData = async () => {
     batch.value = null
   } finally {
     loading.value = false
+  }
+}
+
+const downloadReport = async (plan) => {
+  if (!plan.inspection?.id || downloadingId.value) return
+  downloadingId.value = plan.id
+  try {
+    const { data } = await reportService.downloadInspectionReport(plan.inspection.id, reportLang.value)
+    triggerDownload(data, `bien-ban-${plan.cabinet_code}.pdf`)
+  } catch (e) {
+    console.error('Download failed:', e)
+  } finally {
+    downloadingId.value = null
   }
 }
 

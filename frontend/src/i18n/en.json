@@ -473,7 +473,12 @@
     "rejected": "Rejected",
     "waiting": "Waiting",
     "running": "Running",
-    "cannotLoadBatchList": "Cannot load batch list."
+    "cannotLoadBatchList": "Cannot load batch list.",
+    "exportPdf": "Export Report",
+    "reportLang": "Report Language",
+    "downloading": "Downloading...",
+    "downloadSuccess": "Report downloaded",
+    "downloadError": "Download failed"
   },
 
   "profile": {
