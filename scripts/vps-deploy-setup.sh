@@ -114,7 +114,7 @@ sync_repo() {
     sed -i "s/DB_PORT=.*/DB_PORT=5432/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_DATABASE=.*/DB_DATABASE=fsm_inspection/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_USERNAME=.*/DB_USERNAME=fbb_user/" "$DEPLOY_DIR/backend/.env"
-    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${POSTGRES_PASSWORD}/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${POSTGRES_PASSWORD}|" "$DEPLOY_DIR/backend/.env"
     sed -i "s/CACHE_STORE=.*/CACHE_STORE=database/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=debug/" "$DEPLOY_DIR/backend/.env"
     # Keep APP_KEY from existing .env if exists
