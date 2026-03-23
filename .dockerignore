@@ -4,11 +4,7 @@
 **/vendor
 **/dist
 **/.vite
-**/tests
 **/*.md
-**/docker-compose.yml
-**/Dockerfile
-**/Dockerfile.local
 **/.dockerignore
 **/.editorconfig
 **/.gitignore
@@ -16,6 +12,6 @@
 **/vitest.config.*
 **/tailwind.config.js
 **/postcss.config.js
-app/backend/public/storage
-app/backend/storage
+backend/public/storage
+backend/storage
 storage

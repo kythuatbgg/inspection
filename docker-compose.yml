@@ -36,7 +36,8 @@ services:
       DB_DATABASE: fsm_inspection
       DB_USERNAME: fbb_user
       DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      SESSION_DRIVER: database
+      SESSION_DRIVER: file
+      CACHE_STORE: file
       LOG_CHANNEL: stack
       LOG_LEVEL: info
     volumes:

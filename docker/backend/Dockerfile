@@ -18,14 +18,17 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
-COPY app/backend/ .
+COPY backend/ .
 RUN composer install --no-dev --no-interaction --ignore-platform-reqs \
+    && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
 # Caddy web server (serves :80, proxies to php-fpm :9000)
 COPY docker/backend/Caddyfile /etc/caddy/Caddyfile
 COPY --from=caddy:2 /usr/bin/caddy /usr/bin/caddy
+COPY docker/backend/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 80
-CMD ["sh", "-c", "caddy run --config /etc/caddy/Caddyfile & php-fpm"]
+CMD ["/usr/local/bin/entrypoint.sh"]
