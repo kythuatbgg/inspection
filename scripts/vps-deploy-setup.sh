@@ -99,9 +99,24 @@ sync_repo() {
         --exclude='frontend/dist' \
         "$WORK_TREE/" "$DEPLOY_DIR/"
 
-    cat > "$DEPLOY_DIR/.env" <<ENVVARS
-POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
-ENVVARS
+    # Generate production .env from .env.example + secrets
+    if [ -f "$DEPLOY_DIR/backend/.env.example" ]; then
+        cp "$DEPLOY_DIR/backend/.env.example" "$DEPLOY_DIR/backend/.env"
+    fi
+
+    # Override with production values (Docker env vars take precedence, but be explicit)
+    sed -i "s/APP_ENV=.*/APP_ENV=production/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s|APP_URL=.*|APP_URL=https://${DOMAIN}|" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_HOST=.*/DB_HOST=postgres/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_PORT=.*/DB_PORT=5432/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=fsm_inspection/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=fbb_user/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${POSTGRES_PASSWORD}/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/CACHE_STORE=.*/CACHE_STORE=database/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=debug/" "$DEPLOY_DIR/backend/.env"
+    # Keep APP_KEY from existing .env if exists
 }
 
 ensure_backend_runtime_dirs() {
@@ -253,9 +268,21 @@ rsync -a --delete \
     --exclude='frontend/dist' \
     "$WORK_TREE/" "$DEPLOY_DIR/"
 
-cat > "$DEPLOY_DIR/.env" <<ENVVARS
-POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
-ENVVARS
+if [ -f "$DEPLOY_DIR/backend/.env.example" ]; then
+    cp "$DEPLOY_DIR/backend/.env.example" "$DEPLOY_DIR/backend/.env"
+fi
+
+sed -i "s/APP_ENV=.*/APP_ENV=production/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" "$DEPLOY_DIR/backend/.env"
+sed -i "s|APP_URL=.*|APP_URL=https://${DOMAIN}|" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_HOST=.*/DB_HOST=postgres/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_PORT=.*/DB_PORT=5432/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_DATABASE=.*/DB_DATABASE=fsm_inspection/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_USERNAME=.*/DB_USERNAME=fbb_user/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${POSTGRES_PASSWORD}/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/CACHE_STORE=.*/CACHE_STORE=database/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=debug/" "$DEPLOY_DIR/backend/.env"
 
 mkdir -p \
     "$DEPLOY_DIR/backend/storage/framework/cache/data" \
