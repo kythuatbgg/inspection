@@ -312,6 +312,17 @@ server {
         proxy_read_timeout 60s;
     }
 
+    location /storage/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$http_host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto http;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
     location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
@@ -357,6 +368,17 @@ server {
     }
 
     location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$http_host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    location /storage/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host \$http_host;
