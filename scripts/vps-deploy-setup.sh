@@ -312,7 +312,7 @@ server {
         proxy_read_timeout 60s;
     }
 
-    location /storage/ {
+    location ^~ /storage/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host \$http_host;
@@ -378,7 +378,7 @@ server {
         proxy_read_timeout 60s;
     }
 
-    location /storage/ {
+    location ^~ /storage/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host \$http_host;
