@@ -102,14 +102,26 @@
               <h1 class="text-lg font-bold text-slate-900 font-heading tracking-tight leading-none">FBB Inspector</h1>
             </div>
 
-            <!-- Status -->
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border"
-              :class="isOnline
-                ? 'bg-success/5 border-success/20 text-success'
-                : 'bg-danger/5 border-danger/20 text-danger'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
-              <span class="text-[10px] font-bold uppercase tracking-wider">{{ isOnline ? $t('common.online') : $t('common.offline') }}</span>
+            <!-- Status + Language -->
+            <div class="flex items-center gap-2">
+              <!-- Language Toggle -->
+              <button
+                @click="toggleLanguage"
+                :title="currentLocale === 'vi' ? 'Switch to English' : 'Đổi sang Tiếng Việt'"
+                class="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+              >
+                <Languages class="w-4 h-4 text-slate-500" />
+              </button>
+
+              <!-- Online Status -->
+              <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border"
+                :class="isOnline
+                  ? 'bg-success/5 border-success/20 text-success'
+                  : 'bg-danger/5 border-danger/20 text-danger'"
+              >
+                <span class="w-1.5 h-1.5 rounded-full" :class="isOnline ? 'bg-success' : 'bg-danger'"></span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">{{ isOnline ? $t('common.online') : $t('common.offline') }}</span>
+              </div>
             </div>
           </div>
 
