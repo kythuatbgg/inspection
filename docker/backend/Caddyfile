@@ -8,6 +8,12 @@
 
 :80 {
     root * /var/www/html/public
+
+    handle_path /storage/* {
+        root * /var/www/html/storage/app/public
+        file_server
+    }
+
     php_fastcgi 127.0.0.1:9000
     encode gzip
     file_server
