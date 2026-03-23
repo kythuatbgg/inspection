@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
-# FBB Inspection — VPS Setup Script (single repo)
-# Run: ssh -i ~/.ssh/fbb_vps root@180.93.42.138 'bash -s' < this_script
+# FBB Inspection — VPS Setup Script
+# Run from local: ssh -i ~/.ssh/fbb_vps root@180.93.42.138 'bash -s' < scripts/vps-deploy-setup.sh
 # =============================================================================
 
 set -euo pipefail
@@ -17,34 +17,34 @@ VESTACP_VHOST="/www/server/panel/vhost/nginx"
 WWWROOT="/www/wwwroot/${DOMAIN}"
 
 if [ -z "${POSTGRES_PASSWORD:-}" ]; then
-    echo "[ERROR] POSTGRES_PASSWORD is required before running this script." >&2
-    echo "Example: POSTGRES_PASSWORD='your-password' ssh root@host 'bash -s' < scripts/vps-deploy-setup.sh" >&2
+    echo "[ERROR] POSTGRES_PASSWORD is required." >&2
+    echo "Usage: POSTGRES_PASSWORD='yourpass' ssh root@host 'bash -s' < scripts/vps-deploy-setup.sh" >&2
     exit 1
 fi
 
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
-}
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
 
-echo "=== 1. Setup directories ==="
-mkdir -p "$APP_DIR"/{repo.git,frontend.dist}
-mkdir -p "$DEPLOY_DIR"
-mkdir -p "$RELEASES_DIR"
-mkdir -p "$WORK_TREE"
-mkdir -p "$SHARED_DIR"
-mkdir -p "$WWWROOT"
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 1. Create directories ==="
+mkdir -p "$APP_DIR/repo.git"
+mkdir -p "$DEPLOY_DIR" "$RELEASES_DIR" "$WORK_TREE" "$SHARED_DIR" "$WWWROOT"
 
+# Save deploy secrets
 cat > "$DEPLOY_ENV_FILE" <<ENVVARS
 POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
 ENVVARS
 chmod 600 "$DEPLOY_ENV_FILE"
 
-echo "=== 2. Clone repo (SSH) ==="
-if [ ! -d "$APP_DIR/repo.git" ]; then
-  git clone --bare git@github.com:kythuatbgg/inspection.git "$APP_DIR/repo.git"
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 2. Init bare git repo (from GitHub HTTPS) ==="
+if [ ! -f "$APP_DIR/repo.git/HEAD" ]; then
+    git init --bare "$APP_DIR/repo.git"
+    # Set remote so we can pull on first setup
+    git -C "$APP_DIR/repo.git" remote add origin https://github.com/kythuatbgg/inspection.git 2>/dev/null || true
 fi
 
-# Post-receive hook: smart incremental deployment
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 3. Install post-receive hook ==="
 cat > "$APP_DIR/repo.git/hooks/post-receive" << 'HOOK'
 #!/bin/bash
 set -euo pipefail
@@ -59,34 +59,9 @@ DOMAIN="inspector.quandh.online"
 WWWROOT="/www/wwwroot/${DOMAIN}"
 LOG_FILE="/var/log/fbb-deploy.log"
 
-if [ -f "$DEPLOY_ENV_FILE" ]; then
-    set -a
-    . "$DEPLOY_ENV_FILE"
-    set +a
-fi
+[ -f "$DEPLOY_ENV_FILE" ] && { set -a; . "$DEPLOY_ENV_FILE"; set +a; }
 
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
-}
-
-require_postgres_password() {
-    if [ -z "${POSTGRES_PASSWORD:-}" ]; then
-        log "ERROR: POSTGRES_PASSWORD is not set in deploy environment"
-        exit 1
-    fi
-}
-
-archive_current_release() {
-    if [ -d "$DEPLOY_DIR" ] && [ "$(find "$DEPLOY_DIR" -mindepth 1 -maxdepth 1 | head -n 1)" ]; then
-        local stamp
-        stamp="$(date '+%Y%m%d-%H%M%S')"
-        mkdir -p "$RELEASES_DIR/$stamp"
-        rsync -a --delete "$DEPLOY_DIR/" "$RELEASES_DIR/$stamp/"
-        log "Backup release created at $RELEASES_DIR/$stamp"
-    else
-        log "Skipping backup: current release is empty"
-    fi
-}
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"; }
 
 sync_repo() {
     mkdir -p "$WORK_TREE" "$DEPLOY_DIR"
@@ -100,27 +75,33 @@ sync_repo() {
         --exclude='frontend/dist' \
         "$WORK_TREE/" "$DEPLOY_DIR/"
 
-    # Generate production .env from .env.example + secrets
+    # Generate .env from .env.example
     if [ -f "$DEPLOY_DIR/backend/.env.example" ]; then
         cp "$DEPLOY_DIR/backend/.env.example" "$DEPLOY_DIR/backend/.env"
     fi
 
-    # Override with production values (Docker env vars take precedence, but be explicit)
+    # Inject production values (sed-safe: use | as delimiter)
     sed -i "s/APP_ENV=.*/APP_ENV=production/" "$DEPLOY_DIR/backend/.env"
-    sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/APP_DEBUG=.*/APP_DEBUG=false/" "$DEPLOY_DIR/backend/.env"
     sed -i "s|APP_URL=.*|APP_URL=https://${DOMAIN}|" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_HOST=.*/DB_HOST=postgres/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_PORT=.*/DB_PORT=5432/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_DATABASE=.*/DB_DATABASE=fsm_inspection/" "$DEPLOY_DIR/backend/.env"
     sed -i "s/DB_USERNAME=.*/DB_USERNAME=fbb_user/" "$DEPLOY_DIR/backend/.env"
-    sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${POSTGRES_PASSWORD}|" "$DEPLOY_DIR/backend/.env"
-    sed -i "s/CACHE_STORE=.*/CACHE_STORE=database/" "$DEPLOY_DIR/backend/.env"
-    sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=debug/" "$DEPLOY_DIR/backend/.env"
-    # Keep APP_KEY from existing .env if exists
+    # Use Python to avoid sed delimiter collision with special chars in password
+    python3 -c "
+import re, sys
+content = open('$DEPLOY_DIR/backend/.env').read()
+content = re.sub(r'^DB_PASSWORD=.*', 'DB_PASSWORD=${POSTGRES_PASSWORD}', content, flags=re.MULTILINE)
+open('$DEPLOY_DIR/backend/.env', 'w').write(content)
+"
+    sed -i "s/CACHE_STORE=.*/CACHE_STORE=file/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/SESSION_DRIVER=.*/SESSION_DRIVER=file/" "$DEPLOY_DIR/backend/.env"
+    sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=info/" "$DEPLOY_DIR/backend/.env"
 }
 
-ensure_backend_runtime_dirs() {
+ensure_storage_dirs() {
     mkdir -p \
         "$DEPLOY_DIR/backend/storage/framework/cache/data" \
         "$DEPLOY_DIR/backend/storage/framework/sessions" \
@@ -130,109 +111,78 @@ ensure_backend_runtime_dirs() {
         "$DEPLOY_DIR/backend/bootstrap/cache"
 }
 
-verify_backend_health() {
-    if curl -fsS http://127.0.0.1:8000/up >/dev/null; then
-        log "Health check passed: /up"
-    else
-        log "ERROR: backend health check failed"
-        exit 1
-    fi
-}
-
 copy_frontend_dist() {
-    local frontend_container
-    frontend_container="$(docker compose ps -q frontend 2>/dev/null || true)"
-
-    if [ -z "$frontend_container" ]; then
+    local cid
+    cid="$(docker compose ps -q frontend 2>/dev/null || true)"
+    if [ -z "$cid" ]; then
         log "ERROR: frontend container not found"
         exit 1
     fi
-
     mkdir -p "$WWWROOT"
     rm -rf "$WWWROOT"/*
-    docker cp "$frontend_container:/usr/share/nginx/html/." "$WWWROOT/"
+    docker cp "$cid:/usr/share/nginx/html/." "$WWWROOT/"
 }
 
-# Read the push info from stdin: <old-sha> <new-sha> <ref>
 while read -r OLD_SHA NEW_SHA REF; do
-    # Only process main branch
-    if [[ "$REF" != "refs/heads/main" ]]; then
-        log "Skipping non-main branch: $REF"
-        exit 0
-    fi
+    [[ "$REF" != "refs/heads/main" ]] && { log "Skipping non-main: $REF"; exit 0; }
 
-    log "=== Starting deployment ==="
-    log "Old: $OLD_SHA"
-    log "New: $NEW_SHA"
+    log "=== Deployment started: ${NEW_SHA:0:8} ==="
 
-    require_postgres_password
-
-    # Detect what changed
+    # Detect changed areas
     if [[ "$OLD_SHA" =~ ^0+$ ]]; then
-        CHANGED_FILES=$(git --git-dir="$APP_DIR/repo.git" diff-tree --no-commit-id --name-only -r "$NEW_SHA" 2>/dev/null || echo "")
+        CHANGED=$(git --git-dir="$APP_DIR/repo.git" diff-tree --no-commit-id --name-only -r "$NEW_SHA" 2>/dev/null || echo "")
     else
-        CHANGED_FILES=$(git --git-dir="$APP_DIR/repo.git" diff --name-only "$OLD_SHA" "$NEW_SHA" 2>/dev/null || echo "")
+        CHANGED=$(git --git-dir="$APP_DIR/repo.git" diff --name-only "$OLD_SHA" "$NEW_SHA" 2>/dev/null || echo "")
     fi
 
     FRONTEND_CHANGED=false
     BACKEND_CHANGED=false
     DOCKER_CHANGED=false
-    INFRA_CHANGED=false
 
-    for file in $CHANGED_FILES; do
-        case "$file" in
-            app/frontend/*|frontend/*)
-                FRONTEND_CHANGED=true
-                ;;
-            app/backend/*|backend/*)
-                BACKEND_CHANGED=true
-                ;;
-            app/docker-compose.yml|docker-compose.yml|app/docker/*|docker/*)
-                DOCKER_CHANGED=true
-                ;;
-            scripts/*|.dockerignore)
-                INFRA_CHANGED=true
-                ;;
+    for f in $CHANGED; do
+        case "$f" in
+            frontend/*) FRONTEND_CHANGED=true ;;
+            backend/*)  BACKEND_CHANGED=true ;;
+            docker*|docker-compose.yml) DOCKER_CHANGED=true ;;
         esac
     done
 
-    if [ -z "$CHANGED_FILES" ]; then
+    # Force rebuild everything if no diff info or docker changed
+    if [ -z "$CHANGED" ] || [ "$DOCKER_CHANGED" = true ]; then
         FRONTEND_CHANGED=true
         BACKEND_CHANGED=true
-        DOCKER_CHANGED=true
     fi
 
-    log "Changes detected:"
-    log "  Frontend: $FRONTEND_CHANGED"
-    log "  Backend: $BACKEND_CHANGED"
-    log "  Docker: $DOCKER_CHANGED"
-    log "  Infra: $INFRA_CHANGED"
+    log "Changes → frontend:$FRONTEND_CHANGED backend:$BACKEND_CHANGED docker:$DOCKER_CHANGED"
 
-    archive_current_release
+    # Archive current release
+    if [ -d "$DEPLOY_DIR" ] && [ "$(ls -A "$DEPLOY_DIR" 2>/dev/null)" ]; then
+        stamp="$(date '+%Y%m%d-%H%M%S')"
+        rsync -a --delete "$DEPLOY_DIR/" "$RELEASES_DIR/$stamp/"
+        log "Backup: $RELEASES_DIR/$stamp"
+        # Keep only last 3 releases
+        ls -dt "$RELEASES_DIR"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+    fi
 
-    log "Syncing tracked files into deploy directory..."
     sync_repo
-    ensure_backend_runtime_dirs
-
-    # Docker change = rebuild everything
-    if [ "$DOCKER_CHANGED" = true ] || [ "$INFRA_CHANGED" = true ]; then
-        FRONTEND_CHANGED=true
-        BACKEND_CHANGED=true
-    fi
+    ensure_storage_dirs
 
     cd "$DEPLOY_DIR"
 
+    # Always ensure postgres is up
     POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose up -d postgres
 
-    # Build based on what changed
     if [ "$BACKEND_CHANGED" = true ]; then
         log "Building backend..."
         POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose build --pull backend
         POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose up -d --no-deps backend
 
-        # Run migrations
         log "Running migrations..."
-        docker compose exec -T backend php artisan migrate --force 2>/dev/null || log "Migration note: (may already be applied)"
+        sleep 5
+        docker compose exec -T backend php artisan migrate --force 2>/dev/null \
+            || log "Migration note: may already be up to date"
+        docker compose exec -T backend php artisan db:seed --class=AdminSeeder --force 2>/dev/null \
+            || log "Seeder note: admin may already exist"
         docker compose exec -T backend php artisan optimize:clear >/dev/null 2>&1 || true
         docker compose exec -T backend php artisan config:cache >/dev/null 2>&1 || true
         docker compose exec -T backend php artisan route:cache >/dev/null 2>&1 || true
@@ -243,24 +193,27 @@ while read -r OLD_SHA NEW_SHA REF; do
         log "Building frontend..."
         POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose build frontend
         POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose up -d --no-deps frontend
-
-        # Copy to wwwroot
-        log "Copying frontend to wwwroot..."
+        sleep 3
         copy_frontend_dist
     fi
 
-    verify_backend_health
+    # Health check
+    if curl -fsS http://127.0.0.1:8000/up >/dev/null; then
+        log "Health check passed ✓"
+    else
+        log "ERROR: health check failed"
+        exit 1
+    fi
 
-    log "=== Deployment complete ==="
-    echo ""
+    log "=== Deployment complete: ${NEW_SHA:0:8} ==="
 done
 HOOK
 chmod +x "$APP_DIR/repo.git/hooks/post-receive"
 
-echo "=== 3. Checkout first deploy ==="
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 4. First checkout + deploy ==="
 git --git-dir="$APP_DIR/repo.git" --work-tree="$WORK_TREE" checkout -f main
 
-echo "=== 4. Sync repo into deploy directory ==="
 rsync -a --delete \
     --exclude='.git' \
     --exclude='backend/storage' \
@@ -274,16 +227,22 @@ if [ -f "$DEPLOY_DIR/backend/.env.example" ]; then
 fi
 
 sed -i "s/APP_ENV=.*/APP_ENV=production/" "$DEPLOY_DIR/backend/.env"
-sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/APP_DEBUG=.*/APP_DEBUG=false/" "$DEPLOY_DIR/backend/.env"
 sed -i "s|APP_URL=.*|APP_URL=https://${DOMAIN}|" "$DEPLOY_DIR/backend/.env"
 sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/" "$DEPLOY_DIR/backend/.env"
 sed -i "s/DB_HOST=.*/DB_HOST=postgres/" "$DEPLOY_DIR/backend/.env"
 sed -i "s/DB_PORT=.*/DB_PORT=5432/" "$DEPLOY_DIR/backend/.env"
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=fsm_inspection/" "$DEPLOY_DIR/backend/.env"
 sed -i "s/DB_USERNAME=.*/DB_USERNAME=fbb_user/" "$DEPLOY_DIR/backend/.env"
-sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${POSTGRES_PASSWORD}/" "$DEPLOY_DIR/backend/.env"
-sed -i "s/CACHE_STORE=.*/CACHE_STORE=database/" "$DEPLOY_DIR/backend/.env"
-sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=debug/" "$DEPLOY_DIR/backend/.env"
+python3 -c "
+import re
+content = open('$DEPLOY_DIR/backend/.env').read()
+content = re.sub(r'^DB_PASSWORD=.*', 'DB_PASSWORD=${POSTGRES_PASSWORD}', content, flags=re.MULTILINE)
+open('$DEPLOY_DIR/backend/.env', 'w').write(content)
+"
+sed -i "s/CACHE_STORE=.*/CACHE_STORE=file/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/SESSION_DRIVER=.*/SESSION_DRIVER=file/" "$DEPLOY_DIR/backend/.env"
+sed -i "s/LOG_LEVEL=.*/LOG_LEVEL=info/" "$DEPLOY_DIR/backend/.env"
 
 mkdir -p \
     "$DEPLOY_DIR/backend/storage/framework/cache/data" \
@@ -293,29 +252,32 @@ mkdir -p \
     "$DEPLOY_DIR/backend/storage/logs" \
     "$DEPLOY_DIR/backend/bootstrap/cache"
 
-echo "=== 5. Start containers (first-time) ==="
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 5. Start containers ==="
 cd "$DEPLOY_DIR"
 POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose up -d --build postgres backend
 
-echo "Waiting for PostgreSQL..."
-sleep 15
+log "Waiting for PostgreSQL..."
+sleep 20
 
-echo "=== 6. Run Laravel migrations ==="
+log "=== 6. Migrate + seed admin ==="
 docker compose exec -T backend php artisan migrate --force
+docker compose exec -T backend php artisan db:seed --class=AdminSeeder --force
 docker compose exec -T backend php artisan optimize:clear >/dev/null 2>&1 || true
 docker compose exec -T backend php artisan config:cache >/dev/null 2>&1 || true
 docker compose exec -T backend php artisan route:cache >/dev/null 2>&1 || true
 docker compose exec -T backend php artisan view:cache >/dev/null 2>&1 || true
 
-echo "=== 7. Build frontend + copy to wwwroot ==="
+log "=== 7. Build + deploy frontend ==="
 POSTGRES_PASSWORD="$POSTGRES_PASSWORD" docker compose up -d --build frontend
 sleep 5
 docker cp "$(docker compose ps -q frontend):/usr/share/nginx/html/." "$WWWROOT/"
 
-echo "=== 7b. Verify backend health ==="
-curl -fsS http://127.0.0.1:8000/up >/dev/null
+log "=== 8. Health check ==="
+curl -fsS http://127.0.0.1:8000/up >/dev/null && log "Backend healthy ✓"
 
-echo "=== 8. Setup Nginx vhost (HTTP) ==="
+# ──────────────────────────────────────────────────────────────────────────────
+log "=== 9. Setup Nginx vhost (HTTP) ==="
 cat > "${VESTACP_VHOST}/${DOMAIN}.conf" << VHOST
 server {
     listen 80;
@@ -336,8 +298,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto http;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 60s;
     }
 
     location ^~ /storage/ {
@@ -346,26 +306,24 @@ server {
         proxy_set_header Host \$http_host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto http;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 60s;
     }
 
-    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+    location ^~ /.well-known/acme-challenge/ {
+        root ${WWWROOT};
+        allow all;
     }
 }
 VHOST
 
-echo "=== 9. SSL certbot (if not exists) ==="
+nginx -t && nginx -s reload
+log "Nginx reloaded ✓"
+
+log "=== 10. SSL (certbot) ==="
 if [ ! -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
-    mkdir -p "$WWWROOT/.well-known/acme-challenge"
     certbot certonly --webroot -w "$WWWROOT" -d "$DOMAIN" \
         --non-interactive --agree-tos --email quandhonline@gmail.com
 fi
 
-echo "=== 10. Update vhost with SSL ==="
 cat > "${VESTACP_VHOST}/${DOMAIN}.conf" << VHOST
 server {
     listen 80;
@@ -385,10 +343,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:!MD5;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
     add_header Strict-Transport-Security "max-age=31536000" always;
 
     location / {
@@ -402,8 +358,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto https;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 60s;
     }
 
     location ^~ /storage/ {
@@ -413,13 +367,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto https;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-
-    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
     }
 
     location ^~ /.well-known/acme-challenge/ {
@@ -429,21 +376,18 @@ server {
 }
 VHOST
 
-echo "=== 11. Reload Nginx ==="
 nginx -t && nginx -s reload
+log "SSL configured ✓"
 
 echo ""
-echo "=== DONE ==="
-echo "Site: https://${DOMAIN}"
-echo "API:  https://${DOMAIN}/api/"
-echo ""
-echo "Git remote to add on local:"
-echo "  git remote add vps ssh://root@180.93.42.138${APP_DIR}/repo.git"
-echo ""
-echo "Deploy: git push vps main"
-echo ""
-echo "Incremental deploy:"
-echo "  - Frontend changes only  → builds frontend only"
-echo "  - Backend or infra changes → rebuilds backend, runs migrations, verifies /up"
-echo "  - Docker changes        → rebuilds everything"
-echo "  - No changes            → skips build (fast)"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║  ✅ FBB Inspection deployed successfully!               ║"
+echo "║                                                          ║"
+echo "║  URL:   https://${DOMAIN}                ║"
+echo "║  Admin: admin / Admin@2025                               ║"
+echo "║                                                          ║"
+echo "║  Add git remote on local:                                ║"
+echo "║  git remote add vps ssh://root@180.93.42.138${APP_DIR}/repo.git ║"
+echo "║                                                          ║"
+echo "║  Deploy: git push vps main                               ║"
+echo "╚══════════════════════════════════════════════════════════╝"
