@@ -55,7 +55,8 @@ RELEASES_DIR="$APP_DIR/releases"
 WORK_TREE="$APP_DIR/repo-work"
 SHARED_DIR="$APP_DIR/shared"
 DEPLOY_ENV_FILE="$SHARED_DIR/deploy.env"
-WWWROOT="/www/wwwroot/inspector.quandh.online"
+DOMAIN="inspector.quandh.online"
+WWWROOT="/www/wwwroot/${DOMAIN}"
 LOG_FILE="/var/log/fbb-deploy.log"
 
 if [ -f "$DEPLOY_ENV_FILE" ]; then
