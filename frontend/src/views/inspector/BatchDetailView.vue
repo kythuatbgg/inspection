@@ -24,6 +24,16 @@
             </div>
           </div>
 
+          <!-- Unapproved Banner -->
+          <div v-if="!isApproved" class="rounded-lg bg-warning/10 border border-warning/30 p-4 flex items-start gap-3">
+            <AlertTriangle class="w-5 h-5 text-warning shrink-0 mt-0.5" />
+            <div>
+              <p class="text-sm font-bold text-warning-700">{{ batch.approval_status === 'rejected' ? $t('batchDetail.proposalRejected') : $t('batchDetail.proposalNeedsApproval') }}</p>
+              <p v-if="batch.approval_note" class="text-xs text-warning-600 mt-1">{{ $t('batchDetail.reason') }}: {{ batch.approval_note }}</p>
+              <p v-else class="text-xs text-warning-600 mt-1">Chờ quản trị viên phê duyệt trước khi kiểm tra.</p>
+            </div>
+          </div>
+
           <!-- Report Language -->
           <div class="rounded-lg bg-white border border-slate-200 p-4 shadow-sm">
             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">{{ $t('inspector.reportLang') }}</label>
@@ -69,8 +79,12 @@
                 v-for="plan in planDetails"
                 :key="plan.id"
                 @click="goToInspection(plan)"
-                class="w-full text-left rounded-lg bg-white border border-slate-200 p-4 transition-all cursor-pointer hover:bg-slate-50 shadow-sm"
-                :class="{ 'border-primary-500 ring-1 ring-primary-500 bg-primary-50/10 hover:bg-primary-50/20': isActiveTask(plan.id) }"
+                :disabled="!isApproved && plan.status !== 'done'"
+                class="w-full text-left rounded-lg bg-white border border-slate-200 p-4 transition-all shadow-sm"
+                :class="[
+                  isActiveTask(plan.id) ? 'border-primary-500 ring-1 ring-primary-500 bg-primary-50/10 hover:bg-primary-50/20' : '',
+                  !isApproved && plan.status !== 'done' ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'
+                ]"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex-1 min-w-0 pr-3">
@@ -203,7 +217,12 @@ const goBack = () => {
   router.push({ name: route.name === 'inspector-proposal-detail' ? 'inspector-proposals' : 'inspector-tasks' })
 }
 
+const isApproved = computed(() => batch.value?.approval_status === 'approved')
+
 const goToInspection = (plan) => {
+  // Block inspection for unapproved batches (allow viewing done inspections)
+  if (!isApproved.value && plan.status !== 'done') return
+
   router.push({
     name: 'inspector-batch-inspection',
     params: { planId: plan.id }
