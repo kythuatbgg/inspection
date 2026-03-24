@@ -45,6 +45,35 @@
 </head>
 <body>
     @php
+        /**
+         * Resolve a photo URL to a base64 data URI for DomPDF.
+         * Handles both local dev and production paths.
+         */
+        function resolvePhotoBase64(string $url): ?string {
+            // Strip host and /storage/ prefix to get relative path
+            $relativePath = preg_replace('#^https?://[^/]+#', '', $url);
+            
+            // Try multiple possible file locations
+            $candidates = [
+                // Production: /storage/xxx → storage/app/public/xxx
+                storage_path('app/public/' . preg_replace('#^/storage/#', '', $relativePath)),
+                // Local: public_path + relative
+                public_path($relativePath),
+                // Direct path if already absolute
+                $relativePath,
+            ];
+            
+            foreach ($candidates as $path) {
+                if (file_exists($path) && is_file($path)) {
+                    $mime = mime_content_type($path) ?: 'image/jpeg';
+                    $data = base64_encode(file_get_contents($path));
+                    return "data:{$mime};base64,{$data}";
+                }
+            }
+            return null;
+        }
+    @endphp
+    @php
         $labels = match($lang ?? 'en') {
             'vn', 'vi' => [
                 'title' => 'Biên bản kiểm tra tủ cáp GPON',
@@ -143,12 +172,9 @@
             @foreach(array_chunk($inspection->overall_photos, 2) as $pair)
             <div class="photo-pair">
                 @foreach($pair as $photoUrl)
-                    @php
-                        $absPath = public_path(str_replace(request()->getSchemeAndHttpHost(), '', $photoUrl));
-                        $exists = file_exists($absPath);
-                    @endphp
-                    @if($exists)
-                        <img src="{{ $absPath }}" />
+                    @php $b64 = resolvePhotoBase64($photoUrl); @endphp
+                    @if($b64)
+                        <img src="{{ $b64 }}" />
                     @endif
                 @endforeach
             </div>
@@ -198,13 +224,10 @@
                             <div class="note-text">📝 {{ $item['note'] }}</div>
                         @endif
                         @if(!empty($item['image_url']))
-                            @php
-                                $imgPath = public_path(str_replace(request()->getSchemeAndHttpHost(), '', $item['image_url']));
-                                $imgExists = file_exists($imgPath);
-                            @endphp
-                            @if($imgExists)
+                            @php $b64 = resolvePhotoBase64($item['image_url']); @endphp
+                            @if($b64)
                             <div class="error-photo">
-                                <img src="{{ $imgPath }}" />
+                                <img src="{{ $b64 }}" />
                             </div>
                             @endif
                         @endif

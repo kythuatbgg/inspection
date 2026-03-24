@@ -47,6 +47,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('Starting database seeding...');
 
+        // Always seed admin account first
+        $this->call(AdminSeeder::class);
+
         if (empty($this->seedDataPath)) {
             $this->command->error('Mock data file not found! Searching in:');
             $this->command->error(base_path('../mock_data_seed_full.json'));
