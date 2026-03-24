@@ -165,8 +165,13 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  // Load user data on initial visit/refresh if token exists
+  if (authStore.token && !authStore.user) {
+    await authStore.fetchUser()
+  }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
