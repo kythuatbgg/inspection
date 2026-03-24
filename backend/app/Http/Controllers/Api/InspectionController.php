@@ -121,6 +121,20 @@ class InspectionController extends Controller
             return response()->json(['message' => __('messages.unauthorized')], 403);
         }
 
+        // Block inspection for unapproved batches
+        if ($plan->batch->approval_status !== 'approved') {
+            return response()->json([
+                'message' => 'Lô kiểm tra chưa được phê duyệt. Không thể nộp biên bản.',
+            ], 422);
+        }
+
+        // Block inspection for completed batches
+        if ($plan->batch->status === 'completed') {
+            return response()->json([
+                'message' => 'Lô kiểm tra đã kết thúc. Không thể nộp biên bản.',
+            ], 422);
+        }
+
         if (Inspection::where('plan_detail_id', $request->plan_detail_id)->exists()) {
             return response()->json([
                 'message' => __('messages.cabinet_already_inspected'),

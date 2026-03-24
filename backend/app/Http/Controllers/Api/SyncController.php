@@ -57,6 +57,25 @@ class SyncController extends Controller
                         continue;
                     }
 
+                    // Block sync for unapproved or completed batches
+                    $plan = PlanDetail::find($inspectionData['plan_detail_id']);
+                    if ($plan && $plan->batch) {
+                        if ($plan->batch->approval_status !== 'approved') {
+                            $errors[] = [
+                                'plan_detail_id' => $inspectionData['plan_detail_id'],
+                                'error' => 'Batch not approved',
+                            ];
+                            continue;
+                        }
+                        if ($plan->batch->status === 'completed') {
+                            $errors[] = [
+                                'plan_detail_id' => $inspectionData['plan_detail_id'],
+                                'error' => 'Batch already completed',
+                            ];
+                            continue;
+                        }
+                    }
+
                     // Process images first
                     $details = $this->processDetailsWithImages($inspectionData['details'] ?? []);
 
