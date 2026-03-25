@@ -17,8 +17,30 @@ const props = defineProps({
 
 const router = useRouter()
 const mapContainer = ref(null)
+const mapType = ref('street')
 let map = null
 let markers = []
+let streetLayer = null
+let satelliteLayer = null
+let activeBaseLayer = null
+
+const setMapType = (type = 'street') => {
+  if (!map || !streetLayer || !satelliteLayer) return
+
+  const nextType = type === 'satellite' ? 'satellite' : 'street'
+  const nextLayer = nextType === 'satellite' ? satelliteLayer : streetLayer
+
+  if (activeBaseLayer && map.hasLayer(activeBaseLayer)) {
+    map.removeLayer(activeBaseLayer)
+  }
+
+  nextLayer.addTo(map)
+  activeBaseLayer = nextLayer
+  mapType.value = nextType
+}
+
+const getMapType = () => mapType.value
+
 
 // Fix Leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl
@@ -46,11 +68,15 @@ const initMap = () => {
   // Initialize map centered on Vietnam
   map = L.map(mapContainer.value).setView([10.8231, 106.6297], 13)
 
-  // Add OpenStreetMap tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(map)
+  })
 
+  satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+  })
+
+  setMapType(mapType.value)
   updateMarkers()
 }
 
@@ -151,7 +177,11 @@ const refresh = () => {
   }
 }
 
-defineExpose({ refresh })
+defineExpose({
+  refresh,
+  setMapType,
+  getMapType
+})
 
 onUnmounted(() => {
   if (mapContainer.value) {

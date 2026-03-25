@@ -22,8 +22,25 @@
           >
             <div class="flex items-center">
               <MapPin class="w-4 h-4 mr-2" />
-              Map
+              {{ $t('common.map') }}
             </div>
+          </button>
+        </div>
+
+        <div v-if="viewMode === 'map'" class="flex rounded-lg overflow-hidden bg-slate-100 p-1">
+          <button
+            @click="setMapLayerType('street')"
+            class="px-4 py-2 min-h-[44px] rounded-lg text-sm font-semibold transition-all"
+            :class="mapLayerType === 'street' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+          >
+            {{ $t('common.map') }}
+          </button>
+          <button
+            @click="setMapLayerType('satellite')"
+            class="px-4 py-2 min-h-[44px] rounded-lg text-sm font-semibold transition-all"
+            :class="mapLayerType === 'satellite' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+          >
+            {{ $t('common.satellite') }}
           </button>
         </div>
 
@@ -66,6 +83,23 @@
             <MapPin class="w-5 h-5" />
           </button>
         </div>
+      </div>
+
+      <div v-if="viewMode === 'map'" class="flex bg-slate-100/80 backdrop-blur rounded-[16px] p-1 shadow-inner">
+        <button
+          @click="setMapLayerType('street')"
+          class="flex-1 h-10 flex items-center justify-center rounded-[12px] text-sm font-semibold transition-all duration-200"
+          :class="mapLayerType === 'street' ? 'bg-white shadow-sm text-primary-600' : 'text-slate-500 active:bg-slate-200/50'"
+        >
+          {{ $t('common.map') }}
+        </button>
+        <button
+          @click="setMapLayerType('satellite')"
+          class="flex-1 h-10 flex items-center justify-center rounded-[12px] text-sm font-semibold transition-all duration-200"
+          :class="mapLayerType === 'satellite' ? 'bg-white shadow-sm text-primary-600' : 'text-slate-500 active:bg-slate-200/50'"
+        >
+          {{ $t('common.satellite') }}
+        </button>
       </div>
 
       <!-- Action Buttons -->
@@ -454,6 +488,7 @@ const perPageOptions = [
 ]
 
 const viewMode = ref('list')
+const mapLayerType = ref('street')
 const mapEverOpened = ref(false)
 const cabinetMapRef = ref(null)
 const loading = ref(true)
@@ -462,6 +497,15 @@ const cabinets = ref([])
 const fileInput = ref(null)
 
 // Lazy-init map on first switch, invalidateSize on subsequent switches
+const setMapLayerType = async (type) => {
+  mapLayerType.value = type === 'satellite' ? 'satellite' : 'street'
+
+  if (viewMode.value !== 'map') return
+
+  await nextTick()
+  cabinetMapRef.value?.setMapType(mapLayerType.value)
+}
+
 watch(viewMode, async (mode) => {
   if (mode === 'map') {
     if (!mapEverOpened.value) {
@@ -469,6 +513,14 @@ watch(viewMode, async (mode) => {
     }
     await nextTick()
     cabinetMapRef.value?.refresh()
+    cabinetMapRef.value?.setMapType(mapLayerType.value)
+  }
+})
+
+watch(cabinets, async () => {
+  if (viewMode.value === 'map' && mapEverOpened.value) {
+    await nextTick()
+    cabinetMapRef.value?.setMapType(mapLayerType.value)
   }
 })
 

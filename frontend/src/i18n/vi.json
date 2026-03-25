@@ -97,7 +97,9 @@
     "unknown": "Không xác định",
     "notBelongStation": "Không thuộc trạm",
     "details": "Chi tiết",
-    "directions": "Chỉ đường"
+    "directions": "Chỉ đường",
+    "map": "Bản đồ",
+    "satellite": "Vệ tinh"
   },
 
   "nav": {

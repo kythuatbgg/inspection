@@ -97,7 +97,9 @@
     "unknown": "Unknown",
     "notBelongStation": "Not assigned to station",
     "details": "Details",
-    "directions": "Directions"
+    "directions": "Directions",
+    "map": "Map",
+    "satellite": "Satellite"
   },
 
   "nav": {
