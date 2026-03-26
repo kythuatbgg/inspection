@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\StorageController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\InspectorStatsController;
+use App\Http\Controllers\Api\AccountController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -43,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('batches', [BatchController::class, 'index']);
     Route::post('batches', [BatchController::class, 'store']);
     Route::get('batches/{batch}', [BatchController::class, 'show']);
+
+    // Accounts (list only - creation is via batch creation)
+    Route::get('accounts', [AccountController::class, 'index']);
 
     // Manager-only routes (admin + manager)
     Route::middleware('manager')->group(function () {

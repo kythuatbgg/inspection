@@ -81,12 +81,32 @@
             <p class="font-semibold text-slate-900 mt-1">{{ batch.checklist?.name || '—' }}</p>
           </div>
           <div class="bg-slate-50/80 rounded-[14px] p-4">
+            <p class="text-sm text-slate-500">{{ $t('batch.batchType') }}</p>
+            <p class="font-semibold text-slate-900 mt-1">
+              {{ batch.type === 'deployment' ? $t('batch.batchTypeDeployment') : $t('batch.batchTypeInspection') }}
+            </p>
+          </div>
+          <div class="bg-slate-50/80 rounded-[14px] p-4">
             <p class="text-sm text-slate-500">{{ $t('batchDetail.startDate') }}</p>
             <p class="font-semibold text-slate-900 mt-1">{{ formatDate(batch.start_date) || '—' }}</p>
           </div>
-          <div class="bg-slate-50/80 rounded-[14px] p-4">
+          <div class="bg-slate-50/80 rounded-[14px] p-4 md:col-span-2">
             <p class="text-sm text-slate-500">{{ $t('batchDetail.endDate') }}</p>
             <p class="font-semibold text-slate-900 mt-1">{{ formatDate(batch.end_date) || '—' }}</p>
+          </div>
+        </div>
+
+        <!-- Deployment accounts summary -->
+        <div v-if="batch.type === 'deployment'" class="space-y-2">
+          <h4 class="text-sm font-semibold text-slate-700">{{ $t('batch.accounts') }}</h4>
+          <div class="border border-slate-200 rounded-lg overflow-hidden divide-y divide-slate-100">
+            <div v-for="account in batch.accounts || []" :key="account.account_code" class="px-4 py-3 flex items-center justify-between bg-slate-50/60">
+              <span class="font-medium text-slate-800 text-sm">{{ account.account_code }}</span>
+              <span class="text-xs text-slate-500">{{ account.cabinet_codes?.length || 0 }} tủ</span>
+            </div>
+            <div v-if="!(batch.accounts && batch.accounts.length)" class="px-4 py-3 text-sm text-slate-500 text-center">
+              {{ $t('batch.noAccounts') }}
+            </div>
           </div>
         </div>
       </div>

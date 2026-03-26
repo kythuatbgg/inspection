@@ -17,6 +17,7 @@ class PlanDetail extends Model
     protected $fillable = [
         'batch_id',
         'cabinet_code',
+        'account_id',
         'status',
         'review_status',
         'review_note',
@@ -53,5 +54,13 @@ class PlanDetail extends Model
     public function inspection(): HasOne
     {
         return $this->hasOne(Inspection::class, 'plan_detail_id')->latestOfMany();
+    }
+
+    /**
+     * Get the account this plan detail belongs to.
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
     }
 }

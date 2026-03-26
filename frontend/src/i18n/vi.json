@@ -203,7 +203,20 @@
     "proposeCabinets": "Đề xuất các tủ cáp",
     "submitProposal": "Gửi đề xuất",
     "total": "Tổng",
-    "itemDetails": "Chi tiết từng hạng mục"
+    "itemDetails": "Chi tiết từng hạng mục",
+    "batchType": "Loại batch",
+    "selectBatchType": "Chọn loại batch",
+    "batchTypeInspection": "Kiểm tra",
+    "batchTypeDeployment": "Triển khai",
+    "accounts": "Accounts",
+    "addAccount": "Thêm account",
+    "accountCode": "Mã account",
+    "searchCabinets": "Tìm mã tủ...",
+    "noCabinetsSelected": "Chưa có tủ nào được chọn",
+    "removeAccount": "Xóa account",
+    "cabinetSelectedCount": "{count} tủ đã chọn",
+    "noAccounts": "Không có account",
+    "noAccountsHint": "Chưa có account nào. Bấm \"{action}\" để thêm."
   },
 
   "batchDetail": {

@@ -203,7 +203,20 @@
     "proposeCabinets": "Propose cabinets",
     "submitProposal": "Submit proposal",
     "total": "Total",
-    "itemDetails": "Item details"
+    "itemDetails": "Item details",
+    "batchType": "Batch Type",
+    "selectBatchType": "Select batch type",
+    "batchTypeInspection": "Inspection",
+    "batchTypeDeployment": "Deployment",
+    "accounts": "Accounts",
+    "addAccount": "Add account",
+    "accountCode": "Account Code",
+    "searchCabinets": "Search cabinet...",
+    "noCabinetsSelected": "No cabinets selected",
+    "removeAccount": "Remove account",
+    "cabinetSelectedCount": "{count} cabinets selected",
+    "noAccounts": "No accounts",
+    "noAccountsHint": "No account yet. Click \"{action}\" to add."
   },
 
   "batchDetail": {

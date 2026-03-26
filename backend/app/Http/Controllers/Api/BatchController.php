@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\InspectionBatch;
 use App\Models\PlanDetail;
 use App\Models\User;
@@ -70,6 +71,7 @@ class BatchController extends Controller
             'user:id,name,username',
             'checklist:id,name,min_pass_score,max_critical_allowed',
             'planDetails.inspection',
+            'planDetails.account',
         ])->findOrFail($batchId);
 
         if ($request->user()->role === 'inspector' && $batch->user_id !== $request->user()->id) {
@@ -85,6 +87,11 @@ class BatchController extends Controller
                 'id' => $plan->id,
                 'batch_id' => $plan->batch_id,
                 'cabinet_code' => $plan->cabinet_code,
+                'account_id' => $plan->account_id,
+                'account' => $plan->account ? [
+                    'id' => $plan->account->id,
+                    'account_code' => $plan->account->account_code,
+                ] : null,
                 'status' => $plan->status,
                 'review_status' => $plan->review_status,
                 'review_note' => $plan->review_note,
@@ -96,10 +103,27 @@ class BatchController extends Controller
             ];
         });
 
+        // Group plan_details by account for deployment batches
+        $accounts = null;
+        if ($batch->type === 'deployment') {
+            $accountGroups = $batch->planDetails->groupBy('account_id');
+            $accounts = $accountGroups->map(function ($plans) {
+                $firstPlan = $plans->first();
+                $account = $firstPlan->account;
+                return [
+                    'id' => $account?->id,
+                    'account_code' => $account?->account_code,
+                    'cabinet_codes' => $plans->pluck('cabinet_code')->values()->toArray(),
+                    'plan_ids' => $plans->pluck('id')->values()->toArray(),
+                ];
+            })->values()->toArray();
+        }
+
         return response()->json([
             'data' => [
                 'id' => $batch->id,
                 'name' => $batch->name,
+                'type' => $batch->type,
                 'user' => $batch->user,
                 'checklist_id' => $batch->checklist_id,
                 'checklist' => $batch->checklist,
@@ -115,6 +139,7 @@ class BatchController extends Controller
                     'percentage' => $progress,
                 ],
                 'plan_details' => $planDetails,
+                'accounts' => $accounts,
                 'created_at' => $batch->created_at,
             ],
         ]);
@@ -126,18 +151,22 @@ class BatchController extends Controller
     public function store(Request $request): JsonResponse
     {
         $isCreatorInspector = $request->user()->role === 'inspector';
+        $batchType = $request->input('type', 'inspection');
 
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
+            'type' => 'required|in:inspection,deployment',
             'user_id' => $isCreatorInspector ? 'nullable' : 'required|exists:users,id',
             'checklist_id' => 'required|exists:checklists,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'cabinet_codes' => 'required|array|min:1',
-            'cabinet_codes.*' => 'distinct|exists:cabinets,cabinet_code',
-        ], [
+        ];
+
+        $messages = [
             'name.required' => 'Tên lô kiểm tra là bắt buộc.',
             'name.max' => 'Tên lô không được vượt quá 255 ký tự.',
+            'type.required' => 'Loại batch là bắt buộc.',
+            'type.in' => 'Loại batch không hợp lệ.',
             'user_id.required' => 'Vui lòng chọn người kiểm tra.',
             'user_id.exists' => 'Người kiểm tra không tồn tại.',
             'checklist_id.required' => 'Vui lòng chọn checklist.',
@@ -146,11 +175,59 @@ class BatchController extends Controller
             'start_date.after_or_equal' => 'Ngày bắt đầu phải từ hôm nay trở đi.',
             'end_date.required' => 'Ngày kết thúc là bắt buộc.',
             'end_date.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.',
-            'cabinet_codes.required' => 'Vui lòng chọn ít nhất 1 tủ cáp.',
-            'cabinet_codes.min' => 'Vui lòng chọn ít nhất 1 tủ cáp.',
-            'cabinet_codes.*.distinct' => 'Không được chọn tủ cáp trùng lặp.',
-            'cabinet_codes.*.exists' => 'Mã tủ ":input" không tồn tại.',
-        ]);
+        ];
+
+        // Validate based on batch type
+        if ($batchType === 'inspection') {
+            $rules['cabinet_codes'] = 'required|array|min:1';
+            $rules['cabinet_codes.*'] = 'distinct|exists:cabinets,cabinet_code';
+            $messages['cabinet_codes.required'] = 'Vui lòng chọn ít nhất 1 tủ cáp.';
+            $messages['cabinet_codes.min'] = 'Vui lòng chọn ít nhất 1 tủ cáp.';
+            $messages['cabinet_codes.*.distinct'] = 'Không được chọn tủ cáp trùng lặp.';
+            $messages['cabinet_codes.*.exists'] = 'Mã tủ ":input" không tồn tại.';
+        } elseif ($batchType === 'deployment') {
+            $rules['accounts'] = 'required|array|min:1';
+            $rules['accounts.*.account_code'] = 'required|string|max:100';
+            $rules['accounts.*.cabinet_codes'] = 'required|array|min:1';
+            $rules['accounts.*.cabinet_codes.*'] = 'distinct|exists:cabinets,cabinet_code';
+            $messages['accounts.required'] = 'Vui lòng thêm ít nhất 1 account.';
+            $messages['accounts.min'] = 'Vui lòng thêm ít nhất 1 account.';
+            $messages['accounts.*.account_code.required'] = 'Mã account là bắt buộc.';
+            $messages['accounts.*.cabinet_codes.required'] = 'Mỗi account phải có ít nhất 1 tủ cáp.';
+            $messages['accounts.*.cabinet_codes.min'] = 'Mỗi account phải có ít nhất 1 tủ cáp.';
+            $messages['accounts.*.cabinet_codes.*.distinct'] = 'Không được chọn tủ cáp trùng lặp trong cùng account.';
+            $messages['accounts.*.cabinet_codes.*.exists'] = 'Mã tủ ":input" không tồn tại.';
+        }
+
+        $request->validate($rules, $messages);
+
+        // Additional business validation for deployment batches
+        if ($batchType === 'deployment') {
+            $accountCodes = collect($request->input('accounts', []))
+                ->pluck('account_code')
+                ->map(fn ($code) => trim((string) $code));
+
+            if ($accountCodes->duplicates()->isNotEmpty()) {
+                return response()->json([
+                    'message' => 'Mã account bị trùng trong cùng một batch.',
+                    'errors' => [
+                        'accounts' => ['Mã account bị trùng trong cùng một batch.']
+                    ],
+                ], 422);
+            }
+
+            $allCabinetCodes = collect($request->input('accounts', []))
+                ->flatMap(fn ($acc) => $acc['cabinet_codes'] ?? []);
+
+            if ($allCabinetCodes->duplicates()->isNotEmpty()) {
+                return response()->json([
+                    'message' => 'Một tủ cáp chỉ được gán cho một account trong cùng batch.',
+                    'errors' => [
+                        'accounts' => ['Một tủ cáp chỉ được gán cho một account trong cùng batch.']
+                    ],
+                ], 422);
+            }
+        }
 
         $userId = $isCreatorInspector ? $request->user()->id : $request->user_id;
 
@@ -164,6 +241,7 @@ class BatchController extends Controller
 
         $batch = InspectionBatch::create([
             'name' => $request->name,
+            'type' => $batchType,
             'user_id' => $userId,
             'created_by' => $request->user()->id,
             'checklist_id' => $request->checklist_id,
@@ -173,11 +251,28 @@ class BatchController extends Controller
             'approval_status' => $isCreatorInspector ? 'pending' : 'approved',
         ]);
 
-        foreach ($request->cabinet_codes as $cabinetCode) {
-            $batch->planDetails()->create([
-                'cabinet_code' => $cabinetCode,
-                'status' => 'planned',
-            ]);
+        if ($batchType === 'inspection') {
+            foreach ($request->cabinet_codes as $cabinetCode) {
+                $batch->planDetails()->create([
+                    'cabinet_code' => $cabinetCode,
+                    'status' => 'planned',
+                ]);
+            }
+        } else {
+            // Deployment: create accounts and link plan_details
+            foreach ($request->accounts as $accountData) {
+                $account = Account::firstOrCreate([
+                    'account_code' => $accountData['account_code'],
+                ]);
+
+                foreach ($accountData['cabinet_codes'] as $cabinetCode) {
+                    $batch->planDetails()->create([
+                        'cabinet_code' => $cabinetCode,
+                        'account_id' => $account->id,
+                        'status' => 'planned',
+                    ]);
+                }
+            }
         }
 
         return response()->json([
@@ -546,7 +641,7 @@ class BatchController extends Controller
     /**
      * Approve proposed batch (Manager only)
      */
-    public function approve(Request $request, int $batchId): JsonResponse
+    public function approve(int $batchId): JsonResponse
     {
         $batch = InspectionBatch::findOrFail($batchId);
         

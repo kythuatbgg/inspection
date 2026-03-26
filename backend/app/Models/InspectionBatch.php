@@ -15,6 +15,7 @@ class InspectionBatch extends Model
      */
     protected $fillable = [
         'name',
+        'type',
         'user_id',
         'created_by',
         'checklist_id',
@@ -75,5 +76,20 @@ class InspectionBatch extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get all accounts associated with this batch via plan_details.
+     */
+    public function accounts()
+    {
+        return $this->hasManyThrough(
+            Account::class,
+            PlanDetail::class,
+            'batch_id',
+            'id',
+            'id',
+            'account_id'
+        )->whereNotNull('account_id')->distinct();
     }
 }
