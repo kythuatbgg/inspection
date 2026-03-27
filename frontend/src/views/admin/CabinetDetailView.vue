@@ -204,10 +204,12 @@
 import { ArrowLeft, Loader2, AlertCircle, Server, MapPin, FileEdit, Trash2, Info, Navigation, Clock, ChevronRight } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import cabinetService from '@/services/cabinetService.js'
 import { getDateLocale } from '@/i18n'
 import { useToast } from '@/composables/useToast'
 
+const { t } = useI18n()
 const { error: toastError } = useToast()
 
 const route = useRoute()

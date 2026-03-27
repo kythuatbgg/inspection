@@ -203,7 +203,6 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { success, error: toastError } = useToast()
-const router = useRouter()
 
 const loading = ref(true)
 const checklist = ref({})

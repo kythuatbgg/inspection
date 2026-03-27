@@ -128,7 +128,7 @@ import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
-const { success, error: toastError } = useToast()
+const { success: toastSuccess, error: toastError } = useToast()
 
 const form = reactive({
   name: '',
@@ -184,7 +184,7 @@ const updateProfile = async () => {
 
     success.value = t('profile.updateSuccess')
     setTimeout(() => success.value = '', 3000)
-    success(t('profile.updateSuccess'))
+    toastSuccess(t('profile.updateSuccess'))
   } catch (e) {
     error.value = e.response?.data?.message || t('common.errorOccurred')
     toastError(t('common.errorOccurred'))
@@ -216,7 +216,7 @@ const changePassword = async () => {
     passwordForm.password = ''
     passwordForm.password_confirmation = ''
     setTimeout(() => passwordSuccess.value = '', 3000)
-    success(t('profile.passwordSuccess'))
+    toastSuccess(t('profile.passwordSuccess'))
   } catch (e) {
     passwordError.value = e.response?.data?.message || t('common.errorOccurred')
     toastError(t('common.errorOccurred'))
