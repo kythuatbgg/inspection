@@ -85,16 +85,6 @@
 
     </template>
 
-    <!-- ── Toast ─────────────────────────────────────────────── -->
-    <Transition name="toast">
-      <div
-        v-if="toast.show"
-        class="toast"
-        :class="toast.type === 'error' ? 'toast-error' : 'toast-success'"
-      >
-        {{ toast.message }}
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -111,13 +101,9 @@ import InspectorInspectionsSection from '@/components/inspector/reports/Inspecto
 import { useInspectorReportsDashboard } from '@/composables/useInspectorReportsDashboard'
 import { useInspectorInspectionsList } from '@/composables/useInspectorInspectionsList'
 import { useInspectorReportDownload } from '@/composables/useInspectorReportDownload'
+import { useToast } from '@/composables/useToast'
 
-// ── Toast ───────────────────────────────────────────────────
-const toast = ref({ show: false, message: '', type: 'success' })
-function showToast(message, type = 'success') {
-  toast.value = { show: true, message, type }
-  setTimeout(() => { toast.value.show = false }, 3000)
-}
+const { success, error } = useToast()
 
 // ── Filter state ────────────────────────────────────────────
 const dateFrom = ref('')
@@ -132,9 +118,9 @@ const dateParams = computed(() => {
 })
 
 // ── Composables ─────────────────────────────────────────────
-const dash = useInspectorReportsDashboard({ onError: showToast })
-const list = useInspectorInspectionsList({ dateParams, onError: showToast })
-const dl   = useInspectorReportDownload({ onSuccess: showToast, onError: showToast })
+const dash = useInspectorReportsDashboard({ onError: error })
+const list = useInspectorInspectionsList({ dateParams, onError: error })
+const dl   = useInspectorReportDownload({ onSuccess: success, onError: error })
 
 // ── Refresh all — parallel load: dashboard + inspections together ──
 async function refreshAll() {
@@ -165,22 +151,3 @@ onUnmounted(() => {
   list.cleanup()
 })
 </script>
-
-<style scoped>
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  z-index: 9999;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  color: #fff;
-}
-.toast-success { background: #16a34a; }
-.toast-error   { background: #dc2626; }
-.toast-enter-active, .toast-leave-active { transition: all 0.3s; }
-.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(10px); }
-</style>

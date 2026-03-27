@@ -8,21 +8,19 @@ import reportService, { triggerDownload } from '@/services/reportService'
  *
  * @param {Object} options
  * @param {Object} options.dl - Shared useDownloadState instance from parent shell.
- *                             If not provided, creates its own (for isolated use).
- * @param {Function} options.onError - Error callback (receives message string).
+ * @param {Function} options.onSuccess - Success callback (receives message string).
+ * @param {Function} options.onError   - Error callback (receives message string).
  */
-export function useAdminReportsExport({ dl = null, onError = null } = {}) {
+export function useAdminReportsExport({ dl = null, onSuccess = null, onError = null } = {}) {
   const { t } = useI18n()
 
-  // Accept dl from parent shell so all tabs share the same keyed state.
-  // Falls back to creating its own if not supplied.
   const _dl = dl
 
   function showToast(msg, type = 'success') {
-    if (typeof window !== 'undefined' && window.__adminReportsToast) {
-      window.__adminReportsToast(msg, type)
-    } else if (onError && type === 'error') {
-      onError(msg)
+    if (type === 'error') {
+      onError?.(msg)
+    } else {
+      onSuccess?.(msg)
     }
   }
 

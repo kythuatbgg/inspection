@@ -38,21 +38,11 @@
       />
     </div>
 
-    <!-- Toast -->
-    <Transition 
-      enter-active-class="transition-all duration-300" leave-active-class="transition-all duration-300" 
-      enter-from-class="opacity-0 translate-y-2.5" leave-to-class="opacity-0 translate-y-2.5"
-    >
-      <div v-if="toast.show" class="fixed bottom-6 right-6 px-5 py-3 rounded-lg text-[13px] font-medium z-[9999] shadow-lg text-white" :class="toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'">
-        {{ toast.message }}
-      </div>
-    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   FileText, FileSpreadsheet, BarChart3
 } from 'lucide-vue-next'
@@ -60,11 +50,12 @@ import { useAdminReportsSearch } from '@/composables/useAdminReportsSearch'
 import { useAdminReportsStats } from '@/composables/useAdminReportsStats'
 import { useAdminReportsExport } from '@/composables/useAdminReportsExport'
 import { useDownloadState } from '@/composables/useDownloadState'
+import { useToast } from '@/composables/useToast'
 import AdminReportsTab from '@/components/admin/reports/AdminReportsTab.vue'
 import AdminStatisticsTab from '@/components/admin/reports/AdminStatisticsTab.vue'
 import AdminExportTab from '@/components/admin/reports/AdminExportTab.vue'
 
-const { t } = useI18n()
+const { success, error } = useToast()
 
 // ── Tabs config ──────────────────────────────────────────────
 const tabs = [
@@ -75,25 +66,13 @@ const tabs = [
 
 const activeTab = ref('reports')
 
-// ── Toast ───────────────────────────────────────────────────
-const toast = ref({ show: false, message: '', type: 'success' })
-function showToast(message, type = 'success') {
-  toast.value = { show: true, message, type }
-  setTimeout(() => { toast.value.show = false }, 3000)
-}
-
-// Register global toast handler for composables
-if (typeof window !== 'undefined') {
-  window.__adminReportsToast = showToast
-}
-
-// ── Download state (shared key Set so only the active button is disabled) ──
+// ── Download state ─────────────────────────────────────────────
 const dl = useDownloadState()
 
 // ── Composables ─────────────────────────────────────────────
-const search = useAdminReportsSearch({ onError: showToast })
-const stats  = useAdminReportsStats({ onError: showToast })
-const exportComps = useAdminReportsExport({ dl })
+const search = useAdminReportsSearch({ onError: error })
+const stats  = useAdminReportsStats({ onError: error })
+const exportComps = useAdminReportsExport({ dl, onSuccess: success, onError: error })
 
 // Filter params for statistics export
 const filterParams = computed(() => {
@@ -119,8 +98,5 @@ onMounted(() => {
 
 onUnmounted(() => {
   search.cleanup()
-  if (typeof window !== 'undefined') {
-    delete window.__adminReportsToast
-  }
 })
 </script>
