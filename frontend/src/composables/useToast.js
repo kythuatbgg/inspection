@@ -2,41 +2,48 @@ import { reactive } from 'vue'
 
 // Singleton reactive state — shared across all useToast() calls
 const state = reactive({
-  show: false,
   message: '',
   type: 'success', // 'success' | 'error' | 'info'
+  visible: false,
 })
 
 let timer = null
+let hideTimer = null
 
 /**
  * Single source of truth for toast notifications.
  * Import and call anywhere in the app — no props/callbacks needed.
  *
  * @example
- * const toast = useToast()
- * toast.success('Saved!')
- * toast.error('Something went wrong')
- * toast.info('Processing...')
+ * const { success, error, info } = useToast()
+ * success('Saved!')
+ * error('Something went wrong')
+ * info('Processing...')
  */
 export function useToast() {
   function showToast(message, type = 'success') {
-    // Reset any existing timer to prevent premature hide
+    // Cancel any pending hide timer so the new toast is never cut short
+    if (hideTimer) {
+      clearTimeout(hideTimer)
+      hideTimer = null
+    }
+    // Cancel any pending re-show (prevents flicker when called rapidly)
     if (timer) {
       clearTimeout(timer)
       timer = null
     }
-    state.show = false
-    // Tick so Vue re-triggers Transition on re-open
-    setTimeout(() => {
-      state.show = true
-      state.message = message
-      state.type = type
-    }, 10)
+
+    // Set state immediately — Transition re-triggers when visible goes false→true
+    state.visible = false
+    state.message = message
+    state.type = type
 
     timer = setTimeout(() => {
-      state.show = false
-    }, 3000)
+      state.visible = true
+      hideTimer = setTimeout(() => {
+        state.visible = false
+      }, 3000)
+    }, 20)
   }
 
   function success(message) {

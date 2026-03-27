@@ -6,7 +6,7 @@
     leave-to-class="opacity-0 translate-y-2.5"
   >
     <div
-      v-if="toast.state.show"
+      v-if="toast.state.visible"
       class="fixed bottom-6 right-6 z-[9999] px-5 py-3 rounded-lg text-[13px] font-medium text-white shadow-lg"
       :class="typeClasses[toast.state.type] || typeClasses.success"
     >
