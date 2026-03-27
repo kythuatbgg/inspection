@@ -216,7 +216,9 @@
     "removeAccount": "Remove account",
     "cabinetSelectedCount": "{count} cabinets selected",
     "noAccounts": "No accounts",
-    "noAccountsHint": "No account yet. Click \"{action}\" to add."
+    "noAccountsHint": "No account yet. Click \"{action}\" to add.",
+    "created": "Batch created successfully",
+    "proposalCreated": "Proposal submitted successfully"
   },
 
   "batchDetail": {
@@ -370,7 +372,9 @@
     "editCabinet": "Edit cabinet",
     "addCabinet": "Add new cabinet",
     "latitude": "Latitude",
-    "longitude": "Longitude"
+    "longitude": "Longitude",
+    "created": "Cabinet created successfully",
+    "updated": "Cabinet updated successfully"
   },
 
   "checklist": {
@@ -426,7 +430,10 @@
     "roleField": "Role",
     "deleteConfirm": "Are you sure you want to delete user",
     "userItems": "users",
-    "inTotalAccounts": "of {total} accounts total"
+    "inTotalAccounts": "of {total} accounts total",
+    "created": "User created successfully",
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully"
   },
 
   "settings": {

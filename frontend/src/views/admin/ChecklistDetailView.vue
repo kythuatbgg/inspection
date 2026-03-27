@@ -195,9 +195,14 @@
 import { ChevronLeft, Plus, FileEdit, Trash2, Lock, AlertTriangle, Loader2, ClipboardList } from 'lucide-vue-next'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import checklistService from '@/services/checklistService.js'
+import { useToast } from '@/composables/useToast'
 
 const route = useRoute()
+const router = useRouter()
+const { t } = useI18n()
+const { success, error: toastError } = useToast()
 const router = useRouter()
 
 const loading = ref(true)
@@ -251,10 +256,11 @@ const saveInfo = async () => {
   savingInfo.value = true
   try {
     await checklistService.updateChecklist(checklist.value.id, infoForm.value)
+    success(t('common.save'))
     editingInfo.value = false
     await fetchChecklist()
   } catch (e) {
-    alert(e.response?.data?.message || 'Không thể cập nhật')
+    toastError(e.response?.data?.message || t('common.errorOccurred'))
   } finally {
     savingInfo.value = false
   }
@@ -292,7 +298,7 @@ const saveItem = async () => {
     showItemForm.value = false
     await fetchChecklist()
   } catch (e) {
-    alert(e.response?.data?.message || 'Không thể lưu hạng mục')
+    toastError(e.response?.data?.message || t('common.errorOccurred'))
   } finally {
     savingItem.value = false
   }
@@ -304,7 +310,7 @@ const handleDeleteItem = async (item) => {
     await checklistService.deleteItem(checklist.value.id, item.id)
     await fetchChecklist()
   } catch (e) {
-    alert(e.response?.data?.message || 'Không thể xóa hạng mục')
+    toastError(e.response?.data?.message || t('common.errorOccurred'))
   }
 }
 
@@ -312,10 +318,10 @@ const handleClone = async () => {
   if (!confirm(`Clone checklist "${checklist.value.name}" ra bản mới?`)) return
   try {
     const res = await checklistService.cloneChecklist(checklist.value.id)
-    alert(res.message || 'Clone thành công!')
+    success(t('checklist.cloneSuccess'))
     router.push({ name: 'admin-checklist-detail', params: { id: res.data.id } })
   } catch (e) {
-    alert(e.response?.data?.message || 'Không thể clone')
+    toastError(e.response?.data?.message || t('checklist.cloneError'))
   }
 }
 
@@ -325,7 +331,7 @@ const handleDeleteChecklist = async () => {
     await checklistService.deleteChecklist(checklist.value.id)
     router.push({ name: 'admin-checklists' })
   } catch (e) {
-    alert(e.response?.data?.message || 'Không thể xóa')
+    toastError(e.response?.data?.message || t('checklist.deleteError'))
   }
 }
 

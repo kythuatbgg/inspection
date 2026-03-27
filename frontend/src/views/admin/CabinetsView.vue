@@ -477,8 +477,10 @@ import cabinetService from '@/services/cabinetService.js'
 import CabinetFormModal from '@/components/admin/CabinetFormModal.vue'
 import CabinetMap from '@/components/admin/CabinetMap.vue'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const perPageOptions = [
   { value: 10, label: '10' },
@@ -588,13 +590,13 @@ const downloadTemplate = async () => {
     downloadBlob(blob, 'cabinet_template.xlsx')
   } catch (requestError) {
     console.error('Download template failed:', requestError)
-    alert(t('cabinet.downloadTemplateError'))
+    toastError(t('cabinet.downloadTemplateError'))
   }
 }
 
 const downloadImportResult = async () => {
   if (!importResult.value?.exportToken) {
-    alert(t('cabinet.downloadResultError'))
+    toastError(t('cabinet.downloadResultError'))
     return
   }
 
@@ -603,7 +605,7 @@ const downloadImportResult = async () => {
     downloadBlob(blob, 'import_results.csv')
   } catch (requestError) {
     console.error('Download result failed:', requestError)
-    alert(t('cabinet.downloadResultError'))
+    toastError(t('cabinet.downloadResultError'))
   }
 }
 
@@ -648,7 +650,7 @@ const deleteCabinet = async (cabinet) => {
     await fetchCabinets()
   } catch (requestError) {
     console.error(requestError)
-    alert(t('cabinet.deleteError'))
+    toastError(t('cabinet.deleteError'))
   }
 }
 
@@ -750,7 +752,7 @@ const exportCabinets = async () => {
     downloadBlob(blob, 'cabinets.csv')
   } catch (requestError) {
     console.error(requestError)
-    alert(t('cabinet.exportFailed'))
+    toastError(t('cabinet.exportFailed'))
   }
 }
 

@@ -216,7 +216,9 @@
     "removeAccount": "Xóa account",
     "cabinetSelectedCount": "{count} tủ đã chọn",
     "noAccounts": "Không có account",
-    "noAccountsHint": "Chưa có account nào. Bấm \"{action}\" để thêm."
+    "noAccountsHint": "Chưa có account nào. Bấm \"{action}\" để thêm.",
+    "created": "Tạo lô kiểm tra thành công",
+    "proposalCreated": "Gửi đề xuất thành công"
   },
 
   "batchDetail": {
@@ -370,7 +372,9 @@
     "editCabinet": "Sửa tủ cáp",
     "addCabinet": "Thêm tủ cáp mới",
     "latitude": "Vĩ độ (Lat)",
-    "longitude": "Kinh độ (Lng)"
+    "longitude": "Kinh độ (Lng)",
+    "created": "Tạo tủ thành công",
+    "updated": "Cập nhật tủ thành công"
   },
 
   "checklist": {
@@ -426,7 +430,10 @@
     "roleField": "Vai trò",
     "deleteConfirm": "Bạn có chắc muốn xóa người dùng",
     "userItems": "người dùng",
-    "inTotalAccounts": "trong tổng số {total} tài khoản"
+    "inTotalAccounts": "trong tổng số {total} tài khoản",
+    "created": "Tạo tài khoản thành công",
+    "updated": "Cập nhật tài khoản thành công",
+    "deleted": "Xóa tài khoản thành công"
   },
 
   "settings": {

@@ -124,9 +124,11 @@ import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api.js'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
+const { success, error: toastError } = useToast()
 
 const form = reactive({
   name: '',
@@ -182,8 +184,10 @@ const updateProfile = async () => {
 
     success.value = t('profile.updateSuccess')
     setTimeout(() => success.value = '', 3000)
+    success(t('profile.updateSuccess'))
   } catch (e) {
     error.value = e.response?.data?.message || t('common.errorOccurred')
+    toastError(t('common.errorOccurred'))
   } finally {
     saving.value = false
   }
@@ -212,8 +216,10 @@ const changePassword = async () => {
     passwordForm.password = ''
     passwordForm.password_confirmation = ''
     setTimeout(() => passwordSuccess.value = '', 3000)
+    success(t('profile.passwordSuccess'))
   } catch (e) {
     passwordError.value = e.response?.data?.message || t('common.errorOccurred')
+    toastError(t('common.errorOccurred'))
   } finally {
     changingPassword.value = false
   }

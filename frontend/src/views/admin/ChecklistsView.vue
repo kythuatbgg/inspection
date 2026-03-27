@@ -157,8 +157,10 @@ import { Plus, Loader2, AlertTriangle } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import checklistService from '@/services/checklistService.js'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const loading = ref(true)
 const checklists = ref([])
@@ -192,7 +194,7 @@ const handleCreate = async () => {
     createForm.value = { name: '', min_pass_score: 70, max_critical_allowed: 0 }
     await fetchChecklists()
   } catch (e) {
-    alert(e.response?.data?.message || t('checklist.createError'))
+    toastError(e.response?.data?.message || t('checklist.createError'))
   } finally {
     creating.value = false
   }
@@ -202,10 +204,10 @@ const cloneChecklist = async (c) => {
   if (!confirm(t('checklist.cloneConfirm', { name: c.name }))) return
   try {
     const res = await checklistService.cloneChecklist(c.id)
-    alert(res.message || t('checklist.cloneSuccess'))
+    success(res.message || t('checklist.cloneSuccess'))
     await fetchChecklists()
   } catch (e) {
-    alert(e.response?.data?.message || t('checklist.cloneError'))
+    toastError(e.response?.data?.message || t('checklist.cloneError'))
   }
 }
 
@@ -222,7 +224,7 @@ const handleDelete = async () => {
     showDeleteConfirm.value = false
     await fetchChecklists()
   } catch (e) {
-    alert(e.response?.data?.message || t('checklist.deleteError'))
+    toastError(e.response?.data?.message || t('checklist.deleteError'))
   } finally {
     deleting.value = false
   }

@@ -97,7 +97,12 @@
 import { Loader2, X } from 'lucide-vue-next'
 
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import cabinetService from '@/services/cabinetService'
+import { useToast } from '@/composables/useToast'
+
+const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -158,14 +163,17 @@ const handleSubmit = async () => {
 
     if (isEdit.value) {
       await cabinetService.updateCabinet(props.cabinet.cabinet_code, data)
+      success(t('cabinet.updated'))
     } else {
       await cabinetService.createCabinet(data)
+      success(t('cabinet.created'))
     }
 
     emit('saved')
     close()
   } catch (err) {
-    error.value = err.response?.data?.message || err.response?.data?.error || 'Có lỗi xảy ra. Vui lòng thử lại.'
+    error.value = err.response?.data?.message || err.response?.data?.error || t('common.errorOccurred')
+    toastError(t('common.errorOccurred'))
   } finally {
     loading.value = false
   }

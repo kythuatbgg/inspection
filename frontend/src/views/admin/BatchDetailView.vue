@@ -100,9 +100,9 @@
         <div v-if="batch.type === 'deployment'" class="space-y-2">
           <h4 class="text-sm font-semibold text-slate-700">{{ $t('batch.accounts') }}</h4>
           <div class="border border-slate-200 rounded-lg overflow-hidden divide-y divide-slate-100">
-            <div v-for="account in batch.accounts || []" :key="account.account_code" class="px-4 py-3 flex items-center justify-between bg-slate-50/60">
-              <span class="font-medium text-slate-800 text-sm">{{ account.account_code }}</span>
-              <span class="text-xs text-slate-500">{{ account.cabinet_codes?.length || 0 }} tủ</span>
+            <div v-for="account in batch.accounts || []" :key="account.account_code" class="px-4 py-3 bg-slate-50/60 space-y-1.5">
+              <p class="font-medium text-slate-800 text-sm">{{ account.account_code }}</p>
+              <p class="text-xs text-slate-500 break-words">{{ formatCabinetCodes(account.cabinet_codes) }}</p>
             </div>
             <div v-if="!(batch.accounts && batch.accounts.length)" class="px-4 py-3 text-sm text-slate-500 text-center">
               {{ $t('batch.noAccounts') }}
@@ -188,11 +188,11 @@
                 <td class="px-5 py-4">
                   <h4 class="font-bold text-slate-900 text-sm mb-1">{{ item.cabinet_code }}</h4>
                   <div class="flex items-center gap-2">
-                    <span v-if="item.cabinet?.area" class="text-xs text-slate-500">{{ item.cabinet.area }}</span>
+                    <span class="text-xs text-slate-500">{{ $t('batch.accountCode') }}: {{ getAccountCodeForCabinet(item.cabinet_code) }}</span>
+                    <span v-if="item.cabinet?.area" class="text-xs text-slate-500">• {{ item.cabinet.area }}</span>
                     <a v-if="item.cabinet?.lat && item.cabinet?.lng" :href="`https://www.google.com/maps?q=${item.cabinet.lat},${item.cabinet.lng}`" target="_blank" class="inline-flex items-center text-blue-500 hover:text-primary-600 transition-colors" :title="$t('batchDetail.viewMap')">
                       <MapPin class="w-4 h-4" />
                     </a>
-                    <span v-if="!item.cabinet?.area && (!item.cabinet?.lat || !item.cabinet?.lng)" class="text-xs text-slate-400">—</span>
                   </div>
                 </td>
                 <td class="px-5 py-4">
@@ -276,12 +276,12 @@
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <h4 class="font-bold text-slate-900">{{ item.cabinet_code }}</h4>
-                <div class="flex items-center gap-2 mt-0.5">
-                  <span v-if="item.cabinet?.area" class="text-sm text-slate-500">{{ item.cabinet.area }}</span>
+                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                  <span class="text-sm text-slate-500">{{ $t('batch.accountCode') }}: {{ getAccountCodeForCabinet(item.cabinet_code) }}</span>
+                  <span v-if="item.cabinet?.area" class="text-sm text-slate-500">• {{ item.cabinet.area }}</span>
                   <a v-if="item.cabinet?.lat && item.cabinet?.lng" :href="`https://www.google.com/maps?q=${item.cabinet.lat},${item.cabinet.lng}`" target="_blank" class="inline-flex items-center text-blue-500 hover:text-primary-600 transition-colors p-1 -m-1" :title="$t('batchDetail.viewMap')">
                     <MapPin class="w-4.5 h-4.5" />
                   </a>
-                  <span v-if="!item.cabinet?.area && (!item.cabinet?.lat || !item.cabinet?.lng)" class="text-sm text-slate-400">—</span>
                 </div>
               </div>
               <div class="flex items-center gap-2 shrink-0">
@@ -654,10 +654,13 @@ import batchService from '@/services/batchService.js'
 import cabinetService from '@/services/cabinetService.js'
 import InspectionDetailReadonly from '@/components/inspection/InspectionDetailReadonly.vue'
 import { getDateLocale } from '@/i18n'
+import { buildCabinetAccountMap, findAccountCodeByCabinet, formatCabinetCodes } from '@/utils/deploymentBatchAccounts.js'
+import { useToast } from '@/composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const loading = ref(true)
 const error = ref(null)
@@ -754,12 +757,12 @@ const submitAddCabinets = async () => {
   addingCabinets.value = true
   try {
     const res = await batchService.addCabinetsToBatch(batch.value.id, selectedCabinetCodes.value)
-    alert(res.message || t('batchDetail.addedSuccess'))
+    success(res.message || t('batchDetail.addedSuccess'))
     closeAddCabinetModal()
     await fetchBatch()
     await fetchResults()
   } catch (error) {
-    alert(error.response?.data?.message || t('batchDetail.errorAddCabinet'))
+    toastError(error.response?.data?.message || t('batchDetail.errorAddCabinet'))
   } finally {
     addingCabinets.value = false
   }
@@ -802,12 +805,12 @@ const confirmDelete = async () => {
       deleteTarget.value.plan_id,
       deleteTarget.value.hasInspection // force = true if has inspection
     )
-    alert(res.message || t('batchDetail.deletedSuccess'))
+    success(res.message || t('batchDetail.deletedSuccess'))
     showDeleteConfirm.value = false
     await fetchBatch()
     await fetchResults()
   } catch (err) {
-    alert(err.response?.data?.message || t('batchDetail.errorDeleteCabinet'))
+    toastError(err.response?.data?.message || t('batchDetail.errorDeleteCabinet'))
   } finally {
     deleting.value = false
   }
@@ -868,12 +871,12 @@ const confirmSwap = async () => {
       swapSelectedCode.value,
       swapTarget.value.hasInspection // force = true if has inspection
     )
-    alert(res.message || t('batchDetail.swappedSuccess'))
+    success(res.message || t('batchDetail.swappedSuccess'))
     showSwapModal.value = false
     await fetchBatch()
     await fetchResults()
   } catch (err) {
-    alert(err.response?.data?.message || t('batchDetail.errorSwapCabinet'))
+    toastError(err.response?.data?.message || t('batchDetail.errorSwapCabinet'))
   } finally {
     swapping.value = false
   }
@@ -913,6 +916,12 @@ const progressBarColor = computed(() => {
   return 'bg-primary-500'
 })
 
+const cabinetAccountMap = computed(() => buildCabinetAccountMap(batch.value?.accounts || []))
+
+const getAccountCodeForCabinet = (cabinetCode) => {
+  return findAccountCodeByCabinet(cabinetAccountMap.value, cabinetCode)
+}
+
 // Can close: all inspected + all reviewed
 const canClose = computed(() => {
   if (!summary.value) return false
@@ -945,10 +954,10 @@ const handleApproveBatch = async () => {
   approvingBatch.value = true
   try {
     await batchService.approveBatch(batch.value.id)
-    alert(t('batchDetail.approvedSuccess'))
+    success(t('batchDetail.approvedSuccess'))
     await fetchBatch()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorApprove'))
+    toastError(e.response?.data?.message || t('batchDetail.errorApprove'))
   } finally {
     approvingBatch.value = false
   }
@@ -961,17 +970,17 @@ const openRejectBatchModal = () => {
 
 const confirmRejectBatch = async () => {
   if (!rejectBatchReason.value.trim()) {
-    alert(t('batchDetail.rejectReasonEmpty'))
+    toastError(t('batchDetail.rejectReasonEmpty'))
     return
   }
   rejectingBatch.value = true
   try {
     await batchService.rejectBatch(batch.value.id, rejectBatchReason.value)
-    alert(t('batchDetail.rejectedSuccess'))
+    success(t('batchDetail.rejectedSuccess'))
     showRejectBatchModal.value = false
     await fetchBatch()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorReject'))
+    toastError(e.response?.data?.message || t('batchDetail.errorReject'))
   } finally {
     rejectingBatch.value = false
   }
@@ -993,10 +1002,11 @@ const handleEdit = async () => {
   saving.value = true
   try {
     await batchService.updateBatch(batch.value.id, editForm.value)
+    success(t('common.save'))
     showEditModal.value = false
     await fetchBatch()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorUpdate'))
+    toastError(e.response?.data?.message || t('batchDetail.errorUpdate'))
   } finally {
     saving.value = false
   }
@@ -1009,7 +1019,7 @@ const handleDelete = async () => {
     await batchService.deleteBatch(batch.value.id, true)
     router.push({ name: 'admin-batches' })
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorDelete'))
+    toastError(e.response?.data?.message || t('batchDetail.errorDelete'))
   }
 }
 
@@ -1019,7 +1029,7 @@ const reviewPlan = async (planId, status) => {
     await batchService.reviewPlan(planId, { review_status: status })
     await fetchResults()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorAction'))
+    toastError(e.response?.data?.message || t('batchDetail.errorAction'))
   }
 }
 
@@ -1036,11 +1046,11 @@ const approveAllPending = async () => {
         await batchService.reviewPlan(item.plan_id, { review_status: 'approved' })
         successCount++
       }
-      alert(t('batchDetail.approvedAllSuccess', { count: successCount }))
+      success(t('batchDetail.approvedAllSuccess', { count: successCount }))
       await fetchResults()
     } catch (e) {
       console.error(e)
-      alert(e.response?.data?.message || t('batchDetail.errorBulkApprove'))
+      toastError(e.response?.data?.message || t('batchDetail.errorBulkApprove'))
       await fetchResults()
     } finally {
       loading.value = false
@@ -1065,7 +1075,7 @@ const confirmReject = async () => {
     showRejectModal.value = false
     await fetchResults()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorRejectAction'))
+    toastError(e.response?.data?.message || t('batchDetail.errorRejectAction'))
   }
 }
 
@@ -1075,11 +1085,11 @@ const handleClose = async () => {
   closing.value = true
   try {
     const res = await batchService.closeBatch(batch.value.id)
-    alert(`✅ ${res.message}\n\nĐạt: ${res.summary.approved}\nTừ chối: ${res.summary.rejected}`)
+    success(`${res.message} — Đạt: ${res.summary.approved}, Từ chối: ${res.summary.rejected}`)
     await fetchBatch()
     await fetchResults()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorClose'))
+    toastError(e.response?.data?.message || t('batchDetail.errorClose'))
   } finally {
     closing.value = false
   }
@@ -1091,11 +1101,11 @@ const handleReopen = async () => {
   reopening.value = true
   try {
     await batchService.reopenBatch(batch.value.id)
-    alert(t('batchDetail.reopenedSuccess'))
+    success(t('batchDetail.reopenedSuccess'))
     await fetchBatch()
     await fetchResults()
   } catch (e) {
-    alert(e.response?.data?.message || t('batchDetail.errorReopen'))
+    toastError(e.response?.data?.message || t('batchDetail.errorReopen'))
   } finally {
     reopening.value = false
   }

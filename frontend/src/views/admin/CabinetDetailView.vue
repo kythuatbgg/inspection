@@ -206,6 +206,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import cabinetService from '@/services/cabinetService.js'
 import { getDateLocale } from '@/i18n'
+import { useToast } from '@/composables/useToast'
+
+const { error: toastError } = useToast()
 
 const route = useRoute()
 const router = useRouter()
@@ -279,7 +282,7 @@ const deleteCabinet = async () => {
     await cabinetService.deleteCabinet(route.params.code)
     router.push('/admin/cabinets')
   } catch (e) {
-    alert(e.response?.data?.message || 'Xóa thất bại')
+    toastError(e.response?.data?.message || t('cabinet.deleteError'))
   } finally {
     deleting.value = false
     showDelete.value = false

@@ -105,8 +105,10 @@ import { Trash2, Loader2, RefreshCw, Server } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import api from '@/services/api'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const loading = ref(true)
 const stats = ref(null)
@@ -137,10 +139,12 @@ const runCleanup = async () => {
   try {
     const res = await api.post('/admin/storage-cleanup', { hours: cleanupHours.value })
     cleanupMessage.value = res.data?.message || t('settings.cleanupComplete')
+    success(t('settings.cleanupComplete'))
     // Refresh stats
     await fetchStats()
   } catch (e) {
     cleanupMessage.value = 'error: ' + (e.response?.data?.message || t('settings.cleanupError'))
+    toastError(t('settings.cleanupError'))
   } finally {
     cleaningUp.value = false
   }

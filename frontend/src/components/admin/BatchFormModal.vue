@@ -270,12 +270,14 @@ import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 import MobileDatePicker from '@/components/common/MobileDatePicker.vue'
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false }
 })
 
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const emit = defineEmits(['update:modelValue', 'saved'])
 
@@ -451,16 +453,17 @@ const handleSubmit = async () => {
     emit('saved')
     close()
     resetForm()
+    success(t('batch.created'))
   } catch (e) {
+    toastError(e.response?.data?.message || t('common.errorOccurred'))
     const res = e.response?.data
     if (res?.errors) {
       fieldErrors.value = res.errors
       const allErrors = Object.values(res.errors).flat()
       formError.value = allErrors.join('\n')
     } else {
-      formError.value = res?.message || 'Không thể tạo lô kiểm tra'
+      formError.value = res?.message || t('common.errorOccurred')
     }
-    console.error(e)
   } finally {
     submitting.value = false
   }

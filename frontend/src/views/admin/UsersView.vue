@@ -352,9 +352,12 @@
               <input v-model="form.email" type="email" class="input-field min-h-[52px]" required>
             </div>
 
-            <div v-if="!editingUser">
+            <div>
               <label class="block text-sm font-medium text-slate-700 mb-2">{{ $t('user.passwordField') }}</label>
               <input v-model="form.password" type="password" class="input-field min-h-[52px]" :required="!editingUser">
+              <p v-if="editingUser" class="mt-2 text-xs text-slate-500">
+                Để trống nếu không đổi mật khẩu.
+              </p>
             </div>
 
             <div>
@@ -419,8 +422,10 @@ import { useI18n } from 'vue-i18n'
 import { getDateLocale } from '@/i18n'
 import userService from '@/services/userService.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const roleFilterOptions = computed(() => [
   { value: '', label: t('user.allRoles') },
@@ -584,22 +589,26 @@ const saveUser = async () => {
 
   try {
     if (editingUser.value) {
+      const nextPassword = form.value.password.trim()
       const data = {
         name: form.value.name,
         email: form.value.email,
         role: form.value.role
       }
 
-      if (form.value.password) data.password = form.value.password
+      if (nextPassword) data.password = nextPassword
       await userService.updateUser(editingUser.value.id, data)
+      success(t('user.updated'))
     } else {
       await userService.createUser(form.value)
+      success(t('user.created'))
     }
 
     closeModal()
     await Promise.all([fetchUsers(), fetchStats()])
   } catch (e) {
     formError.value = e.response?.data?.message || t('common.errorOccurred')
+    toastError(t('common.errorOccurred'))
   } finally {
     saving.value = false
   }
@@ -617,6 +626,7 @@ const deleteUser = async () => {
     await userService.deleteUser(deletingUser.value.id)
     showDeleteConfirm.value = false
     deletingUser.value = null
+    success(t('user.deleted'))
 
     if (users.value.length === 1 && pagination.value.current_page > 1) {
       pagination.value.current_page -= 1
@@ -624,7 +634,7 @@ const deleteUser = async () => {
 
     await Promise.all([fetchUsers(), fetchStats()])
   } catch (e) {
-    alert(e.response?.data?.message || t('common.errorOccurred'))
+    toastError(e.response?.data?.message || t('common.errorOccurred'))
   } finally {
     deleting.value = false
   }

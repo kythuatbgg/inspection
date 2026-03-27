@@ -141,10 +141,15 @@
 <script setup>
 import { Search, X, Loader2 } from 'lucide-vue-next'
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import batchService from '@/services/batchService.js'
 import api from '@/services/api.js'
 import MobileBottomSheet from '@/components/common/MobileBottomSheet.vue'
 import MobileDatePicker from '@/components/common/MobileDatePicker.vue'
+import { useToast } from '@/composables/useToast'
+
+const { t } = useI18n()
+const { success, error: toastError } = useToast()
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false }
@@ -241,14 +246,17 @@ const handleSubmit = async () => {
     emit('saved')
     close()
     resetForm()
+    success(t('batch.proposalCreated'))
   } catch (e) {
     const res = e.response?.data
     if (res?.errors) {
       fieldErrors.value = res.errors
       const allErrors = Object.values(res.errors).flat()
       formError.value = allErrors.join('\n')
+      toastError(allErrors[0] || t('common.errorOccurred'))
     } else {
-      formError.value = res?.message || 'Không thể tạo đề xuất'
+      formError.value = res?.message || t('common.errorOccurred')
+      toastError(t('common.errorOccurred'))
     }
     console.error(e)
   } finally {
